@@ -15,9 +15,9 @@ void add(int i,int j,int c){
 }
 int query(int i,int j){
 	int sum=0,x=i,y=j;
-	while(x){
+	while(x>0){
 		y=j;
-		while(y){
+		while(y>0){
 			sum+=t[x][y];
 			y-=lowbit(y);
 		}
@@ -36,7 +36,7 @@ int main(){
 		}
 		else if(op==2){
 			cin>>l>>x>>r>>y;
-			cout<<query(r,y)-query(r,x)-query(l,y)+query(l,x)<<endl;
+			cout<<query(r,y)-query(r,x-1)-query(l-1,y)+query(l-1,x-1)<<endl;
 		}else{
 			break;
 		}
