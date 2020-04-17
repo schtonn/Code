@@ -1,26 +1,31 @@
-#include "bits/stdc++.h"
+#include "iostream"
 using namespace std;
-struct mengbier{
-	bool face;
-	string name;
-}toy[100010];
-int n,m,a,s,p;
-int sum[100010],gg[100010];
-int main(){
-	cin>>n>>m;
-	for(int i=0;i<n;i++){
-		cin>>toy[i].face>>toy[i].name;
+int t[500010], n, m, op, x, y;
+int lowbit(int x) { return x & -x; }
+void add(int i, int x) {
+	while (i <= n) {
+		t[i] += x;
+		i += lowbit(i);
 	}
-	for(int i=0;i<m;i++){
-		cin>>a>>s;
-		int f=toy[p].face;
-		p=(((!f)&&(!a))||(f&&a))?(p-s+n)%n:(p+s+n)%n;
-	}
-	cout<<toy[p].name<<endl;
-	for(int i = 1; i <= n; ++i) sum[i] = sum[i - 1] + gg[i];
-while(m--)
-{
-    int L, R; scanf("%d%d", &L, &R);
-    printf("%d\n", sum[R] - sum[L - 1]);
 }
+int query(int i) {
+	int sum=0;
+	while (i > 0) {
+		sum += t[i];
+		i -= lowbit(i);
+	}
+	return sum;
+}
+int main() {
+	cin >> n >> m;
+	for (int i = 1; i <= n; i++) {
+		cin >> op;
+		add(i, op);
+	}
+	for (int i = 1; i <= m; i++) {
+		cin >> op >> x >> y;
+		if (op == 1)add(x, y);
+		else cout << query(y) - query(x - 1) << endl;
+	}
+	return 0;
 }
