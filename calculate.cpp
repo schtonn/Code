@@ -23,8 +23,8 @@ struct node{
 	matrix sum,lazy;
 }t[4*N];
 ostream& operator<<(ostream& ous,matrix a){
-	for(long long i=0;i<a.x;i++){
-		for(long long j=0;j<a.y;j++){
+	for(int i=0;i<a.x;i++){
+		for(int j=0;j<a.y;j++){
 			ous<<a.v[i][j]<<' ';
 		}
 		ous<<endl;
@@ -52,11 +52,10 @@ void clear(matrix &a){
 matrix operator+(matrix a,matrix b){
 	matrix c;
 	if(a.x!=b.x||a.y!=b.y)return c;
-	long long x=a.x,y=a.y;
+	int x=a.x,y=a.y;
 	c.x=x;c.y=y;
-	for(long long i=0;i<x;i++){
-		for(long long j=0;j<y;j++){
-			c.v[i][j]=0;
+	for(int i=0;i<x;i++){
+		for(int j=0;j<y;j++){
 			c.v[i][j]=a.v[i][j]+b.v[i][j]%mod;
 		}
 	}
@@ -64,17 +63,13 @@ matrix operator+(matrix a,matrix b){
 }
 matrix operator*(matrix a,matrix b){
 	matrix c;
- 	if(a.y!=b.x){
-		cout<<"multiply error"<<endl;
-		cout<<a<<"*"<<endl<<b;
-		return a;
-	}
-	long long x=a.x,y=b.y,z=a.y;
+	if(a.y!=b.x)return c;
+	int x=a.x,y=b.y,z=a.y;
 	c.x=x;c.y=y;
-	for(long long i=0;i<x;i++){
-		for(long long j=0;j<y;j++){
+	for(int i=0;i<x;i++){
+		for(int j=0;j<y;j++){
 			c.v[i][j]=0;
-			for(long long k=0;k<z;k++){
+			for(int k=0;k<z;k++){
 				c.v[i][j]=(c.v[i][j]+a.v[i][k]*b.v[k][j]+mod)%mod;
 			}
 		}
@@ -155,13 +150,13 @@ matrix query(int id,int l,int r){
 	}
 }
 void init(){
-	for(long long i=0;i<c1.x;i++){
-		for(long long j=0;j<c1.y;j++){
+	for(int i=0;i<c1.x;i++){
+		for(int j=0;j<c1.y;j++){
 			c1.v[i][j]=base1[i][j];
 		}
 	}
-	for(long long i=0;i<c2.x;i++){
-		for(long long j=0;j<c2.y;j++){
+	for(int i=0;i<c2.x;i++){
+		for(int j=0;j<c2.y;j++){
 			c2.v[i][j]=base2[i][j];
 		}
 	}
