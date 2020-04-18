@@ -4,9 +4,9 @@ int t[1034][1034],n,m,op,l,r,x,y,c;
 int lowbit(int x){return x&-x;}
 void add(int x,int y,int c){
 	int i=x,j=y;
-	while(i<n){
+	while(i<=n){
 		j=y;
-		while(j<n){
+		while(j<=n){
 			t[i][j]+=c;
 			j+=lowbit(j);
 		}
@@ -32,11 +32,11 @@ int main(){
 			cin>>n;
 		}else if(op==1){
 			cin>>x>>y>>c;
-			add(x,y,c);
+			add(x+1,y+1,c);
 		}
 		else if(op==2){
 			cin>>l>>x>>r>>y;
-			cout<<query(r,y)-query(r,x-1)-query(l-1,y)+query(l-1,x-1)<<endl;
+			cout<<query(r+1,y+1)-query(r+1,x)-query(l,y+1)+query(l,x)<<endl;
 		}else{
 			break;
 		}
