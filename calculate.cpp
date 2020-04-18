@@ -41,10 +41,12 @@ bool check(matrix a){
 	return flag;
 }
 void clear(matrix &a){
-	int f=max(a.x,a.y);
-	for(int i=0;i<f;i++){
-		for(int j=0;j<f;j++){
-			if(i==j)a.v[i][j]=1;
+	int flag;
+	if(a.x==a.y)flag=0;
+	else flag=1;
+	for(int i=0;i<a.x;i++){
+		for(int j=0;j<a.y;j++){
+			if(i==j||flag)a.v[i][j]=1;
 			else a.v[i][j]=0;
 		}
 	}
