@@ -2,26 +2,26 @@
 using namespace std;
 int t[1034][1034],n,m,op,l,r,x,y,c;
 int lowbit(int x){return x&-x;}
-void add(int i,int j,int c){
-	int x=i,y=j;
-	while(x<n){
-		y=j;
-		while(y<n){
-			t[x][y]+=c;
-			y+=lowbit(y);
+void add(int x,int y,int c){
+	int i=x,j=y;
+	while(i<n){
+		j=y;
+		while(j<n){
+			t[i][j]+=c;
+			j+=lowbit(j);
 		}
-		x+=lowbit(x);
+		i+=lowbit(i);
 	}
 }
-int query(int i,int j){
-	int sum=0,x=i,y=j;
-	while(x>0){
-		y=j;
-		while(y>0){
-			sum+=t[x][y];
-			y-=lowbit(y);
+int query(int x,int y){
+	int sum=0,i=x,j=y;
+	while(i>0){
+		j=y;
+		while(j>0){
+			sum+=t[i][j];
+			j-=lowbit(j);
 		}
-		x-=lowbit(x);
+		i-=lowbit(i);
 	}
 	return sum;
 }
