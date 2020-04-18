@@ -1,15 +1,18 @@
 #include "iostream"
 using namespace std;
-#define N 100010
+#define N 1010
 #define lson id << 1
 #define rson id << 1 | 1
-#define modd 10301
+#define mod 10301
 int a[N], b[N], n, m, op, x, y, k;
 int base1[3][3] = {
 	{1, 1, 2},
 	{0, 1, 0},
-	{0, 1, 1}},
-	base2[3][3] = {{1, 0, 0}, {0, 1, 2}, {1, 0, 1}};
+	{0, 1, 1}};
+int base2[3][3] = {
+	{1, 0, 0},
+	{1, 1, 2},
+	{1, 0, 1}};
 struct matrix
 {
 	int v[3][3];
@@ -69,7 +72,7 @@ matrix operator+(matrix a, matrix b)
 	{
 		for (int j = 0; j < y; j++)
 		{
-			c.v[i][j] = (a.v[i][j] + b.v[i][j]) % modd;
+			c.v[i][j] = (a.v[i][j] + b.v[i][j]) % mod;
 		}
 	}
 	return c;
@@ -89,7 +92,7 @@ matrix operator*(matrix a, matrix b)
 			c.v[i][j] = 0;
 			for (int k = 0; k < z; k++)
 			{
-				c.v[i][j] = (c.v[i][j] + a.v[i][k] * b.v[k][j] + modd) % modd;
+				c.v[i][j] = (c.v[i][j] + a.v[i][k] * b.v[k][j] + mod) % mod;
 			}
 		}
 	}
@@ -124,9 +127,9 @@ void buildtree(int id, int l, int r)
 	t[id].sum.y = 1;
 	if (l == r)
 	{
-		t[id].sum.v[0][0] = (a[l] * a[l]) % modd;
-		t[id].sum.v[1][0] = (b[l] * b[l]) % modd;
-		t[id].sum.v[2][0] = (a[l] * b[l]) % modd;
+		t[id].sum.v[0][0] = (a[l] * a[l]) % mod;
+		t[id].sum.v[1][0] = (b[l] * b[l]) % mod;
+		t[id].sum.v[2][0] = (a[l] * b[l]) % mod;
 		return;
 	}
 	int mid = (l + r) >> 1;
@@ -176,7 +179,7 @@ matrix query(int id, int l, int r)
 {
 	if (t[id].l >= l && t[id].r <= r)
 	{
-		return t[id].lazy * t[id].sum;
+		return t[id].sum;
 	}
 	pushdown(id);
 	if (t[lson].r >= r)
@@ -207,12 +210,16 @@ void init()
 }
 int main()
 {
+	freopen("testdata.in", "r", stdin);
+	freopen("testdata.out", "w", stdout);
 	c1.x = c1.y = c2.x = c2.y = 3;
 	init();
 	cin >> n >> m;
 	for (int i = 1; i <= n; i++)
 	{
 		cin >> a[i] >> b[i];
+		a[i] %= mod;
+		b[i] %= mod;
 	}
 	buildtree(1, 1, n);
 	for (int i = 1; i <= m; i++)
@@ -223,7 +230,7 @@ int main()
 		else if (op == 2)
 			change2(1, x, y);
 		else
-			cout << query(1, x, y).v[2][0] % modd << endl;
+			cout << query(1, x, y).v[2][0] % mod << endl;
 	}
 	return 0;
 }
