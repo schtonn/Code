@@ -41,12 +41,9 @@ bool check(matrix a){
 	return flag;
 }
 void clear(matrix &a){
-	int flag;
-	if(a.x==a.y)flag=0;
-	else flag=1;
 	for(int i=0;i<a.x;i++){
 		for(int j=0;j<a.y;j++){
-			if(i==j||flag)a.v[i][j]=1;
+			if(i==j)a.v[i][j]=1;
 			else a.v[i][j]=0;
 		}
 	}
@@ -58,7 +55,7 @@ matrix operator+(matrix a,matrix b){
 	c.x=x;c.y=y;
 	for(int i=0;i<x;i++){
 		for(int j=0;j<y;j++){
-			c.v[i][j]=a.v[i][j]+b.v[i][j]%mod;
+			c.v[i][j]=(a.v[i][j]+b.v[i][j])%mod;
 		}
 	}
 	return c;
@@ -98,13 +95,12 @@ void buildtree(int id,int l,int r){
 	t[id].r=r;
 	t[id].lazy.x=t[id].lazy.y=3;
 	clear(t[id].lazy);
-	clear(t[id].sum);
 	t[id].sum.x=3;
 	t[id].sum.y=1;
 	if(l==r){
-		t[id].sum.v[0][0]=a[l]*a[l];
-		t[id].sum.v[1][0]=b[l]*b[l];
-		t[id].sum.v[2][0]=a[l]*b[l];
+		t[id].sum.v[0][0]=a[l]*a[l]%mod;
+		t[id].sum.v[1][0]=b[l]*b[l]%mod;
+		t[id].sum.v[2][0]=a[l]*b[l]%mod;
 		return;
 	}
 	int mid=(l+r)>>1;
@@ -172,19 +168,10 @@ int main(){
 	}
 	buildtree(1,1,n);
 	for(int i=1;i<=m;i++){
-		cin>>op;
-		if(op==1){
-			cin>>x>>y;
-			change1(1,x,y);
-		}
-		else if(op==2){
-			cin>>x>>y;
-			change2(1,x,y);
-		}
-		else{
-			cin>>x>>y;
-			cout<<query(1,x,y).v[2][0]%mod<<endl;
-		}
+		cin>>op>>x>>y;
+		if(op==1)change1(1,x,y);
+		else if(op==2)change2(1,x,y);
+		else cout<<query(1,x,y).v[2][0]%mod<<endl;
 	}
 	return 0;
 }
