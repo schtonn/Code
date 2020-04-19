@@ -1,45 +1,24 @@
-#include"iostream"
+#include "bits/stdc++.h"
 using namespace std;
-int t[1034][1034],n,m,op,l,r,x,y,c;
-int lowbit(int x){return x&-x;}
-void add(int x,int y,int c){
-	int i=x,j=y;
-	while(i<=n){
-		j=y;
-		while(j<=n){
-			t[i][j]+=c;
-			j+=lowbit(j);
-		}
-		i+=lowbit(i);
-	}
-}
-int query(int x,int y){
-	int sum=0,i=x,j=y;
-	while(i>0){
-		j=y;
-		while(j>0){
-			sum+=t[i][j];
-			j-=lowbit(j);
-		}
-		i-=lowbit(i);
-	}
-	return sum;
-}
+int a[200],b[200];
 int main(){
-	while(true){
-		cin>>op;
-		if(op==0){
-			cin>>n;
-		}else if(op==1){
-			cin>>x>>y>>c;
-			add(x+1,y+1,c);
-		}
-		else if(op==2){
-			cin>>l>>x>>r>>y;
-			cout<<query(r+1,y+1)-query(r+1,x)-query(l,y+1)+query(l,x)<<endl;
-		}else{
-			break;
-		}
+	freopen("testdata.in","w",stdout);
+	srand(time(NULL));
+	cout<<10<<' '<<100<<endl;
+	for(int i=1;i<=10;i++){
+		a[i]=rand()%9+1;
+	}
+	for(int i=1;i<=10;i++){
+		b[i]=rand()%9+1;
+	}
+	for(int i=1;i<=10;i++){
+		cout<<a[i]<<' '<<b[i]<<endl;
+	}
+	for(int i=1;i<=100;i++){
+		int op=rand()%3+1;
+		int l=rand()%9+1,r=rand()%9+1;
+		if(l>r)swap(l,r);
+		cout<<op<<' '<<l<<' '<<r<<endl;
 	}
 	return 0;
 }
