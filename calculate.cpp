@@ -179,7 +179,7 @@ matrix query(int id, int l, int r)
 {
 	if (t[id].l >= l && t[id].r <= r)
 	{
-		return t[id].sum;
+		return t[id].lazy * t[id].sum;
 	}
 	pushdown(id);
 	if (t[lson].r >= r)
@@ -188,7 +188,7 @@ matrix query(int id, int l, int r)
 		return query(rson, l, r);
 	else
 	{
-		return (t[lson].lazy * query(lson, l, t[lson].r)) + (t[rson].lazy * query(rson, t[rson].l, r));
+		return (query(lson, l, t[lson].r)) + (query(rson, t[rson].l, r));
 	}
 }
 void init()
