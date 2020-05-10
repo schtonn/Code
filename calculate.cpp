@@ -21,7 +21,7 @@ int main(){
         // cout<<x<<endl<<y<<endl<<z<<endl;
 		bool fleg=1;
 		for(int j=0;j<len*2;j++){
-			if(z[i]!=y[i]){
+			if(z[j]!=y[j]){
 				fleg=0;
 				break;
 			}
