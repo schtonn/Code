@@ -12,11 +12,7 @@ int main(){
         cin>>u>>v;
         e[u][v]=true;
     }
-    for(int i=1;i<=n;i++){
-        dp[1<<(i-1)][i]=1;
-        special[1<<(i-1)][1]=-1;
-        special[1<<(i-1)][2]=i;
-    }
+    dp[1][1]=true;
     for(int s=1;s<(1<<n);++s){
         for(int p=1;p<=n;++p){
             if(s&(1<<(p-1))==0)continue;
@@ -31,15 +27,17 @@ int main(){
         }
     }
     int s=(1<<n)-1;
+    bool flag;
     do{
+        flag=1;
         for(int i=1;i<=n;i++){
             if(g[s][i]>0){
                 cout<<g[s][i]<<' ';
                 s-=(1<<(g[s][i]-1));
+                flag=0;
                 break;
             }
         }
-    }while(special[s][1]!=-1);
-    cout<<special[s][2]<<endl;
+    }while(s!=1&&flag==0);
     return 0;
 }
