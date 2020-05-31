@@ -37,12 +37,12 @@ int main(){
     }
     cout<<endl;
     int s=(1<<n)-1;
-    bool flag;
     stack<int>output;
     for(int i=1;i<=n;i++){
         cout<<dp[s][i]<<' ';
     }
     cout<<endl;
+    int flag=1;
     for(int i=1;i<=n;i++){
         if(dp[s][i]&&e[i][1]){
             int p=i;
@@ -53,8 +53,13 @@ int main(){
                 p=g[s][p];
                 s-=(1<<(t-1));
             }while(s!=1);
+            flag=0;
             break;
         }
+    }
+    if(flag=1){
+        cout<<-1<<endl;
+        return 0;
     }
     while(!output.empty()){
         cout<<output.top()<<' ';
