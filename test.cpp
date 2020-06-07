@@ -1,6 +1,6 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int N=1<<10;
+const int N=1<<6;
 const int M=100;
 const int mod=10007;
 int m,n;
@@ -21,18 +21,18 @@ bool T(int A,int B){
     return false;
 }
 struct matrix{
-	int v[N];
+	int v[N+10][N+10];
 	int x,y;
-}F[M];
-// ostream&operator<<(ostream&ous,matrix a){
-// 	for(int i=0;i<a.x;i++){
-// 		for(int j=0;j<a.y;j++){
-// 			ous<<a.v[i][j]<<' ';
-// 		}
-// 		ous<<endl;
-// 	}
-// 	return ous;
-// }
+}F[M],t,one;
+ostream&operator<<(ostream&ous,matrix a){
+	for(int i=0;i<a.x;i++){
+		for(int j=0;j<a.y;j++){
+			ous<<a.v[i][j]<<' ';
+		}
+		ous<<endl;
+	}
+	return ous;
+}
 // void clear(matrix &a){
 // 	for(int i=0;i<a.x;i++){
 // 		for(int j=0;j<a.y;j++){
@@ -41,40 +41,65 @@ struct matrix{
 // 		}
 // 	}
 // }
-// matrix operator+(matrix a,matrix b){
-// 	matrix c;
-// 	if(a.x!=b.x||a.y!=b.y)return c;
-// 	int x=a.x,y=a.y;
-// 	c.x=x;
-// 	c.y=y;
-// 	for(int i=0;i<x;i++){
-// 		for(int j=0;j<y;j++){
-// 			c.v[i][j]=(a.v[i][j]+b.v[i][j])%mod;
-// 		}
-// 	}
-// 	return c;
-// }
-// matrix operator*(matrix a,matrix b){
-// 	matrix c;
-// 	if(a.y!=b.x)return c;
-// 	int x=a.x,y=b.y,z=a.y;
-// 	c.x=x;
-// 	c.y=y;
-// 	for(int i=0;i<x;i++){
-// 		for(int j=0;j<y;j++){
-// 			c.v[i][j]=0;
-// 			for(int k=0;k<z;k++){
-// 				c.v[i][j]=(c.v[i][j]+a.v[i][k]*b.v[k][j]+mod)%mod;
-// 			}
-// 		}
-// 	}
-// 	return c;
-// }
+matrix operator+(matrix a,matrix b){
+	matrix c;
+	if(a.x!=b.x||a.y!=b.y)return c;
+	int x=a.x,y=a.y;
+	c.x=x;
+	c.y=y;
+	for(int i=0;i<x;i++){
+		for(int j=0;j<y;j++){
+			c.v[i][j]=(a.v[i][j]+b.v[i][j])%mod;
+		}
+	}
+	return c;
+}
+matrix operator*(matrix a,matrix b){
+	matrix c;
+	if(a.y!=b.x)return c;
+	int x=a.x,y=b.y,z=a.y;
+	c.x=x;
+	c.y=y;
+	for(int i=0;i<x;i++){
+		for(int j=0;j<y;j++){
+			c.v[i][j]=0;
+			for(int k=0;k<z;k++){
+				c.v[i][j]=(c.v[i][j]+a.v[i][k]*b.v[k][j]+mod)%mod;
+			}
+		}
+	}
+	return c;
+}
 void init(){
+    t.x=t.y=1<<n;
+    for(int i=0;i<=(1<<n)-1;i++){
+        for(int j=0;j<=(1<<n)-1;j++){
+            t.v[i][j]=T(i,j);
+            if(i==j)one.v[i][j]=1;
+        }
+        cout<<endl;
+    }
 }
 int main(){
     cin>>n>>m;
-    F[0].v[0]=1;
+    init();
+    for(int i=0;i<=(1<<n)-1;i++){
+        F[0].v[0][i]=1;
+    }
+    F[0].x=F[0].y=(1<<n);
+    cout<<F[0]<<t<<endl;
+    for(int i=1;i<=m;i++){
+        F[i]=t*F[i-1];
+        cout<<F[i]<<endl;
+    }
+    int cnt=m;
+    matrix ans=one;
+    while(cnt){
+        if(cnt&1)ans=ans*t;
+        t=t*t;
+        cnt>>=1;
+    }
+    ans=ans*F[0];
     // for(int i=1;i<=m;i++){//行数
     //     for(int cur=0;cur<=(1<<n)-1;cur++){//枚举本行状态(000~111)
     //         for(int pre=0;pre<=(1<<n)-1;pre++){//枚举上一行状态
