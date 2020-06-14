@@ -32,7 +32,11 @@ int main(){
     for(int i=1;i<=m;i++){
         cout<<fact(hole[i])<<endl;
     }
-    F[0][0]=1;
+    if(m==2){
+        F[0][hole[1]]=1;
+    }else{
+        F[0][0]=1;
+    }
     for(int i=1;i<=m;i++){//行数
         for(int B=0;B<=(1<<n)-1;B++){//枚举本行状态
             for(int A=0;A<=(1<<n)-1;A++){//枚举上一行状态
