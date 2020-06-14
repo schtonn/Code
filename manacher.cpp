@@ -1,20 +1,19 @@
 #include"bits/stdc++.h"
 using namespace std;
-int len,rad[1010];
+int len,rad[2000020];
 int maxid,maxr;
-char fakes[1010],s[2020];
-inline int min( int a, int b ){
-    return a < b ? a : b;
-}
+char fakes[1000010],s[2000020];
+// inline int min( int a, int b ){
+//     return a < b ? a : b;
+// }
 
 int main(){
     cin>>fakes;
     len=strlen(fakes);
     for(int i=0;i<=len*2;i+=2){
         s[i]='#';
-        s[i+1]=fakes[i/2];
+        s[i+1]=fakes[(i+1)/2];
     }
-    cout<<s<<endl;
     len=strlen(s);
     int l=0,r=-1;//区间边界
     for(int i=0;i<len;i++){
