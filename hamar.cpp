@@ -1,26 +1,44 @@
 #include "bits/stdc++.h"
 using namespace std;
-#define N 110
-string s;
-int dp[N][N],len;
-int main(){
-    memset(dp,0x3f3f3f3f,sizeof(dp));
-	for(int i=0;i<len;i++)dp[i][i]=0;
-    cin>>s;
-    len=s.length();
-    for(int add=0;add<len;add++){
-        for(int base=0;base<len;base++){
-            int l=base,r=base+add;
-            if(s[l]==s[r]){
-                if(add>1)dp[l][r]=min(dp[l][r],dp[l+1][r-1]);
-                else dp[l][r]=0;
-            }
-            dp[l][r]=min(dp[l][r],min(dp[l+1][r]+1,dp[l][r-1]+1));
-            if(add>1)dp[l][r]=min(dp[l][r],dp[l+1][r-1]+1);
-            else dp[l][r]=min(dp[l][r],1);
+#define N 121
+int J, K, n, s[N], e = -1, maxMuck, ans;
+int muck(int x)
+{
+    return x / J + (x % J ? 1 : 0);
+}
+int main()
+{
+    cin >> n;
+    for (int i = 0; i < n; i++)
+    {
+        cin >> s[i];
+    }
+    cin >> K >> J;
+    for (int i = 0; i < n; i++)
+    {
+        if ((s[i] >= K) && (muck(s[i]) - muck(s[i] - K) > maxMuck))
+        {
+            e = i;
+            maxMuck = muck(s[i]) - muck(s[i] - K);
         }
     }
-    cout<<dp[0][len-1]<<endl;
+    if (e == -1)
+    {
+        e = 0;
+        for (int i = 0; i < n; i++)
+        {
+            if (s[i] >= s[e])
+            {
+                e = i;
+            }
+        }
+    }
+    // s[e] = max(0, s[e] - K);
+    for (int i = 0; i < n; i++)
+    {
+        ans += muck(s[i]);
+    }
+    cout << ans - maxMuck << endl;
     return 0;
 }
 /*
