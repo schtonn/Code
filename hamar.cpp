@@ -1,8 +1,8 @@
 #include "bits/stdc++.h"
 using namespace std;
-#define N 121
-int J, K, n, s[N], e = -1, maxMuck, ans;
-int muck(int x)
+#define N 600
+int J, K, n, s[N], e = 500, maxJedi, ans;
+int jedi(int x)
 {
     return x / J + (x % J ? 1 : 0);
 }
@@ -16,31 +16,27 @@ int main()
     cin >> K >> J;
     for (int i = 0; i < n; i++)
     {
-        if ((s[i] >= K) && (muck(s[i]) - muck(s[i] - K) > maxMuck))
+        if ((s[i] >= K && jedi(s[i]) - jedi(s[i] - K) > maxJedi))
         {
             e = i;
-            maxMuck = muck(s[i]) - muck(s[i] - K);
+            maxJedi = jedi(s[i]) - jedi(s[i] - K);
         }
     }
-    if (e == -1)
+    if (e == 500)
     {
-        e = 0;
         for (int i = 0; i < n; i++)
         {
-            if (s[i] >= s[e])
+            if (s[i] > s[e])
             {
                 e = i;
             }
         }
     }
-    // s[e] = max(0, s[e] - K);
+    s[e] = max(0, s[e] - K);
     for (int i = 0; i < n; i++)
     {
-        ans += muck(s[i]);
+        ans += jedi(s[i]);
     }
-    cout << ans - maxMuck << endl;
+    cout << ans << endl;
     return 0;
 }
-/*
-
-*/
