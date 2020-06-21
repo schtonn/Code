@@ -1,42 +1,34 @@
 #include "bits/stdc++.h"
 using namespace std;
-#define N 600
-int J, K, n, s[N], e = 500, maxJedi, ans;
-int jedi(int x)
-{
-    return x / J + (x % J ? 1 : 0);
-}
-int main()
-{
-    cin >> n;
-    for (int i = 0; i < n; i++)
-    {
-        cin >> s[i];
-    }
-    cin >> K >> J;
-    for (int i = 0; i < n; i++)
-    {
-        if ((s[i] >= K && jedi(s[i]) - jedi(s[i] - K) > maxJedi))
-        {
-            e = i;
-            maxJedi = jedi(s[i]) - jedi(s[i] - K);
+long long n,m,mop[100][100];
+int main(){
+    cin>>n>>m;
+    mop[1][1]=1;
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            if(i>1)mop[i][j]+=mop[i-1][j];
+            if(j>1)mop[i][j]+=mop[i][j-1];
+            if(i%2==0&&j%2==0)mop[i][j]=0;
+            // cout<<i<<j;
+            // if(((i-1)%2)||(j%2)||i==1){
+            //     cout<<"Y";
+            //     mop[i][j]+=mop[i-1][j];
+            // }
+            // if((i%2)||((j-1)%2)||j==1){
+            //     cout<<"K";
+            //     mop[i][j]+=mop[i][j-1];
+            // }
+            // cout<<endl;
+            // mop[i][j]+=((i-1)%2)||(j%2)?mop[i-1][j]:0;
+            // mop[i][j]+=(i%2)||((j-1)%2)?mop[i][j-1]:0;
         }
     }
-    if (e == 500)
-    {
-        for (int i = 0; i < n; i++)
-        {
-            if (s[i] > s[e])
-            {
-                e = i;
-            }
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            cout<<mop[i][j]<<' ';
         }
+        cout<<endl;
     }
-    s[e] = max(0, s[e] - K);
-    for (int i = 0; i < n; i++)
-    {
-        ans += jedi(s[i]);
-    }
-    cout << ans << endl;
+    cout<<mop[n][m];
     return 0;
 }
