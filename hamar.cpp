@@ -1,34 +1,29 @@
 #include "bits/stdc++.h"
 using namespace std;
-long long n,m,mop[100][100];
+int n,ans,d[100],p[100],f[100][100];
 int main(){
-    cin>>n>>m;
-    mop[1][1]=1;
+	freopen("ValueHistogram.in","r",stdin);
+	freopen("ValueHistogram.out","w",stdout);
+    cin>>n;
     for(int i=1;i<=n;i++){
-        for(int j=1;j<=m;j++){
-            if(i>1)mop[i][j]+=mop[i-1][j];
-            if(j>1)mop[i][j]+=mop[i][j-1];
-            if(i%2==0&&j%2==0)mop[i][j]=0;
-            // cout<<i<<j;
-            // if(((i-1)%2)||(j%2)||i==1){
-            //     cout<<"Y";
-            //     mop[i][j]+=mop[i-1][j];
-            // }
-            // if((i%2)||((j-1)%2)||j==1){
-            //     cout<<"K";
-            //     mop[i][j]+=mop[i][j-1];
-            // }
-            // cout<<endl;
-            // mop[i][j]+=((i-1)%2)||(j%2)?mop[i-1][j]:0;
-            // mop[i][j]+=(i%2)||((j-1)%2)?mop[i][j-1]:0;
-        }
+        cin>>d[i];
     }
     for(int i=1;i<=n;i++){
-        for(int j=1;j<=m;j++){
-            cout<<mop[i][j]<<' ';
-        }
-        cout<<endl;
+        cin>>p[i];
     }
-    cout<<mop[n][m];
+    memset(f,-1,sizeof(f));
+    f[0][0]=0;
+    for(int i=1;i<=n;i++){
+        for(int j=0;j<=(i-1)*2;j++){
+            if(f[i-1][j]!=-1){
+                f[i][j+p[i-1]]=max(f[i][j+p[i-1]],f[i-1][j]+d[i-1]);
+                if(f[i-1][j]>=d[i-1])f[i][j]=max(f[i][j],f[i-1][j]);
+            }
+        }
+    }
+    for(int i=n*2;i>=0;i--){
+        if(f[n][i]!=-1)ans=i;
+    }
+    cout<<ans<<endl;
     return 0;
 }
