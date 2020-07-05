@@ -1,18 +1,25 @@
 #include "bits/stdc++.h"
 using namespace std;
-long long n,a[1000010],dp[1000010];
+int n,m,a[1010][1010],dp[1010][1010];
 int main(){
-    cin>>n;
+    cin>>n>>m;
     for(int i=1;i<=n;i++){
-        cin>>a[i];
+        for(int j=1;j<=m;j++){
+            cin>>a[i][j];
+        }
     }
-    dp[0]=0;
-    dp[1]=a[1];
-    dp[2]=max(dp[0],dp[1])+a[2];
-    dp[3]=max(max(dp[0],dp[1]),dp[2])+a[3];
-    for(int i=4;i<=n;i++){
-        dp[i]=max(max(max(dp[i-1],dp[i-2]),dp[i-3]),dp[i-4])+a[i];
+    dp[1][1]=a[1][1];
+    for(int i=2;i<=n;i++){
+        dp[i][1]=dp[i-1][1]+a[i][1];
     }
-    cout<<dp[n]<<endl;
+    for(int j=2;j<=m;j++){
+        dp[1][j]=dp[1][j-1]+a[1][j];
+    }
+    for(int i=2;i<=n;i++){
+        for(int j=2;j<=m;j++){
+            dp[i][j]=max(dp[i-1][j],dp[i][j-1])+a[i][j];
+        }
+    }
+    cout<<dp[n][m]<<endl;
     return 0;
 }
