@@ -19,15 +19,15 @@ struct snack_data{
 	int tail_x,tail_y;
 	int way;//0up,1down,2left,3right
 	int speed;
-	int appearance_head,appearance_body;
+	int appr_head,appr_body;
 	int eat_num;
 	int turn[155][55];
 }snack;
 const int way_x[4]={0,0,-1,1};
 const int way_y[4]={-1,1,0,0};
 int max_score;
-map<char,int>map_appearance;
-char appearance[72]={'$','%','&','*','@','?','+','-',':',';','0','1','2','3','4','5','6','7','8','9',
+map<char,int>map_appr;
+char appr[72]={'$','%','&','*','@','?','+','-',':',';','0','1','2','3','4','5','6','7','8','9',
 'a','A','b','B','c','C','d','D','e','E','f','F','g','G','h','H','i','I','j','J','k','K','l','L','m','M',
 'n','N','o','O','p','P','q','Q','r','R','s','S','t','T','u','U','v','V','w','W','x','X','y','Y','z','Z'};
 struct food_data{
@@ -70,12 +70,12 @@ inline void set_color(int red,int green,int blue){
 	(FOREGROUND_RED)*red|(FOREGROUND_GREEN*green)|(FOREGROUND_BLUE*blue));
 }
 inline void inti(){
-	map_appearance['$']=1;
+	map_appr['$']=1;
 	FILE *fp=freopen("save.save","r",stdin);
 	if(fp==NULL){
 		size_x=size_y=11;
 		snack.speed=1;
-		snack.appearance_head=4;snack.appearance_body=0;
+		snack.appr_head=4;snack.appr_body=0;
 		goto READ_OVER;
 	}
 	
@@ -84,9 +84,9 @@ inline void inti(){
 	if(size_x<0||size_x>150||size_y<0||size_y>50) goto FILE_ERROR;
 	scanf("%d",&snack.speed);
 	if(snack.speed<0||snack.speed>100) goto FILE_ERROR;
-	scanf("%d%d",&snack.appearance_head,&snack.appearance_body);
-	if(snack.appearance_head<0||snack.appearance_head>71) goto FILE_ERROR;
-	if(snack.appearance_body<0||snack.appearance_body>71) goto FILE_ERROR;
+	scanf("%d%d",&snack.appr_head,&snack.appr_body);
+	if(snack.appr_head<0||snack.appr_head>71) goto FILE_ERROR;
+	if(snack.appr_body<0||snack.appr_body>71) goto FILE_ERROR;
 	for(R int i=0;i<size_x;i++)for(R int j=0;j<size_y;j++){
 		scanf("%d",&tmp_map[i][j]);
 		if(tmp_map[i][j]!=0&&tmp_map[i][j]!=1) goto FILE_ERROR;
@@ -111,7 +111,7 @@ inline void save(){
 	printf("%d\n",max_score);
 	printf("%d %d\n",size_x,size_y);
 	printf("%d\n",snack.speed);
-	printf("%d %d\n",snack.appearance_head,snack.appearance_body);
+	printf("%d %d\n",snack.appr_head,snack.appr_body);
 	for(R int i=0;i<size_x;i++){
 		for(R int j=0;j<size_y;j++) printf("%d ",Map[i][j]);
 		EN;
@@ -143,11 +143,11 @@ inline void build_setting(){
 	point_setting=0;
 	pos(language_x-1,language_y);putchar('*');
 	pos(language_x,language_y);
-	puts("����");
+	puts("LANG");
 	pos(uninstall_x,uninstall_y);
-	puts("ж��");
+	puts("UNINS");
 	pos(back_x,back_y);
-	puts("����");
+	puts("EXIT");
 	pos(0,0);
 }
 inline void change_language(){
@@ -174,12 +174,12 @@ inline void setting(){
 			}
 			if(num==13){//enter
 				if(point_setting==0){
-					MessageBox(NULL,TEXT("���Ҽ�ͷ�ı䣬Enterѡȡ"),TEXT("�ı�����"),MB_OK);
+					MessageBox(NULL,TEXT("NOPE,AREYOUCRAZY"),TEXT("CRAZYNESS"),MB_OK);
 					change_language();
 				}
 				else if(point_setting==1){
-					if(MessageBox(NULL,TEXT("ж�ز�ɾ���浵��"),TEXT("ж��"),MB_YESNO)==6)
-						uninstall();
+					if(MessageBox(NULL,TEXT("COMPLETELYUSELESS"),TEXT("NOPENOPE"),MB_YESNO)==6)
+					uninstall();
 				}
 				else return;
 			}
@@ -211,8 +211,8 @@ inline void print_special_food(){
 	red=rand()%2,green=rand()%2,blue=rand()%2;
 	if((red&green&blue)||(!(red|green|blue))) goto RAND_COLOR;
 	set_color(red,green,blue);
-	int special_food_appearance=rand()%72;
-	putchar(appearance[special_food_appearance]);
+	int special_food_appr=rand()%72;
+	putchar(appr[special_food_appr]);
 	set_color(1,1,1);
 }
 inline void get_new_food(){
@@ -236,9 +236,9 @@ inline void build_snack_food(){
 	int firx=fir%size_x,firy=fir/size_x;
 	int secx=sec%size_x,secy=sec/size_x;
 	int thix=thi%size_x,thiy=thi/size_x;
-	pos(firx,firy);putchar(appearance[snack.appearance_head]);
-	pos(secx,secy);putchar(appearance[snack.appearance_body]);
-	pos(thix,thiy);putchar(appearance[snack.appearance_body]);
+	pos(firx,firy);putchar(appr[snack.appr_head]);
+	pos(secx,secy);putchar(appr[snack.appr_body]);
+	pos(thix,thiy);putchar(appr[snack.appr_body]);
 	get_new_food();
 	pos(0,size_y+1);
 	snack.head_x=firx;snack.head_y=firy;
@@ -279,13 +279,13 @@ inline void start_game(){
 		if(_head_x<0||_head_y<0) goto DIED;
 		if(head_!='\0'&&head_!=' '&&!(_head_x==food.x&&_head_y==food.y)){
 			DIED:;
-			MessageBox(NULL,TEXT("you died!"),TEXT(""),MB_OK);
+			MessageBox(NULL,TEXT("DEIIIEEE!"),TEXT(""),MB_OK);
 			max_score=max(max_score,now_score);
 			return;
 		}
-		pos(_head_x,_head_y);putchar(appearance[snack.appearance_head]);
+		pos(_head_x,_head_y);putchar(appr[snack.appr_head]);
 		snack.turn[_head_x][_head_y]=snack.way;
-		pos(snack.head_x,snack.head_y);putchar(appearance[snack.appearance_body]);
+		pos(snack.head_x,snack.head_y);putchar(appr[snack.appr_body]);
 		snack.head_x=_head_x;snack.head_y=_head_y;
 		if(food.x==snack.head_x&&food.y==snack.head_y){
 			snack.eat_num++;
@@ -314,7 +314,7 @@ inline void start_game(){
 //game end
 
 //custom start
-const int appearance_x=80,appearance_y=5;
+const int appr_x=80,appr_y=5;
 const int map_x=80,map_y=7;
 const int speed_x=80,speed_y=9;
 const int back_custom_x=80,back_custom_y=13;
@@ -323,8 +323,8 @@ int point_custom;
 inline void build_custom(){
 	system("cls");
 	point_custom=0;
-	pos(appearance_x-1,appearance_y);putchar('*');
-	pos(appearance_x,appearance_y);
+	pos(appr_x-1,appr_y);putchar('*');
+	pos(appr_x,appr_y);
 	puts("APPEARANCE");
 	pos(map_x,map_y);
 	puts("MAP");
@@ -337,12 +337,12 @@ inline void build_custom(){
 	pos(0,0);
 }
 inline void change_point_custom(){
-	pos(appearance_x-1,appearance_y);putchar(' ');
+	pos(appr_x-1,appr_y);putchar(' ');
 	pos(map_x-1,map_y);putchar(' ');
 	pos(speed_x-1,speed_y);putchar(' ');
 	pos(back_custom_x-1,back_custom_y);putchar(' ');
 	pos(setsize_x-1,setsize_y);putchar(' ');
-	if(point_custom==0){pos(appearance_x-1,appearance_y);putchar('*');}
+	if(point_custom==0){pos(appr_x-1,appr_y);putchar('*');}
 	else if(point_custom==1){pos(map_x-1,map_y);putchar('*');}
 	else if(point_custom==2){pos(speed_x-1,speed_y);putchar('*');}
 	else if(point_custom==3){pos(setsize_x-1,setsize_y);putchar('*');}
@@ -350,28 +350,28 @@ inline void change_point_custom(){
 	pos(0,0);
 }
 
-inline void change_appearance(){
+inline void change_appr(){
 	system("cls");
 	puts("ENTER=Set/ESC=Quit");
-	for(R int i=0;i<=6;i++) putchar(appearance[snack.appearance_body]);
-	putchar(appearance[snack.appearance_head]);
+	for(R int i=0;i<=6;i++) putchar(appr[snack.appr_body]);
+	putchar(appr[snack.appr_head]);
 	pos(6,1);
-	int now=0,appearance_head_tmp=snack.appearance_head,appearance_body_tmp=snack.appearance_body;
+	int now=0,appr_head_tmp=snack.appr_head,appr_body_tmp=snack.appr_body;
 	for(;;){
 		if(kbhit()){
 			R int num=getch();
 			if(num==27){//Esc
-				int tmp=MessageBox(NULL,TEXT("SURERERERE?"),TEXT(""),MB_YESNOCANCEL);
+				int tmp=MessageBox(NULL,TEXT("RUSUERE"),TEXT(""),MB_YESNOCANCEL);
 				if(tmp==2) continue;
 				if(tmp==6){
-					if(appearance_head_tmp==appearance_body_tmp){
+					if(appr_head_tmp==appr_body_tmp){
 						pos(0,2);puts("LALALA");
 						pos(now?7:6,1);
 						continue;
 					}
 					pos(0,2);puts("SET");
-					snack.appearance_head=appearance_head_tmp;
-					snack.appearance_body=appearance_body_tmp;
+					snack.appr_head=appr_head_tmp;
+					snack.appr_body=appr_body_tmp;
 					break;
 				}
 				else{
@@ -387,16 +387,16 @@ inline void change_appearance(){
 			else if(num==224){
 				num=getch();
 				if(num==75){
-					if(now) appearance_head_tmp=appearance_head_tmp-1<0?71:appearance_head_tmp-1;
-					else appearance_body_tmp=appearance_body_tmp-1<0?71:appearance_body_tmp-1;
+					if(now) appr_head_tmp=appr_head_tmp-1<0?71:appr_head_tmp-1;
+					else appr_body_tmp=appr_body_tmp-1<0?71:appr_body_tmp-1;
 				}
 				if(num==77){
-					if(now) appearance_head_tmp=(appearance_head_tmp+1)%72;
-					else appearance_body_tmp=(appearance_body_tmp+1)%72;
+					if(now) appr_head_tmp=(appr_head_tmp+1)%72;
+					else appr_body_tmp=(appr_body_tmp+1)%72;
 				}
 				pos(0,1);
-				for(R int i=0;i<=6;i++) putchar(appearance[appearance_body_tmp]);
-				putchar(appearance[appearance_head_tmp]);
+				for(R int i=0;i<=6;i++) putchar(appr[appr_body_tmp]);
+				putchar(appr[appr_head_tmp]);
 				pos(now?7:6,1);
 			}
 		}
@@ -449,7 +449,7 @@ inline void change_map(){
 		if(kbhit()){
 			R int num=getch();
 			if(num==27){//Esc
-				int tmp=MessageBox(NULL,TEXT("SURERERERE"),TEXT(""),MB_YESNOCANCEL);
+				int tmp=MessageBox(NULL,TEXT("RURE"),TEXT(""),MB_YESNOCANCEL);
 				if(tmp==2) continue;
 				if(tmp==6){
 					if(!check_tmp_map()){
@@ -503,13 +503,13 @@ inline void change_size(){
 	char ss[5007];
 	system("cls");
 	pos(0,0);
-	puts("ROW(10<x<151)COL(10<x<51)Enter=Set.....");
+	puts("ROW(10<x<151)COL(10<y<51)Enter=Set.....");
 	printf("F....");
 	int xx=0;scanf("%s",ss);
 	int len_s=strlen(ss);
 	for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<='9') xx=xx*10+ss[i]-'0';
 	while(xx<=10||xx>150){
-		printf("10<x<151!\nFUCKYOU");
+		printf("10<x<151\nFYOU");
 		scanf("%s",ss);len_s=strlen(ss);
 		xx=0;
 		for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<'9') xx=xx*10+ss[i]-'0';
@@ -519,12 +519,12 @@ inline void change_size(){
 	len_s=strlen(ss);
 	for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<='9') yy=yy*10+ss[i]-'0';
 	while(yy<=10||yy>50){
-		printf("10<x<51!%d\nFUCKYOU",yy);
+		printf("10<y<51%d\nKYOU",yy);
 		scanf("%s",ss);len_s=strlen(ss);
 		yy=0;
 		for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<='9') yy=yy*10+ss[i]-'0';
 	}
-	if(MessageBox(NULL,TEXT("SURERE"),TEXT(""),MB_YESNO)==6){
+	if(MessageBox(NULL,TEXT("RWSRE"),TEXT(""),MB_YESNO)==6){
 		size_x=xx;size_y=yy;
 		puts("SUCCESS.....");
 		for(R int i=0;i<size_x;i++)for(R int j=0;j<size_y;j++) tmp_map[i][j]=Map[i][j];
@@ -542,12 +542,12 @@ inline void change_speed(){
 	system("cls");
 	pos(0,0);
 	puts("SPEED 1-100....");
-	printf("ER");
+	printf("SPEDIN:");
 	int speedd=0;scanf("%s",ss);
 	int len_s=strlen(ss);
 	for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<='9') speedd=speedd*10+ss[i]-'0';
 	while(speedd<1||speedd>100) {
-		printf("0<x<100!\nFUCKYOU");
+		printf("0<x<100\nCKYOU");
 		scanf("%s",ss);len_s=strlen(ss);
 		speedd=0;
 		for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<'9') speedd=speedd*10+ss[i]-'0';
@@ -582,7 +582,7 @@ inline void custom(){
 			}
 			if(num==13){//enter
 				if(point_custom==0){
-					change_appearance();
+					change_appr();
 					system("cls");
 					build_custom();
 					continue;
@@ -623,7 +623,7 @@ inline void build_menu(){
 	pos(setting_x-1,setting_y);
 	putchar('*');
 	pos(setting_x,setting_y);
-	puts("FUCK");
+	puts("NOTHING");
 	pos(custom_x,custom_y);
 	puts("CUSTOM");
 	pos(start_game_x,start_game_y);
