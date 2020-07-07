@@ -14,7 +14,7 @@ struct three_space_data{
 };
 vector<three_space_data>three_space_tmp;
 vector<three_space_data>three_space;
-struct snack_data{
+struct snake_data{
 	int head_x,head_y;
 	int tail_x,tail_y;
 	int way;//0up,1down,2left,3right
@@ -22,7 +22,7 @@ struct snack_data{
 	int appr_head,appr_body;
 	int eat_num;
 	int turn[155][55];
-}snack;
+}snake;
 const int way_x[4]={0,0,-1,1};
 const int way_y[4]={-1,1,0,0};
 int max_score;
@@ -74,19 +74,19 @@ inline void inti(){
 	FILE *fp=freopen("save.save","r",stdin);
 	if(fp==NULL){
 		size_x=size_y=11;
-		snack.speed=1;
-		snack.appr_head=4;snack.appr_body=0;
+		snake.speed=1;
+		snake.appr_head=4;snake.appr_body=0;
 		goto READ_OVER;
 	}
 	
 	scanf("%d",&max_score);
 	scanf("%d%d",&size_x,&size_y);
 	if(size_x<0||size_x>150||size_y<0||size_y>50) goto FILE_ERROR;
-	scanf("%d",&snack.speed);
-	if(snack.speed<0||snack.speed>100) goto FILE_ERROR;
-	scanf("%d%d",&snack.appr_head,&snack.appr_body);
-	if(snack.appr_head<0||snack.appr_head>71) goto FILE_ERROR;
-	if(snack.appr_body<0||snack.appr_body>71) goto FILE_ERROR;
+	scanf("%d",&snake.speed);
+	if(snake.speed<0||snake.speed>100) goto FILE_ERROR;
+	scanf("%d%d",&snake.appr_head,&snake.appr_body);
+	if(snake.appr_head<0||snake.appr_head>71) goto FILE_ERROR;
+	if(snake.appr_body<0||snake.appr_body>71) goto FILE_ERROR;
 	for(R int i=0;i<size_x;i++)for(R int j=0;j<size_y;j++){
 		scanf("%d",&tmp_map[i][j]);
 		if(tmp_map[i][j]!=0&&tmp_map[i][j]!=1) goto FILE_ERROR;
@@ -110,8 +110,8 @@ inline void save(){
 	freopen("save.save","w",stdout);
 	printf("%d\n",max_score);
 	printf("%d %d\n",size_x,size_y);
-	printf("%d\n",snack.speed);
-	printf("%d %d\n",snack.appr_head,snack.appr_body);
+	printf("%d\n",snake.speed);
+	printf("%d %d\n",snake.appr_head,snake.appr_body);
 	for(R int i=0;i<size_x;i++){
 		for(R int j=0;j<size_y;j++) printf("%d ",Map[i][j]);
 		EN;
@@ -190,7 +190,7 @@ inline void setting(){
 
 //game start
 inline void build_game_space(){
-	memset(snack.turn,-1,sizeof snack.turn[155][55]);
+	memset(snake.turn,-1,sizeof snake.turn[155][55]);
 	system("cls");
 	pos(0,size_y);
 	for(R int i=0;i<=size_x;i++) putchar('-');
@@ -230,30 +230,30 @@ inline void get_new_food(){
 	}
 	else putchar('&');
 }
-inline void build_snack_food(){
+inline void build_snake_food(){
 	three_space_data start=three_space[rand()%three_space.size()];
 	int fir=start.first,sec=start.second,thi=start.third;
 	int firx=fir%size_x,firy=fir/size_x;
 	int secx=sec%size_x,secy=sec/size_x;
 	int thix=thi%size_x,thiy=thi/size_x;
-	pos(firx,firy);putchar(appr[snack.appr_head]);
-	pos(secx,secy);putchar(appr[snack.appr_body]);
-	pos(thix,thiy);putchar(appr[snack.appr_body]);
+	pos(firx,firy);putchar(appr[snake.appr_head]);
+	pos(secx,secy);putchar(appr[snake.appr_body]);
+	pos(thix,thiy);putchar(appr[snake.appr_body]);
 	get_new_food();
 	pos(0,size_y+1);
-	snack.head_x=firx;snack.head_y=firy;
-	snack.tail_x=thix;snack.tail_y=thiy;
-	snack.turn[secx][secy]=get_way_by_two_block(firx,firy,secx,secy);
-	snack.turn[thix][thiy]=get_way_by_two_block(secx,secy,thix,thiy);
-	snack.turn[firx][firy]=snack.way=get_way_by_two_block(firx,firy,secx,secy);
+	snake.head_x=firx;snake.head_y=firy;
+	snake.tail_x=thix;snake.tail_y=thiy;
+	snake.turn[secx][secy]=get_way_by_two_block(firx,firy,secx,secy);
+	snake.turn[thix][thiy]=get_way_by_two_block(secx,secy,thix,thiy);
+	snake.turn[firx][firy]=snake.way=get_way_by_two_block(firx,firy,secx,secy);
 }
 inline void start_game(){
 	build_game_space();
-	build_snack_food();
+	build_snake_food();
 	Sleep(2000);
 	R int now_score=0;
 	for(;;){
-		Sleep(1000/snack.speed);
+		Sleep(1000/snake.speed);
 		if(kbhit()){
 			R int num=getch();
 			if(num==224){
@@ -262,9 +262,9 @@ inline void start_game(){
 				else if(num==80) num=1;
 				else if(num==75) num=2;
 				else if(num==77) num=3;
-				if((num==snack.way)||((num^1)==snack.way)) goto FAIL_MOVE;
-				snack.way=num;
-				snack.turn[snack.head_x][snack.head_y]=num;
+				if((num==snake.way)||((num^1)==snake.way)) goto FAIL_MOVE;
+				snake.way=num;
+				snake.turn[snake.head_x][snake.head_y]=num;
 			}
 			else if(num==27){
 				if(MessageBox(NULL,TEXT("FAIL"),TEXT(""),MB_YESNO)==7) goto FAIL_MOVE;
@@ -273,7 +273,7 @@ inline void start_game(){
 			}
 		}
 		FAIL_MOVE:;
-		int _head_x=snack.head_x+way_x[snack.way],_head_y=snack.head_y+way_y[snack.way];
+		int _head_x=snake.head_x+way_x[snake.way],_head_y=snake.head_y+way_y[snake.way];
 		char head_;
 		get_output(head_,_head_x,_head_y);
 		if(_head_x<0||_head_y<0) goto DIED;
@@ -283,32 +283,32 @@ inline void start_game(){
 			max_score=max(max_score,now_score);
 			return;
 		}
-		pos(_head_x,_head_y);putchar(appr[snack.appr_head]);
-		snack.turn[_head_x][_head_y]=snack.way;
-		pos(snack.head_x,snack.head_y);putchar(appr[snack.appr_body]);
-		snack.head_x=_head_x;snack.head_y=_head_y;
-		if(food.x==snack.head_x&&food.y==snack.head_y){
-			snack.eat_num++;
+		pos(_head_x,_head_y);putchar(appr[snake.appr_head]);
+		snake.turn[_head_x][_head_y]=snake.way;
+		pos(snake.head_x,snake.head_y);putchar(appr[snake.appr_body]);
+		snake.head_x=_head_x;snake.head_y=_head_y;
+		if(food.x==snake.head_x&&food.y==snake.head_y){
+			snake.eat_num++;
 			now_score+=food.special?10:1;
 			pos(size_x+8,size_y/2-3);printf("%d",now_score);
 			get_new_food();
 		}
-		if(snack.eat_num>0){
-			snack.eat_num--;
+		if(snake.eat_num>0){
+			snake.eat_num--;
 			goto NO_SUBTAIL;
 		}
 		{
-			int _tail_x=snack.tail_x+way_x[snack.turn[snack.tail_x][snack.tail_y]];
-			int _tail_y=snack.tail_y+way_y[snack.turn[snack.tail_x][snack.tail_y]];
-			pos(snack.tail_x,snack.tail_y);putchar(' ');
+			int _tail_x=snake.tail_x+way_x[snake.turn[snake.tail_x][snake.tail_y]];
+			int _tail_y=snake.tail_y+way_y[snake.turn[snake.tail_x][snake.tail_y]];
+			pos(snake.tail_x,snake.tail_y);putchar(' ');
 //			pos(_tail_x,_tail_y);putchar('$');
 			pos(0,size_y+1);
-			snack.turn[snack.tail_x][snack.tail_y]=-1;
-			snack.tail_x=_tail_x;snack.tail_y=_tail_y;
+			snake.turn[snake.tail_x][snake.tail_y]=-1;
+			snake.tail_x=_tail_x;snake.tail_y=_tail_y;
 		}
 		NO_SUBTAIL:;
 		if(food.special) print_special_food();
-		pos(snack.head_x,snack.head_y);
+		pos(snake.head_x,snake.head_y);
 	}
 }
 //game end
@@ -353,10 +353,10 @@ inline void change_point_custom(){
 inline void change_appr(){
 	system("cls");
 	puts("ENTER=Set/ESC=Quit");
-	for(R int i=0;i<=6;i++) putchar(appr[snack.appr_body]);
-	putchar(appr[snack.appr_head]);
+	for(R int i=0;i<=6;i++) putchar(appr[snake.appr_body]);
+	putchar(appr[snake.appr_head]);
 	pos(6,1);
-	int now=0,appr_head_tmp=snack.appr_head,appr_body_tmp=snack.appr_body;
+	int now=0,appr_head_tmp=snake.appr_head,appr_body_tmp=snake.appr_body;
 	for(;;){
 		if(kbhit()){
 			R int num=getch();
@@ -370,8 +370,8 @@ inline void change_appr(){
 						continue;
 					}
 					pos(0,2);puts("SET");
-					snack.appr_head=appr_head_tmp;
-					snack.appr_body=appr_body_tmp;
+					snake.appr_head=appr_head_tmp;
+					snake.appr_body=appr_body_tmp;
 					break;
 				}
 				else{
@@ -553,7 +553,7 @@ inline void change_speed(){
 		for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<'9') speedd=speedd*10+ss[i]-'0';
 	}
 	if(MessageBox(NULL,TEXT("SURERE"),TEXT(""),MB_YESNO)==6){
-		snack.speed=speedd;
+		snake.speed=speedd;
 		puts("SUCCESS....");
 	}
 	else puts("ERRRR....");
