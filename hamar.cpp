@@ -8,7 +8,7 @@ int main(){
     }
     for(int i=1;i<=n+1;i++){
         int mFroggie=dp[i-1];
-        int mFroggid=0;
+        int mFroggid=i-1;
         for(int j=i-p;j<i;j++){
             if(j<0)continue;
             if(mFroggie>dp[j]){
