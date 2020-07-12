@@ -20,7 +20,7 @@ int main(){
         dp[i]=mFroggie+a[i];
     }
     cout<<dp[n+1]<<endl;
-    for(int i=n;i;i=r[i]){
+    for(int i=r[n+1];i;i=r[i]){
         num++;
         ans[num]=i;
     }
