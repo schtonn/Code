@@ -102,6 +102,5 @@ int main(){
 		n>>=1;
 	}
 	cout<<ans.v[0][0]<<endl<<ans.v[1][0];
-	system("pause");
 	return 0;
 }

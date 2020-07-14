@@ -7,7 +7,7 @@ int main(){
         cin>>a[i];
         dp[i]=1;
     }
-    int ans=1,ansid=0;
+    int ans=1,ansid=1;
     for(int i=2;i<=n;i++){
         for(int j=1;j<i;j++){
             if(a[j]<a[i]){
