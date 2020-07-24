@@ -1,33 +1,49 @@
 #include "bits/stdc++.h"
 using namespace std;
-int n,a[1010],dp[1010],r[1010],ansr[1010];
+int n,W,sum,ans,w[1010],g[10010][2],gcnt=1,gg[1010],ggcnt=1,cnt;
+bool dp[1000010];
+bool ggg(int a,int b){
+    for(int i=1;i<gcnt;i++){
+        if(g[i][0]==a&&g[i][1]==b)return 1;
+    }
+    return 0;
+}
 int main(){
     cin>>n;
     for(int i=1;i<=n;i++){
-        cin>>a[i];
-        dp[i]=1;
+        cin>>w[i];
     }
-    int ans=1,ansid=1;
-    for(int i=2;i<=n;i++){
-        for(int j=1;j<i;j++){
-            if(a[j]<a[i]){
-                if(dp[i]<dp[j]+1){
-                    r[i]=j;
-                }
-                dp[i]=max(dp[i],dp[j]+1);
-                if(ans<dp[i])ansid=i;
-                ans=max(ans,dp[i]);
+    cin>>W;
+    dp[0]=1;
+    for(int i=1;i<=n;i++){
+        sum+=w[i];
+        for(int j=W;j>=0;j--){
+            if(j>=w[i]&&dp[j-w[i]]){
+                g[gcnt][0]=i;
+                g[gcnt++][1]=j;
             }
+            dp[j]=max(j>=w[i]?dp[j-w[i]]:false,dp[j]);
         }
     }
-    cout<<ans<<endl;
-    int num=0;
-    for(int i=ansid;i>0;i=r[i]){
-        num++;
-        ansr[num]=i;
+    for(int i=W;i>=0;i--){
+        if(dp[i]){
+            ans=i;
+            cout<<i<<endl;
+            break;
+        }
     }
-    for(int i=num;i>0;i--){
-        cout<<ansr[i]<<' ';
+    cnt=n;
+    while(ans){
+        if(ggg(cnt,ans)){
+            gg[ggcnt++]=cnt;
+            ans-=w[cnt];
+        }
+        cnt--;
+    }
+    sort(gg+1,gg+ggcnt);
+    cout<<ggcnt-1<<endl;
+    for(int i=1;i<ggcnt;i++){
+        cout<<gg[i]<<' ';
     }
     return 0;
 }
