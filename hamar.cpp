@@ -22,7 +22,7 @@ int check(int t){
     return getf(pos(cx,cy))==getf(pos(n,-1));
 }
 int main(){
-    // freopen("AcradeManao.in","r",stdin);
+    // freopen("ArcadeManao.in","r",stdin);
     // freopen("ArcadeManao.out","w",stdout);
     cin>>n;
     getline(cin,ch);
