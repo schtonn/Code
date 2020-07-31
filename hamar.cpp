@@ -1,19 +1,25 @@
 #include "bits/stdc++.h"
 using namespace std;
-string fAKe;
-int n,num[100],fact,ans,tool=1;
+int n,a[1010],b[1010],c[1010];
+char frog[1010];
+void frogger(int grof[]){//frogger that
+    cin>>frog;
+    n=strlen(frog);
+    for(int i=0;i<n;i++)grof[n-i-1]=frog[i]-'0';
+}
 int main(){
-    cin>>fact>>fAKe;
-    n=fAKe.length();
-    for(int i=0;i<n;i++){
-        if(fAKe[i]>='0'&&fAKe[i]<='9')num[i]=fAKe[i]-'0';
-        if(fAKe[i]>='A'&&fAKe[i]<='Z')num[i]=fAKe[i]-'A'+10;
+    frogger(a);
+    frogger(b);
+    memset(c,0,sizeof(c));
+    for(int i=0;i<1000;i++){
+        c[i]+=a[i]+b[i];
+        if(c[i]>=10){
+            c[i+1]++;
+            c[i]-=10;
+        }
     }
-    for(int i=n-1;i>=0;i--){
-        cout<<ans<<endl;
-        ans+=num[i]*tool;
-        tool*=fact;
-    }
-    cout<<ans<<endl;
+    int frocnt=1010;
+    while(!c[frocnt])frocnt--;
+    for(int i=frocnt;i>=0;i--)cout<<c[i];
     return 0;
 }
