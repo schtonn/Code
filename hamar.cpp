@@ -1,19 +1,29 @@
 #include "bits/stdc++.h"
 using namespace std;
-string fAKe;
-int n,num[100],fact,ans,tool=1;
+#define MAXN 10010
+int n,a[MAXN],b[MAXN],c[MAXN];
+char frog[MAXN];
+void frogger(int grof[]){//frogger that
+    cin>>frog;
+    n=strlen(frog);
+    for(int i=0;i<n;i++)grof[n-i-1]=frog[i]-'0';
+}
 int main(){
-    cin>>fact>>fAKe;
-    n=fAKe.length();
-    for(int i=0;i<n;i++){
-        if(fAKe[i]>='0'&&fAKe[i]<='9')num[i]=fAKe[i]-'0';
-        if(fAKe[i]>='A'&&fAKe[i]<='Z')num[i]=fAKe[i]-'A'+10;
+    frogger(a);
+    frogger(b);
+    memset(c,0,sizeof(c));
+    for(int i=0;i<MAXN-1;i++){
+        for(int j=0;j<=i;j++){
+            c[i]+=a[j]*b[i-j];
+        }
+        if(c[i]>=10){
+            c[i+1]+=c[i]/10;
+            c[i]%=10;
+        }
     }
-    for(int i=n-1;i>=0;i--){
-        cout<<ans<<endl;
-        ans+=num[i]*tool;
-        tool*=fact;
-    }
-    cout<<ans<<endl;
+    int frocnt=MAXN;
+    while(!c[frocnt]&&frocnt>=0)frocnt--;
+    for(int i=frocnt;i>=0;i--)cout<<c[i];
+    if(frocnt==-1)cout<<0<<endl;
     return 0;
 }
