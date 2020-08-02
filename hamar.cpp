@@ -1,29 +1,26 @@
 #include "bits/stdc++.h"
 using namespace std;
-#define MAXN 10010
-int n,a[MAXN],b[MAXN],c[MAXN];
-char frog[MAXN];
-void frogger(int grof[]){//frogger that
-    cin>>frog;
-    n=strlen(frog);
-    for(int i=0;i<n;i++)grof[n-i-1]=frog[i]-'0';
-}
+int n,rad[110],per[110];
+double dis[110],ans=0x3f3f3f3f;
 int main(){
-    frogger(a);
-    frogger(b);
-    memset(c,0,sizeof(c));
-    for(int i=0;i<MAXN-1;i++){
-        for(int j=0;j<=i;j++){
-            c[i]+=a[j]*b[i-j];
-        }
-        if(c[i]>=10){
-            c[i+1]+=c[i]/10;
-            c[i]%=10;
-        }
+	// freopen("MarblePositioning.in","r",stdin);
+	// freopen("MarblePositioning.out","w",stdout);
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        cin>>rad[i];
+        per[i]=i;
     }
-    int frocnt=MAXN;
-    while(!c[frocnt]&&frocnt>=0)frocnt--;
-    for(int i=frocnt;i>=0;i--)cout<<c[i];
-    if(frocnt==-1)cout<<0<<endl;
+    do{
+        dis[1]=0;
+        for(int i=2;i<=n;i++){
+            dis[i]=0;
+            for(int j=1;j<i;j++){
+                int a=rad[per[i]],b=rad[per[j]];
+                dis[i]=max(dis[i],dis[j]+sqrt((a+b)*(a+b)-(a-b)*(a-b)));
+            }
+        }
+        ans=min(ans,dis[n]);
+    }while(next_permutation(per+1,per+1+n));
+    cout<<ans<<endl;
     return 0;
 }

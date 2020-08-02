@@ -13,19 +13,6 @@ void say(string s)
 	printf("\n");
 	return;
 }
-void cay(string s)
-{
-	printf("*");
-    for(int i=0;i<s.size();i++)
-    {
-        cout<<s[i];
-        Sleep(20);
-    }
-	printf("\n");
-	getchar();
-	system("cls");
-	return;
-}
 void fuck(){
 	system("cls");
 	say("FUCK");
@@ -39,7 +26,7 @@ bool CM(){
 	system("title interesting guessing game");
 	Sleep(500);
 	fcnt=0;
-	cay("Please choose the mode:");
+	say("Please choose the mode:");
 	say("MODE 1:Guess number");
 	say("MODE 2:Unguess number");
 	say("MODE fuck:FUCK");
@@ -74,12 +61,13 @@ void ER(){
 }
 void GN(){
 	system("cls");
-	cay("You chose Guess number.");
-	cay("You are going to guess a random number.");
-	cay("Then computer will tell you wherether the number you guess is too big or too small, or jut right.");
+	say("You chose Guess number.");
+	say("You are going to guess a random number.");
+	say("Then computer will tell you wherether the number you guess is too big or too small, or jut right.");
 	ER();
 	srand(time(NULL)+range);
 	number=rand()%(range+1);
+	getchar();
 	system("cls");
 	SG:
 	say("Your guess:");
@@ -116,9 +104,9 @@ bool EC(){
 }
 bool UN(){
 	system("cls");
-	cay("You chose Ungueess number.");
-	cay("You are going to imagine a random number.");
-	cay("Then computer will guess it.");
+	say("You chose Ungueess number.");
+	say("You are going to imagine a random number.");
+	say("Then computer will guess it.");
 	ER();
 	l=0;r=range;
 	while(l<=r){
@@ -131,18 +119,22 @@ bool UN(){
 		if(!EC())return 0;
 		if(number==1)l=guess+1;
 		if(number==2){
-			cay("Success!");
+			say("Success!");
+			getchar();
+			getchar();
 			return 1;
 		}if(number==3)r=guess-1;
 	}
 	cout<<guess<<endl;
-	cay("Success!");
+	say("Success!");
+	getchar();
+	getchar();
 	return 1;
 }
 int main(){
 	system("title \t");
-	cay("Hello.");
-	cay("Welcome to this interesting guessing game.");
+	say("Hello.");
+	say("Welcome to this interesting guessing game.");
 	system("title interesting guessing game");
 	start:
 	if(!CM())return 0;
