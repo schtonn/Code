@@ -1,10 +1,10 @@
 #include "bits/stdc++.h"
 using namespace std;
 long long n,rad[110],per[110];
-double dis[110],ans=0x3f3f3f3f;
+double dis[110],ans=0x3f3f3f3f3f3f3f3f;
 int main(){
-	// freopen("MarblePositioning.in","r",stdin);
-	// freopen("MarblePositioning.out","w",stdout);
+    // freopen("MarblePositioning.in","r",stdin);
+    // freopen("MarblePositioning.out","w",stdout);
     cin>>n;
     for(long long i=1;i<=n;i++){
         cin>>rad[i];
