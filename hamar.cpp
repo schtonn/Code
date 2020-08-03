@@ -1,26 +1,60 @@
 #include "bits/stdc++.h"
 using namespace std;
-long long n,rad[110],per[110];
-double dis[110],ans=0x3f3f3f3f3f3f3f3f;
-int main(){
-    // freopen("MarblePositioning.in","r",stdin);
-    // freopen("MarblePositioning.out","w",stdout);
-    cin>>n;
-    for(long long i=1;i<=n;i++){
-        cin>>rad[i];
-        per[i]=i;
+int n,m,cx,cy,f[100010];
+string ch;
+bool lev[110][110];
+int pos(int x,int y){
+    return x*m+y;
+}
+int getf(int x){
+    return f[x]==x?x:f[x]=getf(f[x]);
+}
+void merge(int x,int y){
+    int fx=getf(x),fy=getf(y);
+    if(fx!=fy)f[fy]=fx;
+}
+int check(int t){
+    for(int i=t;i<n;i++){
+        for(int j=0;j<m;j++){
+            if(lev[i-t][j]&&lev[i][j])merge(pos(i,j),pos(i-t,j));
+        }
     }
-    do{
-        dis[1]=0;
-        for(long long i=2;i<=n;i++){
-            dis[i]=0;
-            for(long long j=1;j<i;j++){
-                long long a=rad[per[i]],b=rad[per[j]];
-                dis[i]=max(dis[i],dis[j]+sqrt((a+b)*(a+b)-(a-b)*(a-b)));
+    return getf(pos(cx,cy))==getf(pos(n,-1));
+}
+int main(){
+    //freopen("ArcadeManao.in","r",stdin);
+    //freopen("ArcadeManao.out","w",stdout);
+    cin>>n;
+    getline(cin,ch);
+    for(int i=0;i<n;i++){
+        getline(cin,ch);
+        m=ch.size();
+        for(int j=0;j<m;j++){
+            if(ch[j]=='X')lev[i][j]=1;
+            else lev[i][j]=0;
+        }
+    }
+    cin>>cx>>cy;
+    cx--;cy--;
+    //lev[cx][cy]=1;
+    for(int i=0;i<n*m;i++)f[i]=i;
+    for(int i=0;i<n;i++){
+        for(int j=1;j<m-1;j++){
+            if(lev[i][j]){
+                if(lev[i][j-1])merge(pos(i,j),pos(i,j-1));
+                if(lev[i][j+1])merge(pos(i,j),pos(i,j+1));
             }
         }
-        ans=min(ans,dis[n]);
-    }while(next_permutation(per+1,per+1+n));
-    printf("%.30lf",ans);
+    }
+    if(getf(pos(cx,cy))==getf(pos(n,-1)))cout<<0<<endl;
+    else{
+        for(int i=1;i<=n;i++){
+            if(check(i)){
+                cout<<i<<endl;
+                return 0;
+            }
+        }
+        cout<<n<<endl;
+    }
     return 0;
 }
