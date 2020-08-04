@@ -50,11 +50,56 @@ num sub(num a,num b){
     }
     return c;
 }
+num mul(num a,num b){
+    int alen=len(a),blen=len(b);
+    num c;
+    c.clear();
+    for(int i=0;i<alen+blen;i++){
+        for(int j=0;j<=i;j++){
+            c.v[i]+=a.v[i]*b.v[i-j];
+        }
+        if(c.v[i]>10){
+            c.v[i+1]+=c.v[i]/10;
+            c.v[i]%=10;
+        }
+    }
+    return c;
+}
+bool check_div(int step,int blen,num b,num d){
+    if(d.v[step+blen])return true;
+    for(int i=blen-1;i>=0;i--){
+        if(d.v[step+i]==b.v[i])continue;
+        return d.v[step+i]>b.v[i];
+    }
+    return true;
+}
+num div(num a,num b){
+    int alen=len(a),blen=len(b);
+    num c,d;
+    c.clear();
+    d.clear();
+    d=a;
+    for(int i=alen-blen;i>=0;i--){
+        while(check_div(i,blen,b,d)){
+            for(int j=0;j<blen;j++){
+                d.v[i+j]-=b.v[j];
+                if(d.v[i+j]<0){
+                    d.v[i+j+1]--;
+                    d.v[i+j]+=10;
+                }
+            }
+            c.v[i]++;
+        }
+    }
+    return c;
+}
 int main(){
     num a,b;
     read(a);
     read(b);
     print(add(a,b));
     print(sub(a,b));
+    print(mul(a,b));
+    print(div(a,b));
     return 0;
 }
