@@ -1,60 +1,97 @@
 #include "bits/stdc++.h"
 using namespace std;
-int n,m,cx,cy,f[100010];
-string ch;
-bool lev[110][110];
-int pos(int x,int y){
-    return x*m+y;
+#define MAXN 10010
+string frog;
+struct num{
+    int v[MAXN];
+};
+int len(num a){
+    int alen=MAXN-1;
+    while(!a.v[alen])alen--;
+    return alen+1;
 }
-int getf(int x){
-    return f[x]==x?x:f[x]=getf(f[x]);
+void read(num &a){
+    frog.clear();
+    cin>>frog;
+    int alen=frog.length();
+    for(int i=0;i<alen;i++)a.v[alen-i-1]=frog[i]-'0';
 }
-void merge(int x,int y){
-    int fx=getf(x),fy=getf(y);
-    if(fx!=fy)f[fy]=fx;
+void print(num a){
+    int alen=len(a);
+    for(int i=alen-1;i>=0;i--)cout<<a.v[i];
+    cout<<endl;
 }
-int check(int t){
-    for(int i=t;i<n;i++){
-        for(int j=0;j<m;j++){
-            if(lev[i-t][j]&&lev[i][j])merge(pos(i,j),pos(i-t,j));
+num add(num a,num b){
+    num c;
+    memset(c.v,0,sizeof(c.v));
+    for(int i=0;i<MAXN-1;i++){
+        c.v[i]+=a.v[i]+b.v[i];
+        if(c.v[i]>=10){
+            c.v[i+1]++;
+            c.v[i]-=10;
         }
     }
-    return getf(pos(cx,cy))==getf(pos(n,-1));
+    return c;
+}
+num sub(num a,num b){
+    num c;
+    memset(c.v,0,sizeof(c.v));
+    for(int i=0;i<MAXN-1;i++){
+        c.v[i]+=a.v[i]-b.v[i];
+        if(c.v[i]<0){
+            c.v[i+1]--;
+            c.v[i]+=10;
+        }
+    }
+    return c;
+}
+num mul(num a,num b){
+    num c;
+    memset(c.v,0,sizeof(c.v));
+    for(int i=0;i<MAXN-1;i++){
+        for(int j=0;j<=i;j++){
+            c.v[i]+=a.v[j]*b.v[i-j];
+        }
+        if(c.v[i]>=10){
+            c.v[i+1]+=c.v[i]/10;
+            c.v[i]%=10;
+        }
+    }
+    return c;
+}
+bool div_check(int step,int blen,num b,num d){
+    if(d.v[step+blen])return true;
+    for(int i=blen-1;i>=0;i--){
+        if(d.v[step+i]==b.v[i])continue;
+        return d.v[step+i]>b.v[i];
+    }
+    return true;
+}
+num div(num a,num b){
+    num c;
+    num d;
+    memset(c.v,0,sizeof(c.v));
+    memset(d.v,0,sizeof(d.v));
+    d=a;
+    int alen=len(a),blen=len(b);
+    for(int i=alen-blen;i>=0;i--){
+        while(div_check(i,blen,b,d)){
+            for(int j=0;j<blen;j++){
+                d.v[i+j]-=b.v[j];
+                if(d.v[i+j]<0){
+                    d.v[i+j+1]--;
+                    d.v[i+j]+=10;
+                }
+            }
+            c.v[i]++;
+        }
+    }
+    return c;
+}
+num convert(int x){
+    
 }
 int main(){
-    //freopen("ArcadeManao.in","r",stdin);
-    //freopen("ArcadeManao.out","w",stdout);
-    cin>>n;
-    getline(cin,ch);
-    for(int i=0;i<n;i++){
-        getline(cin,ch);
-        m=ch.size();
-        for(int j=0;j<m;j++){
-            if(ch[j]=='X')lev[i][j]=1;
-            else lev[i][j]=0;
-        }
-    }
-    cin>>cx>>cy;
-    cx--;cy--;
-    //lev[cx][cy]=1;
-    for(int i=0;i<n*m;i++)f[i]=i;
-    for(int i=0;i<n;i++){
-        for(int j=1;j<m-1;j++){
-            if(lev[i][j]){
-                if(lev[i][j-1])merge(pos(i,j),pos(i,j-1));
-                if(lev[i][j+1])merge(pos(i,j),pos(i,j+1));
-            }
-        }
-    }
-    if(getf(pos(cx,cy))==getf(pos(n,-1)))cout<<0<<endl;
-    else{
-        for(int i=1;i<=n;i++){
-            if(check(i)){
-                cout<<i<<endl;
-                return 0;
-            }
-        }
-        cout<<n<<endl;
-    }
+
     return 0;
 }
