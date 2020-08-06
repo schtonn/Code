@@ -30,9 +30,9 @@ num add(num a,num b){
     c.clear();
     for(int i=0;i<alen+blen;i++){
         c.v[i]+=a.v[i]+b.v[i];
-        if(c.v[i]>10){
+        if(c.v[i]>=10){
             c.v[i+1]++;
-            c.v[i]%=10;
+            c.v[i]-=10;
         }
     }
     return c;
@@ -56,9 +56,9 @@ num mul(num a,num b){
     c.clear();
     for(int i=0;i<alen+blen;i++){
         for(int j=0;j<=i;j++){
-            c.v[i]+=a.v[i]*b.v[i-j];
+            c.v[i]+=a.v[j]*b.v[i-j];
         }
-        if(c.v[i]>10){
+        if(c.v[i]>=10){
             c.v[i+1]+=c.v[i]/10;
             c.v[i]%=10;
         }
