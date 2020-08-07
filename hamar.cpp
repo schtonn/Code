@@ -27,7 +27,15 @@ void print(num a){
 void printt(num a){
     int alen=len(a);
     alen=mod;
-    for(int i=alen-1;i>=0;i--)cout<<a.v[i];
+    int hhhhhhhhamar=-1;
+    for(int i=alen-1;i>=0;i--){
+        hhhhhhhhamar++;
+        if(hhhhhhhhamar==50){
+            cout<<endl;
+            hhhhhhhhamar=0;
+        }
+        cout<<a.v[i];
+    }
     cout<<endl;
 }
 num add(num a,num b){
@@ -126,7 +134,7 @@ int main(){
     // freopen("mason.out","w",stdout);
     int p;
     cin>>p;
-    cout<<ceil(p*log10(2))<<endl;
+    cout<<floor(p*log10(2))+1<<endl;
     num ans=convert(1),a=convert(2),b=convert(p);
     while(len(b)!=1||b.v[0]!=0){
         if(eo(b))ans=modd(mul(ans,a));
@@ -135,4 +143,4 @@ int main(){
     }
     printt(sub(ans,convert(1)));
     return 0;
-}
+} 
