@@ -1,23 +1,28 @@
 #include "bits/stdc++.h"
 using namespace std;
-const long long mod=100003;
-long long n,m;
-long long qpow(long long a,long long b){
-    long long ans=1;
-    a%=mod;
-    while(b){
-        if(b&1)ans=(ans*a)%mod;
-        a=(a*a)%mod;
-        b>>=1;
-    }
-    return ans;
-}
+string a,b,c[1010];
+int alen,blen,clen,junk[1010],ans;
 int main(){
-    // freopen("mason.in","r",stdin);
-    // freopen("mason.out","w",stdout);
-    cin>>m>>n;
-    m%=mod;
-    // n%=mod;
-    cout<<((qpow(m,n)%mod-(m*qpow(m-1,n-1)%mod))+mod)%mod;
+    freopen("Topfox.in","r",stdin);
+    freopen("Topfox.out","w",stdout);
+    cin>>a>>b;
+    alen=a.length();
+    blen=b.length();
+    for(int i=1;i<=alen;i++){
+        for(int j=1;j<=blen;j++){
+            c[clen++]=a.substr(0,i)+b.substr(0,j);
+        }
+    }
+    for(int i=0;i<clen;i++){
+        if(junk[i])continue;
+        for(int j=i+1;j<clen;j++){
+            if(junk[j])continue;
+            if(c[i]==c[j])junk[j]=1;
+        }
+    }
+    for(int i=0;i<clen;i++){
+        if(!junk[i])ans++;
+    }
+    cout<<ans<<endl;
     return 0;
 }
