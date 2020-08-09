@@ -1,28 +1,87 @@
 #include "bits/stdc++.h"
 using namespace std;
-string a,b,c[1010];
-int alen,blen,clen,junk[1010],ans;
+#define MAXN 1010
+struct node{
+    int v,next;
+}e[MAXN];
+int h[MAXN],tot,n,d,con,s,st[MAXN];
+bool vis[MAXN];
+char frog;
+void adde(int u,int v){
+    tot++;
+    e[tot].v=v;
+    e[tot].next=h[u];
+    h[u]=tot;
+}
+queue<int>q;
+void dfs(int u){
+    con++;
+    vis[u]=1;
+    for(int i=h[u];i;i=e[i].next){
+        int v=e[i].v;
+        if(!vis[v])dfs(v);
+    }
+}
+void bfs(int k){
+    while(!q.empty())q.pop();
+    q.push(k);
+    vis[k]=1;
+    while(!q.empty()){
+        int u=q.front();
+        q.pop();
+        s=max(s,st[u]);
+        for(int i=h[u];i;i=e[i].next){
+            int v=e[i].v;
+            if(!vis[v]){
+                vis[v]=1;
+                q.push(v);
+                st[v]=st[u]+1;
+            }
+        }
+    }
+}
 int main(){
-    freopen("Topfox.in","r",stdin);
-    freopen("Topfox.out","w",stdout);
-    cin>>a>>b;
-    alen=a.length();
-    blen=b.length();
-    for(int i=1;i<=alen;i++){
-        for(int j=1;j<=blen;j++){
-            c[clen++]=a.substr(0,i)+b.substr(0,j);
+    // freopen("Egalitarianism.in","r",stdin);
+    // freopen("Egalitarianism.out","w",stdout);
+    cin>>n;
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            cin>>frog;
+            if(frog=='Y'){
+                adde(i,j);
+            }
         }
     }
-    for(int i=0;i<clen;i++){
-        if(junk[i])continue;
-        for(int j=i+1;j<clen;j++){
-            if(junk[j])continue;
-            if(c[i]==c[j])junk[j]=1;
-        }
+    cin>>d;
+    dfs(0);
+    if(con<n){
+        cout<<-1<<endl;
+        return 0;
     }
-    for(int i=0;i<clen;i++){
-        if(!junk[i])ans++;
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++)vis[j]=0;
+        for(int j=0;j<n;j++)st[j]=0;
+        bfs(i);
     }
-    cout<<ans<<endl;
+    cout<<s*d<<endl;
     return 0;
 }
+/*
+15
+NYYNNNNYYYYNNNN
+YNNNYNNNNNNYYNN
+YNNYNYNNNNYNNNN
+NNYNNYNNNNNNNNN
+NYNNNNYNNYNNNNN
+NNYYNNYNNYNNNYN
+NNNNYYNNYNNNNNN
+YNNNNNNNNNYNNNN
+YNNNNNYNNNNNYNN
+YNNNYYNNNNNNNNY
+YNYNNNNYNNNNNNN
+NYNNNNNNNNNNNNY
+NYNNNNNNYNNNNYN
+NNNNNYNNNNNNYNN
+NNNNNNNNNYNYNNN
+1
+*/
