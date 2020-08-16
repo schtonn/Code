@@ -2,7 +2,8 @@
 using namespace std;
 const long long N=90;
 const long long mod=123456789;
-long long n,tlen=4,initial[N+2]={1,1,1,1};
+long long n,tlen,initial[N+2];
+string str;
 struct matrix{
     long long v[N+2][N+2];
     long long x,y;
@@ -14,12 +15,7 @@ struct matrix{
         }
     }
 }t,I,ans,f;
-long long base[N+2][N+2]={
-    {1,1,0,0},
-    {0,0,0,1},
-    {1,1,0,0},
-    {0,0,1,1},
-};
+long long base[N+2][N+2];
 ostream&operator<<(ostream&ous,matrix a){  
     for(long long i=0;i<a.x;i++){
         for(long long j=0;j<a.y;j++){
@@ -81,28 +77,50 @@ void init(){
     }
     for(long long i=0;i<tlen;i++)I.v[i][i]=1;
 }
-int main(){
-    cin>>n;
-    if(n==1){
-        cout<<2<<endl;
-    }else if(n==2){
-        cout<<4<<endl;
-    }else{
-        init();
-        long long cnt=n-2;
-        ans=I;
-        while(cnt){
-            if(cnt&1)ans=ans*t;
-            t=t*t;
-            cnt>>=1;
+long long max_match(string suf){
+    long long pre=0,slen=suf.length(),flag;
+    for(long long i=0;i<slen;i++){
+        flag=1;
+        for(long long j=0;j<slen-i;j++){
+            if(suf[i+j]!=str[j])flag=0;
         }
-        cout<<ans<<endl;
-        ans=ans*f;
-        long long kk=0;
-        for(long long i=0;i<tlen;i++){
-            kk+=ans.v[i][0];
+        if(flag){
+            pre=slen-i;
+            break;
         }
-        cout<<kk%mod<<endl;
     }
+    return pre;
+}
+long long qpow(long long a,long long b){
+    long long ans=1;
+    while(b){
+        if(b&1)ans=(ans*a)%mod;
+        a=(a*a)%mod;
+        b>>=1;
+    }
+    return ans;
+}
+int main(){
+    cin>>str>>n;
+    tlen=str.length();
+    for(long long i=0;i<tlen;i++){
+        base[i][max_match(str.substr(0,i)+'A')]++;
+        base[i][max_match(str.substr(0,i)+'T')]++;
+        base[i][max_match(str.substr(0,i)+'C')]++;
+        base[i][max_match(str.substr(0,i)+'G')]++;
+    }
+    init();
+    matrix ans=I;
+    long long cnt=n;
+    while(cnt){
+        if(cnt&1)ans=ans*t;
+        t=t*t;
+        cnt>>=1;
+    }
+    long long wop=qpow(4,n);
+    for(long long i=0;i<tlen;i++){
+        wop=(wop-ans.v[0][i])+mod%mod;
+    }
+    cout<<wop+mod%mod<<endl;
     return 0;
 }
