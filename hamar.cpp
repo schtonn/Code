@@ -1,26 +1,26 @@
 #include "bits/stdc++.h"
 using namespace std;
-int n,m,k,ans,f[110];
+string a,b,c;
+int f[1010][1010],step[1010][1010],al,bl,cl;
 int main(){
-    // freopen("PiecewiseLinearFunctionDiv2.in","r",stdin);
-    // freopen("PiecewiseLinearFunctionDiv2.out","w",stdout);
-    cin>>n;
-    for(int i=0;i<n;i++){
-        cin>>f[i];
+    cin>>a>>b;
+    al=a.length();
+    bl=b.length();
+    for(int i=1;i<=al;i++){
+        f[i][0]=i;
     }
-    cin>>m;
-    for(int i=0;i<m;i++){
-        cin>>k;
-        ans=0;
-        for(int j=0;j<n-1;j++){
-            if(f[j]==k||(f[j]<k&&f[j+1]>k)||(f[j]>k&&f[j+1]<k))ans++;
-            if(f[j]==k&&f[j+1]==k){
-                ans=-1;
-                break;
+    for(int i=1;i<=bl;i++){
+        f[0][i]=i;
+    }
+    for(int i=1;i<=al;i++){
+        for(int j=1;j<=bl;j++){
+            int A=f[i-1][j],B=f[i][j-1],C=f[i-1][j-1];
+            f[i][j]=min(min(A,B),C)+1;
+            if(a[i-1]==b[j-1]){
+                f[i][j]=C;
             }
         }
-        if(f[n-1]==k&&ans!=-1)ans++;
-        cout<<ans<<' ';
     }
+    cout<<f[al][bl]<<endl;
     return 0;
 }
