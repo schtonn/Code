@@ -1,33 +1,29 @@
 #include "bits/stdc++.h"
 using namespace std;
-#define MAXN 1000
-const long long mod=1e9+9;
-long long C[MAXN+10][MAXN+10],l;
-long long fact(long long n){
-    long long ans=1;
-    for(long long i=26;i>26-n;i--){
-        ans=(ans*i)%mod;
-    }
-    return ans%mod;
-}
-long long P(long long n,long long m){
-    long long ans=1;
-    for(long long i=0;i<m;i++){
-        ans=(ans*n)%mod;
-        n--;
-    }
-    return ans;
-}
+const int inf=0x3f3f3f3f;
+int a[1010],f[1010][1010],t[1010][1010],n;
 int main(){
-    // C[0][0]=1;
-    // for(long long i=1;i<MAXN;i++){
-    //     C[i][0]=C[i][i]=1;
-    //     for(long long j=1;j<=i;j++){
-    //         C[i][j]=(C[i-1][j-1]+C[i-1][j])%mod;
-    //     }
-    // }
-    cin>>l;
-    if(l<=26)cout<<P(26,l)<<endl;
-    else cout<<(P(l-1,25)*26)%mod<<endl;
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        cin>>a[i];
+    }
+    for(int i=1;i<=n;i++){
+        for(int j=i+1;j<=n;j++){
+            for(int k=i;k<=j;k++){
+                t[i][j]+=a[k];
+            }
+        }
+    }
+    for(int len=2;len<=n;len++){
+        for(int i=1;i<=n-len+1;i++){
+            int j=i+len-1;
+            if(i==j)continue;
+            f[i][j]=inf;
+            for(int k=i;k<=j;k++){
+                f[i][j]=min(f[i][j],f[i][k]+f[k+1][j]+t[i][j]);
+            }
+        }
+    }
+    cout<<f[1][n]<<endl;
     return 0;
 }
