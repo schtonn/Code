@@ -1,29 +1,46 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int inf=0x3f3f3f3f;
-int a[1010],f[1010][1010],t[1010][1010],n;
+#define DEBUG
+char S0[1010], T0[1010];
+char S[1010], T[1010];
+int F[1010][1010], B[1010][1010];
+char Q[1010],P[1010],lq=0;
 int main(){
-    cin>>n;
-    for(int i=1;i<=n;i++){
-        cin>>a[i];
-    }
-    for(int i=1;i<=n;i++){
-        for(int j=i+1;j<=n;j++){
-            for(int k=i;k<=j;k++){
-                t[i][j]+=a[k];
+    #ifndef DEBUG
+    freopen("WolfDelaymaster.in","r",stdin);
+    freopen("WolfDelaymaster.out","w",stdout);
+    #endif
+    cin>>S0>>T0;
+    int u=strlen(S0), v=strlen(T0);
+    strcpy(S, "*");
+    strcat(S, S0);
+    strcpy(T, "*");
+    strcat(T, T0);
+    F[0][0]=0;
+    for(int i=1;i<=u;++i)F[i][0]=0;
+    for(int j=1;j<=v;++j)F[0][j]=0;
+    for(int i=1;i<=u;++i){
+        for(int j=1;j<=v;++j){
+            F[i][j]=F[i-1][j];B[i][j]=2;
+            if(S[i]==T[j] && F[i-1][j-1]+1>F[i][j]){
+                F[i][j]=F[i-1][j-1]+1;B[i][j]=1;
+            }
+            if(F[i][j-1]>F[i][j]){
+                F[i][j]=F[i][j-1];B[i][j]=3;
             }
         }
     }
-    for(int len=2;len<=n;len++){
-        for(int i=1;i<=n-len+1;i++){
-            int j=i+len-1;
-            if(i==j)continue;
-            f[i][j]=inf;
-            for(int k=i;k<=j;k++){
-                f[i][j]=min(f[i][j],f[i][k]+f[k+1][j]+t[i][j]);
-            }
+    int ans=F[u][v], pS=u, pT=v;
+    while(pS>0 && pT>0){
+        if(B[pS][pT]==1){
+            Q[++lq]=S[pS];
+            --pS;--pT;
         }
+        else if(B[pS][pT]==2)--pS;
+        else --pT;
     }
-    cout<<f[1][n]<<endl;
+    cout<<ans<<endl;
+    for(int i=lq;i>0;--i)cout<<Q[i];
+    cout<<endl;
     return 0;
 }
