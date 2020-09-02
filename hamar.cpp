@@ -1,46 +1,74 @@
 #include "bits/stdc++.h"
 using namespace std;
 #define DEBUG
-char S0[1010], T0[1010];
-char S[1010], T[1010];
-int F[1010][1010], B[1010][1010];
-char Q[1010],P[1010],lq=0;
+#define N 1010
+int n,c[N],f[N],dp[N],g[N],ssum[N],gsum,sgum[N],ggum;
+vector<int>son[N];
+vector<int>order;
+queue<int>q;
+// int dp(int u){
+//     gsum=ssum=0;
+//     cout<<"and down to "<<u<<' ';
+//     if(son[u].size()){
+//         cout<<"which is not a leave ";
+//         for(int i=0;i<son[u].size();i++){
+//             ssum+=dp(son[u][i]);
+//         }
+//         int k=max(gsum+1,ssum);
+//         cout<<" with son of "<<ssum<<" and grandson of "<<gsum<<' ';
+//         gsum+=ssum;
+//         cout<<"and leaving "<<u<<' ';
+//         return k;
+//     }else{
+//         cout<<"which is a leave, so leaving "<<u<<' ';
+//         return 1;
+//     }
+// }
 int main(){
     #ifndef DEBUG
     freopen("WolfDelaymaster.in","r",stdin);
     freopen("WolfDelaymaster.out","w",stdout);
     #endif
-    cin>>S0>>T0;
-    int u=strlen(S0), v=strlen(T0);
-    strcpy(S, "*");
-    strcat(S, S0);
-    strcpy(T, "*");
-    strcat(T, T0);
-    F[0][0]=0;
-    for(int i=1;i<=u;++i)F[i][0]=0;
-    for(int j=1;j<=v;++j)F[0][j]=0;
-    for(int i=1;i<=u;++i){
-        for(int j=1;j<=v;++j){
-            F[i][j]=F[i-1][j];B[i][j]=2;
-            if(S[i]==T[j] && F[i-1][j-1]+1>F[i][j]){
-                F[i][j]=F[i-1][j-1]+1;B[i][j]=1;
-            }
-            if(F[i][j-1]>F[i][j]){
-                F[i][j]=F[i][j-1];B[i][j]=3;
-            }
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        cin>>c[i];
+    }
+    for(int i=1;i<=n;i++){
+        cin>>f[i];
+        if(i!=1)son[f[i]].push_back(i);
+    }
+    // cout<<dp(1)<<endl;
+    q.push(1);
+    while(!q.empty()){
+        int v=q.front();
+        q.pop();
+        order.push_back(v);
+        for(int i=0;i<son[v].size();i++){
+            q.push(son[v][i]);
         }
     }
-    int ans=F[u][v], pS=u, pT=v;
-    while(pS>0 && pT>0){
-        if(B[pS][pT]==1){
-            Q[++lq]=S[pS];
-            --pS;--pT;
+    for(int i=n-1;i>=0;i--){
+        int u=order[i];
+        gsum=0;
+        if(son[u].size()){
+            for(int i=0;i<son[u].size();i++){
+                ssum[u]+=dp[son[u][i]];
+                sgum[u]+=g[son[u][i]];
+                gsum+=ssum[son[u][i]];
+                ggum+=sgum[son[u][i]];
+            }
+            dp[u]=max(ssum[u],gsum+1);
+            if(ssum[u]>gsum+1){
+                g[u]=sgum[u];
+            }else{
+                g[u]=ggum+c[u];
+            }
+        }else{
+            ssum[u]=0;
+            dp[u]=1;
+            g[u]=c[u];
         }
-        else if(B[pS][pT]==2)--pS;
-        else --pT;
     }
-    cout<<ans<<endl;
-    for(int i=lq;i>0;--i)cout<<Q[i];
-    cout<<endl;
+    cout<<g[1]<<endl;
     return 0;
 }
