@@ -6,7 +6,9 @@ using namespace std;
 #else
     #define N 1010
 #endif
-int n,c[N],f[N],dp[N],g[N],ssum[N],gsum,sgum[N],ggum;
+int n,c[N],f[N],dp[N][2],g[N][2],sum0,sum1,sgum[N],ggum;
+//dp[u][0]:u为根不选u
+//dp[u][1]:u为根选u
 vector<int>son[N];
 vector<int>order;
 queue<int>q;
@@ -30,27 +32,19 @@ int main(){
     }
     for(int i=n-1;i>=0;i--){
         int u=order[i];
-        gsum=ggum=0;
-        if(son[u].size()){
-            for(int i=0;i<son[u].size();i++){
-                int k=son[u][i];
-                ssum[u]+=dp[k];
-                sgum[u]+=g[k];
-                gsum+=ssum[k];
-                ggum+=sgum[k];
-            }
-            dp[u]=max(ssum[u],gsum+1);
-            if(ssum[u]>gsum+1){
-                g[u]=sgum[u];
-            }else{
-                g[u]=ggum+c[u];
-            }
-        }else{
-            ssum[u]=0;
-            dp[u]=1;
-            g[u]=c[u];
+        sum0=sum1=0;
+        for(int i=0;i<son[u].size();i++){
+            sum0+=max(dp[son[u][i]][0],dp[son[u][i]][1]);
+            if(dp[son[u][i]][0]>dp[son[u][i]][1])g[u][0]+=g[son[u][i]][0];
+            else g[u][0]+=g[son[u][i]][1];
+            sum1+=dp[son[u][i]][0];
+            g[u][1]+=g[son[u][i]][0];
         }
+        dp[u][0]=sum0;
+        dp[u][1]=sum1+1;
+        g[u][1]+=c[u];
     }
-    cout<<g[1]<<endl;
+    if(dp[1][1]>dp[1][0])cout<<g[1][1]<<endl;
+    else cout<<g[1][0]<<endl;
     return 0;
 }
