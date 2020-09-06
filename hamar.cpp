@@ -16,6 +16,7 @@ int main(){
     cin>>n>>m;
     for(int i=1;i<=m;i++){
         cin>>u>>v;
+        if(u==v)goto no;
         adde(u,v);
         in[v]++;
     }
@@ -32,12 +33,11 @@ int main(){
             if(!in[v])q.push(v);
         }
     }
+    no:
     if(cnt<n){
-        cout<<"No"<<endl;
+        cout<<"yes"<<endl;
     }else{
-        for(int i=1;i<=n;i++){
-            cout<<ans[i]<<' ';
-        }
+        cout<<"no"<<endl;
     }
     return 0;
 }
