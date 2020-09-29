@@ -1,38 +1,110 @@
-#include "bits/stdc++.h"
-using namespace std;
-int n,len,side,Tot,hj,i,t1,t2,a[5105],A[5105];
+#include <iostream>
+#include <string>
+#include <cmath>
 
-int main(){
-    scanf("%d",&n);len=(n+20)/2;a[1]=2;side=1;Tot=0;hj=3;printf("3.");
-    while(side&&++Tot<=200000000){
-        for(t1=t2=0,i=len-1;i;i--){
-            t1=a[i]*Tot+t2;
-            a[i]=t1%100;
-            t2=t1/100;
+using namespace std;
+
+const double PRECISION=1E-6;
+const int COUNT_OF_NUMBER =4;
+const int NUMBER_TO_BE_CAL=24;
+double number[COUNT_OF_NUMBER];
+string expression[COUNT_OF_NUMBER];
+bool Judgement=false;//判断是否有解。
+int count=0;
+
+void Search(int n)
+{
+    if(n==1)
+    {
+        if( fabs(number[0]-NUMBER_TO_BE_CAL)<= PRECISION )//对于除法，要小心小数的精确位数
+        {
+            cout<<expression[0]<<"\t\t";
+            Judgement=true;
+            count ++;
+            if((count % 3)==0)
+                cout<<endl;
         }
-        for(t2=0,i=0;i<len;i++){
-            t1=a[i]+t2*100;
-            a[i]=t1/hj;
-            t2=t1%hj;
-        }
-        side=0;
-        for(i=len-1;i;i--){
-            A[i-1]+=(A[i]+a[i])/100;
-            A[i]=(A[i]+a[i])%100;
-            side|=(a[i]/10);
-            side|=(a[i]%10);
-        }
-        hj+=2;
+        else
+        { }
     }
-    hj=0;
-    for(i=2;i<=n+1;i++){
-        hj+=2;
-        if(hj>n){
-            printf("%d",A[i]/10);
-            break;
+
+    for(int i=0;i < n;i++)
+    {
+        for(int j=i+1;j < n;j++)
+        {
+            double a, b;
+            string expa, expb;
+
+            a=number[i];
+            b=number[j];
+            number[j]=number[n-1];//递归之后，n比以前小一位，所以可以不停向前赋值
+
+            expa=expression[i];
+            expb=expression[j];
+            expression[j]=expression[n-1];//递归之后，n比以前小一位，所以可以不停向前赋值
+
+            expression[i]='('+expa+'+'+expb+')';//加法不需要分顺序
+            number[i]=a+b;
+            Search(n-1);
+
+            expression[i]='('+expa+'-'+expb+')';//减法应该分顺序，减数以及被减数
+            number[i]=a-b;
+            Search(n-1);
+
+            expression[i]='('+expb+'-'+expa+')';//减法应该分顺序，减数以及被减数
+            number[i]=b-a;
+            Search(n-1);
+
+
+            expression[i]='('+expa+'*'+expb+')';//乘法不需要分顺序
+            number[i]=a * b;
+            Search(n-1);
+
+            if(b!=0)
+            {
+                expression[i]='('+expa+'/'+expb+')';//除法应该分顺序，除数以及被除数
+                number[i]=a/b;
+                Search(n-1);
+            }
+            if(a!=0)
+            {
+                expression[i]='('+expb+'/'+expa+')';//除法应该分顺序，除数以及被除数
+                number[i]=b/a;
+                Search(n-1);
+            }
+
+            number[i]=a;//这4句语句是为了防止如果上面几种可能都失败了的话,
+            number[j]=b;//就把原来的赋值撤消回去,以无干扰的正确的进入到下一次
+            expression[i]=expa;//for循环队列中。
+            expression[j]=expb;//
         }
-        if(A[i]<10)printf("0");printf("%d",A[i]);
-        if(hj==n)break;
     }
+}
+
+int main()
+{
+    cout<<"Please input 4 value of Cards:\n";
+    for(int i=0;i < COUNT_OF_NUMBER;i++)
+    {
+        char buffer[20];
+        cout<<"The "<<i+1<<"th card:";
+        cin >> number[i];
+        itoa(number[i], buffer, 10);//itoa()函数的作用是把第一个参数(数值)传送到第二个参数(字符串)中去，第三个
+        //参数(int型)是该数值在字符串里以什么进制存放。
+        expression[i]=buffer;
+    }
+
+    cout<<endl;
+    Search(COUNT_OF_NUMBER);
+    if(Judgement==true)
+    {
+        cout<<"\nSuccess."<<endl;
+        cout<<"sum:"<<count<<endl;
+    }
+    else
+    {
+        cout<<"Fail."<<endl;
+    }
+    system("pause");
     return 0;
 }
