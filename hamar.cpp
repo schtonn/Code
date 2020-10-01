@@ -1,21 +1,27 @@
 #include "bits/stdc++.h"
 using namespace std;
-int a,b,a1,b1,l;
-int gcd(int a,int b){
-    if(!b)return a;
-    else return gcd(b,a%b);
-}
+int n,na,nb,a[1010],b[1010],ans,bns;
+bool s[5][5]={
+    {0,0,1,1,0},
+    {1,0,0,1,0},
+    {0,1,0,0,1},
+    {0,0,1,0,1},
+    {1,1,0,0,0}
+};
 int main(){
-    cin>>a>>b>>l;
-    a1=l;b1=1;
-    for(int i=1;i<=l;i++){
-        for(int j=1;j<=l;j++){
-            if(gcd(i,j)==1&&i*b>=j*a&&i*b1<j*a1){
-                a1=i;
-                b1=j;
-            }
-        }
+    cin>>n>>na>>nb;
+    for(int i=0;i<na;i++){
+        cin>>a[i];
     }
-    cout<<a1<<' '<<b1<<endl;
+    for(int i=0;i<nb;i++){
+        cin>>b[i];
+    }
+    for(int i=0;i<n;i++){
+        int ak=a[i%na],bk=b[i%nb];
+        if(ak==bk)continue;
+        if(s[ak][bk])ans++;
+        else bns++;
+    }
+    cout<<ans<<' '<<bns<<endl;
     return 0;
 }
