@@ -1,27 +1,36 @@
-#include "bits/stdc++.h"
+#include <string>
+#include <iostream>
 using namespace std;
-int n,na,nb,a[1010],b[1010],ans,bns;
-bool s[5][5]={
-    {0,0,1,1,0},
-    {1,0,0,1,0},
-    {0,1,0,0,1},
-    {0,0,1,0,1},
-    {1,1,0,0,0}
-};
-int main(){
-    cin>>n>>na>>nb;
-    for(int i=0;i<na;i++){
-        cin>>a[i];
-    }
-    for(int i=0;i<nb;i++){
-        cin>>b[i];
-    }
-    for(int i=0;i<n;i++){
-        int ak=a[i%na],bk=b[i%nb];
-        if(ak==bk)continue;
-        if(s[ak][bk])ans++;
-        else bns++;
-    }
-    cout<<ans<<' '<<bns<<endl;
+
+int main() {
+    string ans =
+        "ABCBCCABCBDBDCC"
+        "FTTFDA"
+        "TTTTDA"
+        "FTTFBD"
+        "CBBAC"
+        "DBDBC";
+    int no;
+    cin >> no;
+    cout << ans[no - 1];
     return 0;
 }
+/*
+#include<bits/stdc++.h>
+using namespace std;
+
+int main()
+{
+    string ans =
+        "ABCBACABCBDBACD"
+        "FTTTBA"
+        "FFTTAA"
+        "FFFTCC"
+        "CDDAC"
+        "CBDCB";
+    int no;
+    cin >> no;
+    cout << ans[no - 1];
+    return 0;
+}
+*/
