@@ -194,24 +194,46 @@ void clean(){
     }
 }
 void help(){
-    cout<<"Formatting:"<<endl;
-    cout<<"<equation> ::= <expr> \"=\" <expr>"<<endl;
-    cout<<"<expr> ::= <coef> <formula> | <expr> \"+\" <coef> <formula>"<<endl;
-    cout<<"<coef> ::= <digits> | \"\""<<endl;
-    cout<<"<digits> ::= <digit> | <digits> <digit>"<<endl;
-    cout<<"<digit> ::= \"0\" | \"1\" | ... | \"9\""<<endl;
-    cout<<"<formula> ::= <term> <coef> | <formula> <term> <coef>"<<endl;
-    cout<<"<term> ::= <element> | \"(\" <formula> \")\""<<endl;
-    cout<<"<element> ::= <uppercase> | <uppercase> <lowercase>"<<endl;
-    cout<<"<uppercase> ::= \"A\" | \"B\" | ... | \"Z\""<<endl;
-    cout<<"<lowercase> ::= \"a\" | \"b\" | ... | \"z\""<<endl<<endl;
-    cout<<"The program requires an chemical equation(<equation>) and outputs the state of the equation. An equation should be settled as above, or the program may not work properly."<<endl;
+    cout<<"INPUT"<<endl;
+    cout<<"The program requires an chemical equation(<equation>) and outputs wether it is balanced. An equation should be settled as below, or the program may not work properly."<<endl;
+    cout<<"\t<equation> ::= <expr> \"=\" <expr>"<<endl;
+    cout<<"\t<expr> ::= <coef> <formula> | <expr> \"+\" <coef> <formula>"<<endl;
+    cout<<"\t<coef> ::= <digits> | \"\""<<endl;
+    cout<<"\t<digits> ::= <digit> | <digits> <digit>"<<endl;
+    cout<<"\t<digit> ::= \"0\" | \"1\" | ... | \"9\""<<endl;
+    cout<<"\t<formula> ::= <term> <coef> | <formula> <term> <coef>"<<endl;
+    cout<<"\t<term> ::= <element> | \"(\" <formula> \")\""<<endl;
+    cout<<"\t<element> ::= <uppercase> | <uppercase> <lowercase>"<<endl;
+    cout<<"\t<uppercase> ::= \"A\" | \"B\" | ... | \"Z\""<<endl;
+    cout<<"\t<lowercase> ::= \"a\" | \"b\" | ... | \"z\""<<endl<<endl;
+    cout<<"OUTPUT"<<endl;
     cout<<"\"Y\" means this equation is balanced."<<endl;
     cout<<"\"N\" means this equation is unbalanced."<<endl;
     cout<<"\"unknown elemet\" means this equation contains an unknown element that has not yet be discovered by humanity, or you are inputting illigal equations."<<endl<<endl;
+    cout<<"COMMANDS"<<endl;
     cout<<"help\tProvides Help information."<<endl;
     cout<<"exit\tQuits the program."<<endl<<endl;
-    cout<<"Warning: This program supports up to 1000 expressions with 1000 elements, but no more."<<endl;
+    cout<<"Warning: This program supports up to 1000 expressions with 1000 elements, but no more."<<endl<<endl;
+    cout<<"输入"<<endl;
+    cout<<"程序输入一个化学式，并判断其是否配平。化学式的格式如下，不合法的化学式可能引起未定义行为。"<<endl;
+    cout<<"\t<equation> ::= <expr> \"=\" <expr>"<<endl;
+    cout<<"\t<expr> ::= <coef> <formula> | <expr> \"+\" <coef> <formula>"<<endl;
+    cout<<"\t<coef> ::= <digits> | \"\""<<endl;
+    cout<<"\t<digits> ::= <digit> | <digits> <digit>"<<endl;
+    cout<<"\t<digit> ::= \"0\" | \"1\" | ... | \"9\""<<endl;
+    cout<<"\t<formula> ::= <term> <coef> | <formula> <term> <coef>"<<endl;
+    cout<<"\t<term> ::= <element> | \"(\" <formula> \")\""<<endl;
+    cout<<"\t<element> ::= <uppercase> | <uppercase> <lowercase>"<<endl;
+    cout<<"\t<uppercase> ::= \"A\" | \"B\" | ... | \"Z\""<<endl;
+    cout<<"\t<lowercase> ::= \"a\" | \"b\" | ... | \"z\""<<endl<<endl;
+    cout<<"输出"<<endl;
+    cout<<"\"Y\" 代表化学式已配平"<<endl;
+    cout<<"\"N\" 代表化学式未配平"<<endl;
+    cout<<"\"unknown elemet\" 代表化学式中的某一元素还没有被发现，或者输入的化学式不合法"<<endl<<endl;
+    cout<<"指令"<<endl;
+    cout<<"help\t提供帮助信息"<<endl;
+    cout<<"exit\t退出程序"<<endl<<endl;
+    cout<<"警告：此程序最多接受1000种元素，和1000个分子式，否则同样会引发未定义行为。"<<endl;
 }
 void print(){
     for(int i=0;i<rf;i++){
