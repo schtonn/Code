@@ -6,7 +6,7 @@ using namespace std;
 //INIT
 
 int n,len,weigh[maxe];
-int E;//element count
+int E,lE,rE;//element count
 int M;//molecule count
 int rf;//first of right
 bool err=0;
@@ -32,106 +32,140 @@ int gcd(int a,int b){
     if(!b)return a;
     return gcd(b,a%b);
 }
-bool num(char x){return '0'<=x&&x<='9';}
-bool alp(char x){return 'a'<=x&&x<='z';}
+bool isNum(char x){return '0'<=x&&x<='9';}
+bool isAlpha(char x){return 'a'<=x&&x<='z';}
 int m[maxe][maxe],ans[maxe],cm[maxe];
 
 //DIVIDING & CALCULATING
 
-void eleme(string s,int coef,int ncoef){//single element
-    //cout<<"element: "<<s<<' '<<coef<<endl;
+void eleme(string s,int c,int newC){//single element
+    //cout<<"element: "<<s<<' '<<c<<endl;
     if(err==0){
         err=1;
-        for(int i=1;i<ELM;i++){
-            if(s==chart[i])err=0;
-        }
+        for(int i=1;i<ELM;i++)if(s==chart[i])err=0;
     }
     for(int i=0;i<E;i++){
         if(e[i]==s){
-            m[M][i]+=coef;
-            weigh[i]+=coef;
+            m[M][i]+=c;
+            weigh[i]+=c;
             return;
         }
     }
     e[E]=s;
-    m[M][E]=coef;
-    weigh[E++]=coef;
+    m[M][E]=c;
+    weigh[E++]=c;
 }
-void formu(string s,int coef){//single molecule
-//    cout<<"formula: "<<s<<' '<<coef<<endl;
-    int len=s.length(),layer,ncoef=0,start,end;
-    string newele;
+void formu(string s,int c){//single molecule
+//    cout<<"formula: "<<s<<' '<<c<<endl;
+    int len=s.length(),layer,newC=0,start,end;
+    string newS;
     for(int i=0;i<len;i++){
         if(s[i]=='('){
-            start=i+1;
-            layer=1;
+            start=i+1;layer=1;
             while(layer){
                 i++;
                 if(s[i]=='(')layer++;
                 if(s[i]==')')layer--;
             }
             end=i;
-            if(num(s[i+1])){
+            if(isNum(s[i+1])){
                 i++;
-                while(num(s[i])){
-                    if(i!=0)ncoef*=10;
-                    ncoef+=s[i]-'0';
+                while(isNum(s[i])){
+                    if(i!=0)newC*=10;
+                    newC+=s[i]-'0';
                     i++;
                 }
                 i--;
             }
-            if(ncoef==0)ncoef=1;
-            formu(s.substr(start,end-start),coef*ncoef);
-            ncoef=0;
+            if(newC==0)newC=1;
+            formu(s.substr(start,end-start),c*newC);
         }else{
-            newele=s[i];
-            if(alp(s[i+1])){
-                newele+=s[i+1];
+            newS=s[i];
+            if(isAlpha(s[i+1])){
+                newS+=s[i+1];
                 i++;
             }
-            if(num(s[i+1])){
+            if(isNum(s[i+1])){
                 i++;
-                while(num(s[i])){
-                    ncoef*=10;
-                    ncoef+=s[i]-'0';
+                while(isNum(s[i])){
+                    newC*=10;
+                    newC+=s[i]-'0';
                     i++;
                 }
                 i--;
             }
-            if(ncoef==0)ncoef=1;
-            eleme(newele,coef*ncoef,ncoef);
-            ncoef=0;
+            if(newC==0)newC=1;
+            eleme(newS,c*newC,newC);
         }
+        newC=0;
     }
 }
-void subexpr(string s,int coef){//coefficient
-    int len=s.length(),ncoef=0,pos=0;
-    if(num(s[0])){
-        while(num(s[pos])){
-            if(pos!=0)ncoef*=10;
-            ncoef+=s[pos]-'0';
+void subExpr(string s,int c){//cficient
+    int len=s.length(),newC=0,pos=0;
+    if(isNum(s[0])){
+        while(isNum(s[pos])){
+            if(pos!=0)newC*=10;
+            newC+=s[pos]-'0';
             pos++;
         }
     }
-    if(ncoef==0)ncoef=1;
-    cm[M]=ncoef;
-    formu(s.substr(pos,len-pos),coef*ncoef);
+    if(newC==0)newC=1;
+    cm[M]=newC;
+    formu(s.substr(pos,len-pos),c*newC);
 }
-void expr(string s,int coef){//expressions
+void expr(string s,int c){//expressions
     int len=s.length(),pos=0;
     for(int i=0;i<len;i++){
         if(s[i]=='+'){
-            subexpr(s.substr(pos,i-pos),coef);
+            subExpr(s.substr(pos,i-pos),c);
             M++;
             pos=i+1;
         }
     }
-    subexpr(s.substr(pos,len-pos),coef);
+    subExpr(s.substr(pos,len-pos),c);
     M++;
 }
 
 //BALANCING
 
+void pre(){
+    for(int i=0;i<M;i++){
+        for(int j=0;j<E;j++){
+            if(m[i][j]<0){
+                if(!rf)rf=i;
+                m[i][j]=-m[i][j];
+            }
+        }
+    }
+}
+bool lrBalance(){
+	bool l[1010],r[1010];
+	int lcnt=0,rcnt=0;
+	memset(l,0,sizeof(l));
+	memset(r,0,sizeof(r));
+	for(int i=0;i<rf;i++){
+		for(int j=0;j<E;j++){
+			if(m[i][j])l[j]=1;
+		}
+	}
+	for(int i=rf;i<M;i++){
+		for(int j=0;j<E;j++){
+			if(m[i][j])r[j]=1;
+		}
+	}
+	for(int i=0;i<E;i++){
+		if(l[i])lcnt++;
+		if(r[i])rcnt++;
+	}
+	if(lcnt!=rcnt)return false;
+	return true;
+}
+bool dfs(){
+
+}
+bool balancable(){
+	return lrBalance();
+}
 void reduce(int x){
     int cnt=0;
     int div=m[x][0];
@@ -147,14 +181,6 @@ void reduce(int x){
     }
 }
 void balance(){
-    for(int i=0;i<M;i++){
-        for(int j=0;j<E;j++){
-            if(m[i][j]<0){
-                if(!rf)rf=i;
-                m[i][j]=-m[i][j];
-            }
-        }
-    }
     for(int i=0;i<M;i++){
         //reduce(i);
         for(int j=0;j<E;j++){
@@ -198,11 +224,11 @@ void declare(bool t){
         cout<<"4Au+8NaCN+2H2O+O2=4Na(Au(CN)2)+4NaOH"<<endl<<endl;
     }else{
         cout<<"\t<equation> ::= <expr> \"=\" <expr>"<<endl;
-        cout<<"\t<expr> ::= <coef> <formula> | <expr> \"+\" <coef> <formula>"<<endl;
-        cout<<"\t<coef> ::= <digits> | \"\""<<endl;
+        cout<<"\t<expr> ::= <c> <formula> | <expr> \"+\" <c> <formula>"<<endl;
+        cout<<"\t<c> ::= <digits> | \"\""<<endl;
         cout<<"\t<digits> ::= <digit> | <digits> <digit>"<<endl;
         cout<<"\t<digit> ::= \"0\" | \"1\" | ... | \"9\""<<endl;
-        cout<<"\t<formula> ::= <term> <coef> | <formula> <term> <coef>"<<endl;
+        cout<<"\t<formula> ::= <term> <c> | <formula> <term> <c>"<<endl;
         cout<<"\t<term> ::= <element> | \"(\" <formula> \")\""<<endl;
         cout<<"\t<element> ::= <uppercase> | <uppercase> <lowercase>"<<endl;
         cout<<"\t<uppercase> ::= \"A\" | \"B\" | ... | \"Z\""<<endl;
@@ -224,7 +250,7 @@ void help(){
     cout<<"exit\tQuits the program."<<endl<<endl;
     cout<<"Warning: This program supports up to 1000 expressions with 1000 elements, but no more."<<endl<<endl;
     cout<<"输入"<<endl;
-    cout<<"程序输入一个化学式，并判断其是否配平。化学式的格式如下，不合法的化学式可能引起未定义行为。"<<endl;
+    /*cout<<"程序输入一个化学式，并判断其是否配平。化学式的格式如下，不合法的化学式可能引起未定义行为。"<<endl;
     declare(0);
     cout<<"例如: ";
     declare(1);
@@ -235,7 +261,7 @@ void help(){
     cout<<"指令"<<endl;
     cout<<"help\t提供帮助信息。"<<endl;
     cout<<"exit\t退出程序。"<<endl<<endl;
-    cout<<"警告：此程序最多接受1000种元素，和1000个分子式，否则可能会引发未定义行为。"<<endl;
+    cout<<"警告：此程序最多接受1000种元素，和1000个分子式，否则可能会引发未定义行为。"<<endl;*/ 
 }
 void print(){
     for(int i=0;i<rf;i++){
@@ -292,15 +318,20 @@ int main(){
         else{
             if(flag){
                 cout<<"N"<<endl;
-                balance();
-                cout<<"Attempt to balance: ";
-                print();
-                cout<<"Beware, the attempt will come out unsuccessful most of the times."<<endl;
+                pre(); 
+                if(balancable()){
+    	            balance();
+    	            cout<<"Attempt to balance: ";
+    	            print();
+	                cout<<"Beware, the attempt will come out unsuccessful most of the times."<<endl;
+	            }else{
+	            	cout<<"Unable to balance."<<endl;
+				}
             }
             else cout<<"Y"<<endl;
         }
     }
-    system("pause");
+//    system("pause");
     return 0;
 }
 /*
