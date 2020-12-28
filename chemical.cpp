@@ -1,16 +1,14 @@
 #include "bits/stdc++.h"
 using namespace std;
-#define maxe 1010
-#define ELM 119
+#define maxm 1010
+#define E 119//element count
 
-//INIT
+//******************INIT*****************//
 
-int n,len,weigh[maxe];
-int E,lE,rE;//element count
+int n,len,weigh[E];
 int M;//molecule count
-int rf;//first of right
 bool err=0;
-string chart[ELM]={"",
+string e[E]={"",
     "H","He",
 
     "Li","Be","B","C","N","O","F","Ne",
@@ -27,23 +25,19 @@ string chart[ELM]={"",
     "Fr","Ra","Ac","Th","Pa","U","Np","Pu","Am","Cm","Bk","Cf","Es","Fm","Md","No","Lr","Rf",
     "Db","Sg","Bh","Hs","Mt","Ds","Rg","Cn","Nh","Fl","Mc","Lv","Ts","Og",
 };
-string s,l,r,e[maxe];
+string s;
 int gcd(int a,int b){
     if(!b)return a;
     return gcd(b,a%b);
 }
 bool isNum(char x){return '0'<=x&&x<='9';}
 bool isAlpha(char x){return 'a'<=x&&x<='z';}
-int m[maxe][maxe],ans[maxe],cm[maxe];
 
-//DIVIDING & CALCULATING
+//******************DIVIDING & CALCULATING*****************//
 
+int m[maxm][E],cm[E];
 void eleme(string s,int c,int newC){//single element
     //cout<<"element: "<<s<<' '<<c<<endl;
-    if(err==0){
-        err=1;
-        for(int i=1;i<ELM;i++)if(s==chart[i])err=0;
-    }
     for(int i=0;i<E;i++){
         if(e[i]==s){
             m[M][i]+=c;
@@ -51,9 +45,7 @@ void eleme(string s,int c,int newC){//single element
             return;
         }
     }
-    e[E]=s;
-    m[M][E]=c;
-    weigh[E++]=c;
+    err=1;
 }
 void formu(string s,int c){//single molecule
 //    cout<<"formula: "<<s<<' '<<c<<endl;
@@ -126,13 +118,15 @@ void expr(string s,int c){//expressions
     M++;
 }
 
-//BALANCING
+//******************BALANCING*****************//
 
-void pre(){
+int ans[E];
+int fR;//first of right
+void findCenter(){
     for(int i=0;i<M;i++){
         for(int j=0;j<E;j++){
             if(m[i][j]<0){
-                if(!rf)rf=i;
+                if(!fR)fR=i;
                 m[i][j]=-m[i][j];
             }
         }
@@ -143,12 +137,12 @@ bool lrBalance(){
 	int lcnt=0,rcnt=0;
 	memset(l,0,sizeof(l));
 	memset(r,0,sizeof(r));
-	for(int i=0;i<rf;i++){
+	for(int i=0;i<fR;i++){
 		for(int j=0;j<E;j++){
 			if(m[i][j])l[j]=1;
 		}
 	}
-	for(int i=rf;i<M;i++){
+	for(int i=fR;i<M;i++){
 		for(int j=0;j<E;j++){
 			if(m[i][j])r[j]=1;
 		}
@@ -161,42 +155,27 @@ bool lrBalance(){
 	return true;
 }
 bool dfs(){
-
+    
 }
 bool balancable(){
 	return lrBalance();
 }
-void reduce(int x){
-    int cnt=0;
-    int div=m[x][0];
-    for(int i=0;i<E;i++){
-        if(m[x][i]){
-            div=gcd(div,m[x][i]);
-            cnt++;
-        }
-    }
-    if(cnt<=1)return;
-    for(int i=0;i<E;i++){
-        m[x][i]/=div;
-    }
-}
 void balance(){
     for(int i=0;i<M;i++){
-        //reduce(i);
         for(int j=0;j<E;j++){
             m[i][j]/=cm[i];
         }
     }
     for(int i=0;i<E;i++){
         int l=0,r=0;
-        for(int j=0;j<rf;j++)l+=m[j][i]*ans[j];
-        for(int j=rf;j<M;j++)r+=m[j][i]*ans[j];
+        for(int j=0;j<fR;j++)l+=m[j][i]*ans[j];
+        for(int j=fR;j<M;j++)r+=m[j][i]*ans[j];
         int div=gcd(l,r);
         l/=div;
         r/=div;
         swap(l,r);
-        for(int j=0;j<rf;j++)/*if(m[j][i])*/ans[j]*=l;
-        for(int j=rf;j<M;j++)/*if(m[j][i])*/ans[j]*=r;
+        for(int j=0;j<fR;j++)/*if(m[j][i])*/ans[j]*=l;
+        for(int j=fR;j<M;j++)/*if(m[j][i])*/ans[j]*=r;
     }
     int div=ans[0];
     for(int i=0;i<M;i++){
@@ -207,13 +186,14 @@ void balance(){
     }
 }
 
-//HELPERS
+//******************HELPERS*****************//
 
 void clean(){
     M=0;
     err=0;
-    for(int i=0;i<maxe;i++){
-        for(int j=0;j<maxe;j++){
+    memset(weigh,0,sizeof(weigh));
+    for(int i=0;i<maxm;i++){
+        for(int j=0;j<E;j++){
             m[i][j]=0;
         }
         ans[i]=1;
@@ -248,7 +228,7 @@ void help(){
     cout<<"COMMANDS"<<endl;
     cout<<"help\tProvides Help information."<<endl;
     cout<<"exit\tQuits the program."<<endl<<endl;
-    cout<<"Warning: This program supports up to 1000 expressions with 1000 elements, but no more."<<endl<<endl;
+    cout<<"Warning: This program supports up to 119 expressions with 1000 elements, but no more."<<endl<<endl;
     cout<<"输入"<<endl;
     /*cout<<"程序输入一个化学式，并判断其是否配平。化学式的格式如下，不合法的化学式可能引起未定义行为。"<<endl;
     declare(0);
@@ -261,10 +241,10 @@ void help(){
     cout<<"指令"<<endl;
     cout<<"help\t提供帮助信息。"<<endl;
     cout<<"exit\t退出程序。"<<endl<<endl;
-    cout<<"警告：此程序最多接受1000种元素，和1000个分子式，否则可能会引发未定义行为。"<<endl;*/ 
+    cout<<"警告：此程序最多接受119种元素，和1000个分子式，否则可能会引发未定义行为。"<<endl;*/ 
 }
 void print(){
-    for(int i=0;i<rf;i++){
+    for(int i=0;i<fR;i++){
         if(ans[i]!=1)cout<<ans[i];
         for(int j=0;j<E;j++){
             if(m[i][j]){
@@ -272,10 +252,10 @@ void print(){
                 if(m[i][j]!=1)cout<<m[i][j];
             }
         }
-        if(i!=rf-1)cout<<'+';
+        if(i!=fR-1)cout<<'+';
     }
     cout<<'=';
-    for(int i=rf;i<M;i++){
+    for(int i=fR;i<M;i++){
         if(ans[i]!=1)cout<<ans[i];
         for(int j=0;j<E;j++){
             if(m[i][j]){
@@ -288,13 +268,12 @@ void print(){
     cout<<endl;
 }
 
+//******************MAIN*****************//
 
 int main(){
     while(true){
         clean();
         cout<<"Chemical>";
-        memset(weigh,0,sizeof(weigh));
-        E=0;
         cin>>s;
         if(s=="help"){
             help();
@@ -318,14 +297,14 @@ int main(){
         else{
             if(flag){
                 cout<<"N"<<endl;
-                pre(); 
+                findCenter(); 
                 if(balancable()){
     	            balance();
     	            cout<<"Attempt to balance: ";
     	            print();
 	                cout<<"Beware, the attempt will come out unsuccessful most of the times."<<endl;
 	            }else{
-	            	cout<<"Unable to balance."<<endl;
+	            	cout<<"Attempt to balance failed."<<endl;
 				}
             }
             else cout<<"Y"<<endl;
