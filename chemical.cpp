@@ -120,13 +120,13 @@ void expr(string s,int c){//expressions
 
 //******************BALANCING*****************//
 
-int ans[E];
-int fR;//first of right
+int ans[E],vis[E];
+int fR=-1;//first of right
 void findCenter(){
     for(int i=0;i<M;i++){
         for(int j=0;j<E;j++){
             if(m[i][j]<0){
-                if(!fR)fR=i;
+                if(fR==-1)fR=i;
                 m[i][j]=-m[i][j];
             }
         }
@@ -148,17 +148,71 @@ bool lrBalance(){
 		}
 	}
 	for(int i=0;i<E;i++){
-		if(l[i])lcnt++;
-		if(r[i])rcnt++;
+		if(l[i]!=r[i])return false;
 	}
-	if(lcnt!=rcnt)return false;
-	return true;
+    return true;
 }
-bool dfs(){
-    
+bool containLoop(int self,int x){
+    for(int i=0;i<M;i++){
+        if(m[i][x]&&i!=self){
+            if(vis[i])return true;
+            vis[i]=true;
+            for(int j=0;j<E;j++)if(m[i][j]&&j!=x)if(containLoop(i,j))return true;
+            vis[i]=false;
+        }
+    }
+    return false;
 }
 bool balancable(){
-	return lrBalance();
+    if(lrBalance()){
+        memset(vis,0,sizeof(vis));
+        for(int i=0;i<E;i++){
+            int flag=-1;
+            for(int j=0;j<M;j++){
+                if(m[j][i]){
+                    flag=j;
+                    break;
+                }
+            }
+            if(flag!=-1){
+                vis[flag]=true;
+                if(containLoop(flag,i))return false;
+                vis[flag]=false;
+            }
+            for(int i=0;i<M;i++){
+                int cnt=0;
+                for(int j=0;j<E;j++){
+                    if(m[i][j])cnt++;
+                }
+                if(cnt>2)return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+void balanceProcess(int k){
+    int l=0,r=0;
+    for(int i=0;i<fR;i++)l+=m[i][k]*ans[i];
+    for(int i=fR;i<M;i++)r+=m[i][k]*ans[i];
+    if(l==0||r==0)return;
+    int div=gcd(l,r);
+    l/=div;
+    r/=div;
+    swap(l,r);
+    bool changed[E];
+    memset(changed,false,sizeof(changed));
+    for(int i=0;i<fR;i++)if(m[i][k]){
+        ans[i]*=l;
+        changed[i]=true;
+    }
+    for(int i=fR;i<M;i++)if(m[i][k]){
+        ans[i]*=r;
+        changed[i]=true;
+    }
+    for(int i=0;i<E;i++){
+        if(changed[i])balanceProcess(i);
+    }
 }
 void balance(){
     for(int i=0;i<M;i++){
@@ -167,15 +221,7 @@ void balance(){
         }
     }
     for(int i=0;i<E;i++){
-        int l=0,r=0;
-        for(int j=0;j<fR;j++)l+=m[j][i]*ans[j];
-        for(int j=fR;j<M;j++)r+=m[j][i]*ans[j];
-        int div=gcd(l,r);
-        l/=div;
-        r/=div;
-        swap(l,r);
-        for(int j=0;j<fR;j++)/*if(m[j][i])*/ans[j]*=l;
-        for(int j=fR;j<M;j++)/*if(m[j][i])*/ans[j]*=r;
+        balanceProcess(i);
     }
     int div=ans[0];
     for(int i=0;i<M;i++){
@@ -302,7 +348,7 @@ int main(){
     	            balance();
     	            cout<<"Attempt to balance: ";
     	            print();
-	                cout<<"Beware, the attempt will come out unsuccessful most of the times."<<endl;
+	                cout<<"Beware, the attempt will wipe out all the formatting, and it's not always succesful."<<endl;
 	            }else{
 	            	cout<<"Attempt to balance failed."<<endl;
 				}
