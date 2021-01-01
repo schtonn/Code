@@ -1,3 +1,7 @@
+//chemical.cpp
+//Author: schtonn
+//A chemical equation balancer
+
 #include "bits/stdc++.h"
 using namespace std;
 #define maxm 1010
@@ -20,13 +24,9 @@ int priv[E]={0,
 };
 string e[E]={"",
     "H","He",
-
     "Li","Be","B","C","N","O","F","Ne",
-
     "Na","Mg","Al","Si","P","S","Cl","Ar",
-
     "K","Ca","Sc","Ti","V","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr",
-
     "Rb","Sr","Y","Zr","Nb","Mo","Tc","Ru","Rh","Pd","Ag","Cd","In","Sn","Sb","Te","I","Xe",
 
     "Cs","Ba","La","Ce","Pr","Nd","Pm","Sm","Eu","Gd","Tb","Dy","Ho","Er","Tm","Yb","Lu","Hf",
@@ -37,8 +37,7 @@ string e[E]={"",
 };
 string s;
 int gcd(int a,int b){
-    if(!b)return a;
-    return gcd(b,a%b);
+    return b?gcd(b,a%b):a;
 }
 bool isNum(char x){return '0'<=x&&x<='9';}
 bool isAlpha(char x){return 'a'<=x&&x<='z';}
@@ -46,7 +45,17 @@ bool isAlpha(char x){return 'a'<=x&&x<='z';}
 //******************DIVIDING & CALCULATING*****************//
 
 int m[maxm][E],cm[E];
-void eleme(string s,int c,int newC){//single element
+int coef(string s,int &pos){
+    int ans=0;
+    while(isNum(s[pos+1])){
+        pos++;
+        ans*=10;
+        ans+=s[pos]-'0';
+    }
+    if(ans==0)ans=1;
+    return ans;
+}
+void eleme(string s,int c){//single element
     //cout<<"element: "<<s<<' '<<c<<endl;
     for(int i=0;i<E;i++){
         if(e[i]==s){
@@ -59,9 +68,10 @@ void eleme(string s,int c,int newC){//single element
 }
 void formu(string s,int c){//single molecule
 //    cout<<"formula: "<<s<<' '<<c<<endl;
-    int len=s.length(),layer,newC=0,start,end;
+    int len=s.length(),layer,newC,start,end;
     string newS;
     for(int i=0;i<len;i++){
+        newC=0;
         if(s[i]=='('){
             start=i+1;layer=1;
             while(layer){
@@ -70,46 +80,25 @@ void formu(string s,int c){//single molecule
                 if(s[i]==')')layer--;
             }
             end=i;
-            if(isNum(s[i+1])){
-                i++;
-                while(isNum(s[i])){
-                    if(i!=0)newC*=10;
-                    newC+=s[i]-'0';
-                    i++;
-                }
-                i--;
-            }
-            if(newC==0)newC=1;
+            newC=coef(s,i);
             formu(s.substr(start,end-start),c*newC);
         }else{
             newS=s[i];
             if(isAlpha(s[i+1])){
-                newS+=s[i+1];
                 i++;
+                newS+=s[i];
             }
-            if(isNum(s[i+1])){
-                i++;
-                while(isNum(s[i])){
-                    newC*=10;
-                    newC+=s[i]-'0';
-                    i++;
-                }
-                i--;
-            }
-            if(newC==0)newC=1;
-            eleme(newS,c*newC,newC);
+            newC=coef(s,i);
+            eleme(newS,c*newC);
         }
-        newC=0;
     }
 }
 void subExpr(string s,int c){//coefficient
     int len=s.length(),newC=0,pos=0;
-    if(isNum(s[0])){
-        while(isNum(s[pos])){
-            if(pos!=0)newC*=10;
-            newC+=s[pos]-'0';
-            pos++;
-        }
+    while(isNum(s[pos])){
+        newC*=10;
+        newC+=s[pos]-'0';
+        pos++;
     }
     if(newC==0)newC=1;
     cm[M]=newC;
@@ -194,15 +183,9 @@ bool balanceProcess(int k,int step){
         ans[i]*=r;
         if(r!=1)changed[i]=true;
     }
-    for(int i=0;i<M;i++){
-        if(changed[i]){
-            for(int j=0;j<E;j++){
-                if(m[i][j]&&j!=k){
-                    if(!balanceProcess(j,step+1))return false;
-                }
-            }
-        }
-    }
+    for(int i=0;i<M;i++)if(changed[i])
+        for(int j=0;j<E;j++)if(m[i][j]&&j!=k)
+            if(!balanceProcess(j,step+1))return false;
     return true;
 }
 bool balance(){
@@ -216,7 +199,7 @@ bool balance(){
         if(!balanceProcess(i,0))flag=false;
     }
     down();
-    return lrBalance()&&flag;
+    return flag;
 }
 bool forceBalance(int step){
     if(step>=M){
@@ -231,7 +214,7 @@ bool forceBalance(int step){
         }
         return true;
     }
-    for(int i=1;i<=30;i++){
+    for(int i=1;i<=20;i++){
         ans[step]=i;
         if(forceBalance(step+1)){
             return true;
@@ -260,11 +243,11 @@ void declare(bool t){
         cout<<"4Au+8NaCN+2H2O+O2=4Na(Au(CN)2)+4NaOH"<<endl<<endl;
     }else{
         cout<<"\t<equation> ::= <expr> \"=\" <expr>"<<endl;
-        cout<<"\t<expr> ::= <c> <formula> | <expr> \"+\" <c> <formula>"<<endl;
-        cout<<"\t<c> ::= <digits> | \"\""<<endl;
+        cout<<"\t<expr> ::= <coef> <formula> | <expr> \"+\" <coef> <formula>"<<endl;
+        cout<<"\t<coef> ::= <digits> | \"\""<<endl;
         cout<<"\t<digits> ::= <digit> | <digits> <digit>"<<endl;
         cout<<"\t<digit> ::= \"0\" | \"1\" | ... | \"9\""<<endl;
-        cout<<"\t<formula> ::= <term> <c> | <formula> <term> <c>"<<endl;
+        cout<<"\t<formula> ::= <term> <coef> | <formula> <term> <coef>"<<endl;
         cout<<"\t<term> ::= <element> | \"(\" <formula> \")\""<<endl;
         cout<<"\t<element> ::= <uppercase> | <uppercase> <lowercase>"<<endl;
         cout<<"\t<uppercase> ::= \"A\" | \"B\" | ... | \"Z\""<<endl;
@@ -383,20 +366,22 @@ int main(){
         else{
             if(flag){
                 cout<<"N"<<endl;
-                findCenter(); 
-                if(balance()){
+                findCenter();
+                if(!lrBalance()){
+                    cout<<"Impossible to balance because of missing elements."<<endl;
+                }else if(balance()){
     	            cout<<"Attempt to balance: ";
     	            print();
 	                cout<<"Beware, the attempt will wipe out all the formatting, and it's not always succesful."<<endl;
 	            }else{
 	            	cout<<"Attempt to balance failed."<<endl;
-                    cout<<"Do you want to try forcibly(may cause serious lag)?(Y/N)";
+                    cout<<"Do you want to try forcibly within 20(may cause serious lag or error)?(Y/N)";
                     char YN;
                     cin>>YN;
                     if(toupper(YN)=='Y'){
                         memset(ans,1,sizeof(ans));
                         if(forceBalance(0))print();
-                        else cout<<"Impossible within 30."<<endl;
+                        else cout<<"Impossible within 20."<<endl;
                     }
 				}
             }
@@ -407,16 +392,10 @@ int main(){
     return 0;
 }
 /*
-11
 H2+O2=H2O
 2H2+O2=2H2O
 H2+Cl2=2NaCl
 H2+Cl2=2HCl
-CH4+2O2=CO2+2H2O
-CaCl2+2AgNO3=Ca(NO3)2+2AgCl
-3Ba(OH)2+2H3PO4=6H2O+Ba3(PO4)2
-3Ba(OH)2+2H3PO4=Ba3(PO4)2+6H2O
-4Zn+10HNO3=4Zn(NO3)2+NH4NO3+3H2O
-4Au+8NaCN+2H2O+O2=4Na(Au(CN)2)+4NaOH
-Cu+As=Cs+Au
+Zn+HNO3=Zn(NO3)2+NH4NO3+H2O
+CO+2Fe=COFFee
 */
