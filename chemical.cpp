@@ -92,7 +92,7 @@ void formu(string s,int c){//single molecule
         newC=0;
     }
 }
-void subExpr(string s,int c){//cficient
+void subExpr(string s,int c){//coefficient
     int len=s.length(),newC=0,pos=0;
     if(isNum(s[0])){
         while(isNum(s[pos])){
@@ -152,77 +152,7 @@ bool lrBalance(){
 	}
     return true;
 }
-bool containLoop(int self,int x){
-    for(int i=0;i<M;i++){
-        if(m[i][x]&&i!=self){
-            if(vis[i])return true;
-            vis[i]=true;
-            for(int j=0;j<E;j++)if(m[i][j]&&j!=x)if(containLoop(i,j))return true;
-            vis[i]=false;
-        }
-    }
-    return false;
-}
-bool balancable(){
-    if(lrBalance()){
-        memset(vis,0,sizeof(vis));
-        for(int i=0;i<E;i++){
-            int flag=-1;
-            for(int j=0;j<M;j++){
-                if(m[j][i]){
-                    flag=j;
-                    break;
-                }
-            }
-            if(flag!=-1){
-                vis[flag]=true;
-                if(containLoop(flag,i))return false;
-                vis[flag]=false;
-            }
-            for(int i=0;i<M;i++){
-                int cnt=0;
-                for(int j=0;j<E;j++){
-                    if(m[i][j])cnt++;
-                }
-                if(cnt>2)return false;
-            }
-        }
-        return true;
-    }
-    return false;
-}
-void balanceProcess(int k){
-    int l=0,r=0;
-    for(int i=0;i<fR;i++)l+=m[i][k]*ans[i];
-    for(int i=fR;i<M;i++)r+=m[i][k]*ans[i];
-    if(l==0||r==0)return;
-    int div=gcd(l,r);
-    l/=div;
-    r/=div;
-    swap(l,r);
-    bool changed[E];
-    memset(changed,false,sizeof(changed));
-    for(int i=0;i<fR;i++)if(m[i][k]){
-        ans[i]*=l;
-        changed[i]=true;
-    }
-    for(int i=fR;i<M;i++)if(m[i][k]){
-        ans[i]*=r;
-        changed[i]=true;
-    }
-    for(int i=0;i<E;i++){
-        if(changed[i])balanceProcess(i);
-    }
-}
-void balance(){
-    for(int i=0;i<M;i++){
-        for(int j=0;j<E;j++){
-            m[i][j]/=cm[i];
-        }
-    }
-    for(int i=0;i<E;i++){
-        balanceProcess(i);
-    }
+void down(){
     int div=ans[0];
     for(int i=0;i<M;i++){
         div=gcd(ans[i],div);
@@ -231,6 +161,53 @@ void balance(){
         ans[i]/=div;
     }
 }
+bool balanceProcess(int k,int step){
+    if(step>20)return false;
+    down();
+    int l=0,r=0;
+    for(int i=0;i<fR;i++)l+=m[i][k]*ans[i];
+    for(int i=fR;i<M;i++)r+=m[i][k]*ans[i];
+    if(l==0&&r==0)return true;
+    if(l==0||r==0)return false;
+    int div=gcd(l,r);
+    l/=div;
+    r/=div;
+    swap(l,r);
+    if(l<0||r<0)return false;
+    bool changed[E];
+    memset(changed,false,sizeof(changed));
+    for(int i=0;i<fR;i++)if(m[i][k]){
+        ans[i]*=l;
+        if(l!=1)changed[i]=true;
+    }
+    for(int i=fR;i<M;i++)if(m[i][k]){
+        ans[i]*=r;
+        if(r!=1)changed[i]=true;
+    }
+    for(int i=0;i<M;i++){
+        if(changed[i]){
+            for(int j=0;j<E;j++){
+                if(m[i][j]&&j!=k){
+                    if(!balanceProcess(j,step+1))return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+bool balance(){
+    bool flag=true;
+    for(int i=0;i<M;i++){
+        for(int j=0;j<E;j++){
+            m[i][j]/=cm[i];
+        }
+    }
+    for(int i=0;i<E;i++){
+        if(!balanceProcess(i,0))flag=false;
+    }
+    down();
+    return lrBalance()&&flag;
+}
 
 //******************HELPERS*****************//
 
@@ -238,6 +215,7 @@ void clean(){
     M=0;
     err=0;
     memset(weigh,0,sizeof(weigh));
+    memset(vis,0,sizeof(vis));
     for(int i=0;i<maxm;i++){
         for(int j=0;j<E;j++){
             m[i][j]=0;
@@ -275,8 +253,8 @@ void help(){
     cout<<"help\tProvides Help information."<<endl;
     cout<<"exit\tQuits the program."<<endl<<endl;
     cout<<"Warning: This program supports up to 119 expressions with 1000 elements, but no more."<<endl<<endl;
-    cout<<"输入"<<endl;
-    /*cout<<"程序输入一个化学式，并判断其是否配平。化学式的格式如下，不合法的化学式可能引起未定义行为。"<<endl;
+    /*cout<<"输入"<<endl;
+    cout<<"程序输入一个化学式，并判断其是否配平。化学式的格式如下，不合法的化学式可能引起未定义行为。"<<endl;
     declare(0);
     cout<<"例如: ";
     declare(1);
@@ -333,6 +311,7 @@ int main(){
             if(s[j]=='='){
                 expr(s.substr(0,j),1);
                 expr(s.substr(j+1,len-j),-1);
+                break;
             }
         }
         int flag=0;
@@ -344,8 +323,7 @@ int main(){
             if(flag){
                 cout<<"N"<<endl;
                 findCenter(); 
-                if(balancable()){
-    	            balance();
+                if(balance()){
     	            cout<<"Attempt to balance: ";
     	            print();
 	                cout<<"Beware, the attempt will wipe out all the formatting, and it's not always succesful."<<endl;
