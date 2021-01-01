@@ -2,12 +2,22 @@
 using namespace std;
 #define maxm 1010
 #define E 119//element count
+#define maxp 3
 
 //******************INIT*****************//
 
 int n,len,weigh[E];
 int M;//molecule count
 bool err=0;
+int priv[E]={0,
+    2,2,
+    1,1,2,2,2,3,2,2,
+    1,1,1,2,2,2,2,2,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,
+};
 string e[E]={"",
     "H","He",
 
@@ -208,6 +218,28 @@ bool balance(){
     down();
     return lrBalance()&&flag;
 }
+bool forceBalance(int step){
+    if(step>=M){
+        memset(weigh,0,sizeof(weigh));
+        for(int i=0;i<M;i++){
+            for(int j=0;j<E;j++){
+                if(m[i][j])weigh[j]+=m[i][j]*ans[i]*(i<fR?1:-1);
+            }
+        }
+        for(int i=0;i<E;i++){
+            if(weigh[i]!=0)return false;
+        }
+        return true;
+    }
+    for(int i=1;i<=30;i++){
+        ans[step]=i;
+        if(forceBalance(step+1)){
+            return true;
+        }
+        ans[step]=0;
+    }
+    return false;
+}
 
 //******************HELPERS*****************//
 
@@ -267,26 +299,55 @@ void help(){
     cout<<"exit\t退出程序。"<<endl<<endl;
     cout<<"警告：此程序最多接受119种元素，和1000个分子式，否则可能会引发未定义行为。"<<endl;*/ 
 }
+void P(int i,int j){
+    cout<<e[j];
+    if(m[i][j]!=1)cout<<m[i][j];
+}
+void printM(int k){
+    int cnt=0,mcnt=0;
+    for(int i=0;i<E;i++){
+        if(m[k][i]){
+            cnt++;
+            if(priv[i]==1)mcnt++;
+        }
+    }
+    if(cnt==2){
+        int a=0,b=0;
+        for(int i=0;i<E;i++){
+            if(m[k][i]&&!a)a=i;
+            else if(m[k][i])b=i;
+        }
+        if((a==1||b==1)&&!mcnt){
+            if(b==1)swap(a,b);
+            if(m[k][1]<3){
+                P(k,1);P(k,b);
+            }else{
+                P(k,b);P(k,1);
+            }
+        }else{
+            goto notHO;
+        }
+    }else{
+        notHO:
+        for(int p=1;p<=maxp;p++){
+            for(int i=0;i<E;i++){
+                if(m[k][i]&&priv[i]==p){
+                    P(k,i);
+                }
+            }
+        }
+    }
+}
 void print(){
     for(int i=0;i<fR;i++){
         if(ans[i]!=1)cout<<ans[i];
-        for(int j=0;j<E;j++){
-            if(m[i][j]){
-                cout<<e[j];
-                if(m[i][j]!=1)cout<<m[i][j];
-            }
-        }
+        printM(i);
         if(i!=fR-1)cout<<'+';
     }
     cout<<'=';
     for(int i=fR;i<M;i++){
         if(ans[i]!=1)cout<<ans[i];
-        for(int j=0;j<E;j++){
-            if(m[i][j]){
-                cout<<e[j];
-                if(m[i][j]!=1)cout<<m[i][j];
-            }
-        }
+        printM(i);
         if(i!=M-1)cout<<'+';
     }
     cout<<endl;
@@ -329,6 +390,14 @@ int main(){
 	                cout<<"Beware, the attempt will wipe out all the formatting, and it's not always succesful."<<endl;
 	            }else{
 	            	cout<<"Attempt to balance failed."<<endl;
+                    cout<<"Do you want to try forcibly(may cause serious lag)?(Y/N)";
+                    char YN;
+                    cin>>YN;
+                    if(toupper(YN)=='Y'){
+                        memset(ans,1,sizeof(ans));
+                        if(forceBalance(0))print();
+                        else cout<<"Impossible within 30."<<endl;
+                    }
 				}
             }
             else cout<<"Y"<<endl;
