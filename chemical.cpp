@@ -120,8 +120,9 @@ void expr(string s,int c){//expressions
 //******************BALANCING*****************//
 
 int ans[E],vis[E];
-int fR=-1;//first of right
+int fR;//first of right
 void findCenter(){
+    fR=-1;
     for(int i=0;i<M;i++){
         for(int j=0;j<E;j++){
             if(m[i][j]<0){
