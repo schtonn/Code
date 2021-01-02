@@ -66,7 +66,7 @@ void eleme(string s,int c){//single element
     }
     err=1;
 }
-void formu(string s,int c){//single molecule
+void term(string s,int c){//single molecule
 //    cout<<"formula: "<<s<<' '<<c<<endl;
     int len=s.length(),layer,newC,start,end;
     string newS;
@@ -81,7 +81,7 @@ void formu(string s,int c){//single molecule
             }
             end=i;
             newC=coef(s,i);
-            formu(s.substr(start,end-start),c*newC);
+            term(s.substr(start,end-start),c*newC);
         }else{
             newS=s[i];
             if(isAlpha(s[i+1])){
@@ -93,7 +93,7 @@ void formu(string s,int c){//single molecule
         }
     }
 }
-void subExpr(string s,int c){//coefficient
+void formula(string s,int c){//coefficient
     int len=s.length(),newC=0,pos=0;
     while(isNum(s[pos])){
         newC*=10;
@@ -102,18 +102,18 @@ void subExpr(string s,int c){//coefficient
     }
     if(newC==0)newC=1;
     cm[M]=newC;
-    formu(s.substr(pos,len-pos),c*newC);
+    term(s.substr(pos,len-pos),c*newC);
 }
 void expr(string s,int c){//expressions
     int len=s.length(),pos=0;
     for(int i=0;i<len;i++){
         if(s[i]=='+'){
-            subExpr(s.substr(pos,i-pos),c);
+            formula(s.substr(pos,i-pos),c);
             M++;
             pos=i+1;
         }
     }
-    subExpr(s.substr(pos,len-pos),c);
+    formula(s.substr(pos,len-pos),c);
     M++;
 }
 
@@ -230,8 +230,7 @@ bool forceBalance(int step){
 void clean(){
     M=0;
     err=0;
-    memset(weigh,0,sizeof(weigh));
-    memset(vis,0,sizeof(vis));
+    for(int i=0;i<E;i++)weigh[i]=vis[i]=0;
     for(int i=0;i<maxm;i++){
         for(int j=0;j<E;j++){
             m[i][j]=0;
@@ -263,25 +262,14 @@ void help(){
     declare(1);
     cout<<"OUTPUT"<<endl;
     cout<<"\"Y\" means this equation is balanced."<<endl;
-    cout<<"\"N\" means this equation is unbalanced."<<endl;
+    cout<<"\"N\" means this equation is unbalanced. The program will then try to balance the equation."<<endl;
+    cout<<"\tMethod A - recursively balance"<<endl;
+    cout<<"\tMethod B - forcibly balance, only within 20."<<endl;
     cout<<"\"unknown elemet\" means this equation contains an unknown element that has not yet be discovered by humanity, or you are inputting illigal equations."<<endl<<endl;
     cout<<"COMMANDS"<<endl;
     cout<<"help\tProvides Help information."<<endl;
     cout<<"exit\tQuits the program."<<endl<<endl;
-    cout<<"Warning: This program supports up to 119 expressions with 1000 elements, but no more."<<endl<<endl;
-    /*cout<<"输入"<<endl;
-    cout<<"程序输入一个化学式，并判断其是否配平。化学式的格式如下，不合法的化学式可能引起未定义行为。"<<endl;
-    declare(0);
-    cout<<"例如: ";
-    declare(1);
-    cout<<"输出"<<endl;
-    cout<<"\"Y\" 代表化学式已配平。"<<endl;
-    cout<<"\"N\" 代表化学式未配平。"<<endl;
-    cout<<"\"unknown elemet\" 代表化学式中的某一元素还没有被发现，或者输入的化学式不合法。"<<endl<<endl;
-    cout<<"指令"<<endl;
-    cout<<"help\t提供帮助信息。"<<endl;
-    cout<<"exit\t退出程序。"<<endl<<endl;
-    cout<<"警告：此程序最多接受119种元素，和1000个分子式，否则可能会引发未定义行为。"<<endl;*/ 
+    cout<<"Warning: This program supports only 1000 expressions with 119 kinds of elements."<<endl<<endl;
 }
 void P(int i,int j){
     cout<<e[j];
@@ -369,19 +357,22 @@ int main(){
                 cout<<"N"<<endl;
                 findCenter();
                 if(!lrBalance()){
-                    cout<<"Impossible to balance because of missing elements."<<endl;
+                    cout<<"Impossible to balance: Missing elements."<<endl;
                 }else if(balance()){
-    	            cout<<"Attempt to balance: ";
+    	            cout<<"Method A(recursively): ";
     	            print();
-	                cout<<"Beware, the attempt will wipe out all the formatting, and it's not always succesful."<<endl;
+	                cout<<"Warning: the attempt will wipe out all the formatting such as atomic groups."<<endl;
 	            }else{
 	            	cout<<"Attempt to balance failed."<<endl;
-                    cout<<"Do you want to try forcibly within 20(may cause serious lag or error)?(Y/N)";
+                    cout<<"Do you want to try Method B within 20(may cause serious lag)?(Y/N)";
                     char YN;
                     cin>>YN;
                     if(toupper(YN)=='Y'){
                         memset(ans,1,sizeof(ans));
-                        if(forceBalance(0))print();
+                        if(forceBalance(0)){
+                            cout<<"Method B(forcibly): ";
+                            print();
+                        }
                         else cout<<"Impossible within 20."<<endl;
                     }
 				}
