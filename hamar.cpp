@@ -1,33 +1,37 @@
-//https://www.luogu.com.cn/record/44718759
+//https://www.luogu.com.cn/record/44544813
 #include "bits/stdc++.h"
 using namespace std;
-const int N=1000010;
-int n,m,pat[N],txt[N];
-vector<int>pos[N];
-int main(){
-    cin>>n;
-    for(int i=1;i<=n;i++){
-        cin>>pat[i];
-        pos[pat[i]].push_back(i);
+#define N 100010
+int n,m,a[N],d[N];
+bool done[N];
+bool check(int mid){
+    int cost=0;
+    memset(done,0,sizeof(done));
+    for(int i=mid;i>=1;i--){
+        if(d[i]&&!done[d[i]]){
+            cost+=a[d[i]];
+            done[d[i]]=true;
+        }else if(cost)cost--;
     }
-    cin>>m;
+    if(cost)return false;//still need revise
     for(int i=1;i<=m;i++){
-        int L,p=0,flag=0;
-        cin>>L;
-        for(int j=1;j<=L;j++)cin>>txt[j];
-        for(int j=1;j<=L;j++){
-            vector<int>::iterator t=upper_bound(pos[txt[j]].begin(),pos[txt[j]].end(),p);
-            if(pos[txt[j]].end()==t){
-                flag=1;
-                cout<<"NIE"<<endl;
-                break;
-            }else p=*t;
-        }
-        if(!flag)cout<<"TAK"<<endl;
+        if(!done[i])return false;//not all subjects
     }
+    return true;//all ok
+}
+int main(){
+    cin>>n>>m;
+    for(int i=1;i<=n;i++)cin>>d[i];
+    for(int i=1;i<=m;i++)cin>>a[i];
+    int l=m,r=n,ret=-1;
+    while(l<=r){
+        int mid=(l+r)/2;
+        if(check(mid)){
+            r=mid-1;
+            ret=mid;
+        }
+        else l=mid+1;
+    }
+    cout<<ret<<endl;
     return 0;
 }
-/*
-必做：P1419，P2115，P3500，CF732D，P2985，CF359D
-其他：P4951，P3576，CF553D，P2218
-*/
