@@ -121,73 +121,6 @@ inline void save(){
 }
 //function end
 
-//setting start
-int point_setting;
-const int language_x=80,language_y=5;
-const int uninstall_x=80,uninstall_y=7;
-const int back_x=80,back_y=9;
-inline void uninstall(){
-	
-}
-inline void change_point_setting(){
-	pos(language_x-1,language_y);putchar(' ');
-	pos(uninstall_x-1,uninstall_y);putchar(' ');
-	pos(back_x-1,back_y);putchar(' ');
-	if(point_setting==0){pos(language_x-1,language_y);putchar('*');}
-	else if(point_setting==1){pos(uninstall_x-1,uninstall_y);putchar('*');}
-	else{pos(back_x-1,back_y);putchar('*');}
-	pos(0,0);
-}
-inline void build_setting(){
-	system("cls");
-	point_setting=0;
-	pos(language_x-1,language_y);putchar('*');
-	pos(language_x,language_y);
-	puts("����");
-	pos(uninstall_x,uninstall_y);
-	puts("ж��");
-	pos(back_x,back_y);
-	puts("����");
-	pos(0,0);
-}
-inline void change_language(){
-	
-}
-inline void setting(){
-	build_setting();
-	for(;;){
-		if(kbhit()){
-			int num=getch();
-			if(num==224){
-				num=getch();
-				if(num==72){//up
-					if(point_setting>0) point_setting--;
-					else point_setting=2;
-					change_point_setting();
-				}
-				else if(num==80){//down
-					if(point_setting<2) point_setting++;
-					else point_setting=0;
-					change_point_setting();
-				}
-				continue;
-			}
-			if(num==13){//enter
-				if(point_setting==0){
-					MessageBox(NULL,TEXT("���Ҽ�ͷ�ı䣬Enterѡȡ"),TEXT("�ı�����"),MB_OK);
-					change_language();
-				}
-				else if(point_setting==1){
-					if(MessageBox(NULL,TEXT("ж�ز�ɾ���浵��"),TEXT("ж��"),MB_YESNO)==6)
-						uninstall();
-				}
-				else return;
-			}
-		}
-	}
-}
-//setting end
-
 //game start
 inline void build_game_space(){
 	memset(snack.turn,-1,sizeof snack.turn[155][55]);
@@ -200,8 +133,8 @@ inline void build_game_space(){
 		for(R int i=0;i<size_x;i++) putchar(Map[i][j]?'#':'\0');
 		EN;
 	}
-	pos(size_x+2,size_y/2-3);printf("SC");
-	pos(size_x+2,size_y/2-1);printf("HISC%d",max_score);
+	pos(size_x+2,size_y/2-3);printf("SCORE:");
+	pos(size_x+2,size_y/2-1);printf("HI-SC:%d",max_score);
 	pos(0,size_y+1);
 }
 inline void print_special_food(){
@@ -267,7 +200,7 @@ inline void start_game(){
 				snack.turn[snack.head_x][snack.head_y]=num;
 			}
 			else if(num==27){
-				if(MessageBox(NULL,TEXT("FAIL"),TEXT(""),MB_YESNO)==7) goto FAIL_MOVE;
+				if(MessageBox(NULL,TEXT("Exit?"),TEXT(""),MB_YESNO)==7) goto FAIL_MOVE;
 				max_score=max(max_score,now_score);
 				return;
 			}
@@ -361,22 +294,22 @@ inline void change_appearance(){
 		if(kbhit()){
 			R int num=getch();
 			if(num==27){//Esc
-				int tmp=MessageBox(NULL,TEXT("SURERERERE?"),TEXT(""),MB_YESNOCANCEL);
+				int tmp=MessageBox(NULL,TEXT("Save changes?"),TEXT(""),MB_YESNOCANCEL);
 				if(tmp==2) continue;
 				if(tmp==6){
 					if(appearance_head_tmp==appearance_body_tmp){
-						pos(0,2);puts("LALALA");
+						pos(0,2);puts("You can't tell head and body!");
 						pos(now?7:6,1);
 						continue;
 					}
-					pos(0,2);puts("SET");
+					pos(0,2);puts("Successful...");
 					snack.appearance_head=appearance_head_tmp;
 					snack.appearance_body=appearance_body_tmp;
 					break;
 				}
 				else{
 					pos(0,2);
-					puts("EXPLODE!!");
+					puts("Exiting without saving...");
 					break;
 				}
 			}
@@ -402,8 +335,8 @@ inline void change_appearance(){
 		}
 	}
 	pos(0,4);
-	puts("BILESSS.....");
-	char c=getchar();
+	puts("Press any key to continue...");
+	getchar();
 }
 inline int getnear(int xx,int yy){
 	int _xx,_yy;
@@ -449,12 +382,12 @@ inline void change_map(){
 		if(kbhit()){
 			R int num=getch();
 			if(num==27){//Esc
-				int tmp=MessageBox(NULL,TEXT("SURERERERE"),TEXT(""),MB_YESNOCANCEL);
+				int tmp=MessageBox(NULL,TEXT("Save changes?"),TEXT(""),MB_YESNOCANCEL);
 				if(tmp==2) continue;
 				if(tmp==6){
 					if(!check_tmp_map()){
 						pos(0,size_y+1);
-						puts("NONONONO!");
+						puts("Go away!");
 						pos(now_x,now_y);
 						continue;
 					}
@@ -463,12 +396,12 @@ inline void change_map(){
 					int three_space_tmp_size=three_space_tmp.size();
 					for(R int i=0;i<three_space_tmp_size;i++) three_space.push_back(three_space_tmp[i]);
 					pos(0,size_y+1);
-					puts("SUCCESS...");
+					puts("Success...");
 					break;
 				}
 				else{
 					pos(0,size_y+1);
-					puts("EXPLODE!!!");
+					puts("Exitng without saving...");
 					break;
 				}
 			}
@@ -496,52 +429,52 @@ inline void change_map(){
 		}
 	}
 	pos(0,size_y+1);
-	puts("SFJJJJJJ.....");
-	char c=getchar();
+	puts("Press any key to continue...");
+	getchar();
 }
 inline void change_size(){
 	char ss[5007];
 	system("cls");
 	pos(0,0);
-	puts("ROW(10<x<151)COL(10<x<51)Enter=Set.....");
-	printf("F....");
+	puts("ROW(10<x<151)COL(10<x<51)Enter=Set...");
+	printf("Enter ROW:");
 	int xx=0;scanf("%s",ss);
 	int len_s=strlen(ss);
 	for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<='9') xx=xx*10+ss[i]-'0';
 	while(xx<=10||xx>150){
-		printf("10<x<151!\nFUCKYOU");
+		printf("10<x<151!\nPlease retry");
 		scanf("%s",ss);len_s=strlen(ss);
 		xx=0;
 		for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<'9') xx=xx*10+ss[i]-'0';
 	}
-	printf("F....");
+	printf("Enter COL:");
 	int yy=0;scanf("%s",ss);
 	len_s=strlen(ss);
 	for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<='9') yy=yy*10+ss[i]-'0';
 	while(yy<=10||yy>50){
-		printf("10<x<51!%d\nFUCKYOU",yy);
+		printf("10<x<51!%d\nPlease retry",yy);
 		scanf("%s",ss);len_s=strlen(ss);
 		yy=0;
 		for(R int i=0;i<len_s;i++)if(ss[i]>='0'&&ss[i]<='9') yy=yy*10+ss[i]-'0';
 	}
-	if(MessageBox(NULL,TEXT("SURERE"),TEXT(""),MB_YESNO)==6){
+	if(MessageBox(NULL,TEXT("Save changes?"),TEXT(""),MB_YESNO)==6){
 		size_x=xx;size_y=yy;
-		puts("SUCCESS.....");
+		puts("Success...");
 		for(R int i=0;i<size_x;i++)for(R int j=0;j<size_y;j++) tmp_map[i][j]=Map[i][j];
 		check_tmp_map();
 		int len_=three_space_tmp.size();
 		three_space.clear();
 		for(R int i=0;i<len_;i++) three_space.push_back(three_space_tmp[i]);
 	}
-	else puts("EXPLODE.....");
-	puts("\nSDJEKKKK....");
-	char c=getchar();
+	else puts("Exitng withou saving...");
+	puts("\nPress any key to continue...");
+	getchar();
 }
 inline void change_speed(){
 	char ss[5007];
 	system("cls");
 	pos(0,0);
-	puts("SPEED 1-100....");
+	puts("SPEED 1-100...");
 	printf("ER");
 	int speedd=0;scanf("%s",ss);
 	int len_s=strlen(ss);
@@ -554,12 +487,12 @@ inline void change_speed(){
 	}
 	if(MessageBox(NULL,TEXT("SURERE"),TEXT(""),MB_YESNO)==6){
 		snack.speed=speedd;
-		puts("SUCCESS....");
+		puts("SUCCESS...");
 	}
-	else puts("ERRRR....");
+	else puts("ERRRR...");
 	//Sleep(1000);
-	puts("\nFHHHHH....");
-	char c=getch();
+	puts("\nFHHHHH...");
+	getch();
 }
 inline void custom(){
 	build_custom();
@@ -620,10 +553,8 @@ const int over_x=80,over_y=11;
 int now_point;
 inline void build_menu(){
 	now_point=0;
-	pos(setting_x-1,setting_y);
+	pos(custom_x-1,custom_y);
 	putchar('*');
-	pos(setting_x,setting_y);
-	puts("FUCK");
 	pos(custom_x,custom_y);
 	puts("CUSTOM");
 	pos(start_game_x,start_game_y);
@@ -637,9 +568,8 @@ inline void change_point(){
 	pos(custom_x-1,custom_y);putchar(' ');
 	pos(start_game_x-1,start_game_y);putchar(' ');
 	pos(over_x-1,over_y);putchar(' ');
-	if(now_point==0){pos(setting_x-1,setting_y);putchar('*');}
-	else if(now_point==1){pos(custom_x-1,custom_y);putchar('*');}
-	else if(now_point==2){pos(start_game_x-1,start_game_y);putchar('*');}
+	if(now_point==0){pos(custom_x-1,custom_y);putchar('*');}
+	else if(now_point==1){pos(start_game_x-1,start_game_y);putchar('*');}
 	else{pos(over_x-1,over_y);putchar('*');}
 	pos(0,0);
 }
@@ -651,19 +581,18 @@ inline void menu(){
 				num=getch();
 				if(num==72){//up
 					if(now_point>0) now_point--;
-					else now_point=3;
+					else now_point=2;
 					change_point();
 				}
 				else if(num==80){//down
-					if(now_point<3) now_point++;
+					if(now_point<2) now_point++;
 					else now_point=0;
 					change_point();
 				}
 			}
 			if(num==13){
-				if(now_point==0){setting();system("cls");build_menu();}
-				else if(now_point==1){custom();system("cls");build_menu();}
-				else if(now_point==2){start_game();system("cls");build_menu();}
+				if(now_point==0){custom();system("cls");build_menu();}
+				else if(now_point==1){start_game();system("cls");build_menu();}
 				else{save();return;}
 			}
 		}
