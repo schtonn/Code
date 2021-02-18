@@ -6,7 +6,7 @@ char a[N>>1],b[N>>1];
 double ar[N],av[N],br[N],bv[N];
 int i,la,lb,lans,l;
 int ans[N>>1];
-void Swap(double&x,double&y){double t=x;x=y;y=t;}
+void dswap(double&x,double&y){double t=x;x=y;y=t;}
 int rev(int x,int len){
     int ret=0;
     for(int i=1;i<=len;i++){
@@ -21,8 +21,8 @@ void FFT(double*ar,double*av,int n,int flag){
     for(int i=0;i<=n-1;i++){
         int j=rev(i,lgn);
         if(j>i){
-            Swap(ar[i],ar[j]);
-            Swap(av[i],av[j]);
+            dswap(ar[i],ar[j]);
+            dswap(av[i],av[j]);
         }
     }
     for(int s=1;s<=lgn;s++){
@@ -59,7 +59,7 @@ void work(){
     la=strlen(a);
     lb=strlen(b);
     l=1;
-    int lmax=(la>lb?la:lb);
+    int lmax=max(la,lb);
     while(l<lmax)l<<=1;
     l<<=1;
     for(int i=0;i<=l-1;i++){
