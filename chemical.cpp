@@ -134,7 +134,6 @@ void findCenter(){
 }
 bool lrBalance(){
 	bool l[1010],r[1010];
-	int lcnt=0,rcnt=0;
 	memset(l,0,sizeof(l));
 	memset(r,0,sizeof(r));
 	for(int i=0;i<fR;i++){
