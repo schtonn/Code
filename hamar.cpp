@@ -1,9 +1,9 @@
 #include "bits/stdc++.h"
 using namespace std;
-#define N 10
-#define M 1010
+#define N 100
+#define M 5010
 int x,y,f[N][N],ansf[N][N];
-int a[N][M],ans[M];
+int a[M][M],ans[M];
 int n,m;//n=number of equation, m=number of unknown
 struct loc{
     int x,y;
@@ -124,12 +124,13 @@ void work(){
 void solute(){
     for(int i=n-1;i>=0;i--){
         start:
-        print();
+        //print();
         int flag=0,pos;
         for(int j=0;j<m;j++)if(a[i][j]){
             flag++;
             pos=j;
         }
+        if(flag==0)continue;
         if(flag==1)ans[pos]=a[i][m];
         for(int j=0;j<i;j++){
             if(a[j][pos])xrow(i,j);
