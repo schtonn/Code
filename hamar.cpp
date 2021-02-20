@@ -11,7 +11,7 @@ struct loc{
 int c[N][N];
 void clear(int i,int j){
     a[i][j]=0;
-    for(int u=j;u<ca[i];u++)a[i][u]=a[i][u+1];
+    for(int u=j;u<=ca[i];u++)a[i][u]=a[i][u+1];
     ca[i]--;
 }
 void rnd(int u,int v){
