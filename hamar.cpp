@@ -14,6 +14,14 @@ void clear(int i,int j){
     for(int u=j;u<=ca[i];u++)a[i][u]=a[i][u+1];
     ca[i]--;
 }
+bool neartip(int u,int v){
+    for(int i=-1;i<=1;i++){
+        for(int j=-1;j<=1;j++){
+            if(f[u+i][v+j])return true;
+        }
+    }
+    return false;
+}
 void rnd(int u,int v){
     for(int i=-1;i<=1;i++){
         for(int j=-1;j<=1;j++){
@@ -28,8 +36,8 @@ void rnd(int u,int v){
 }
 void label(){
     for(int i=1;i<=x;i++){
-        for(int j=1;j<=x;j++){
-            if(!f[i][j]){
+        for(int j=1;j<=y;j++){
+            if(!f[i][j]&&neartip(i,j)){
                 m++;
                 p[m].x=i;
                 p[m].y=j;
@@ -45,7 +53,7 @@ void print(){
     }
     cout<<endl;
     for(int i=1;i<=x;i++){
-        for(int j=1;j<=x;j++){
+        for(int j=1;j<=y;j++){
             cout<<"("<<i<<","<<j<<")="<<c[i][j]<<' ';
         }
     }
@@ -60,13 +68,13 @@ void print(){
 void init(){
     cin>>x>>y;
     for(int i=1;i<=x;i++){
-        for(int j=1;j<=x;j++){
+        for(int j=1;j<=y;j++){
             cin>>f[i][j];
         }
     }
     label();
     for(int i=1;i<=x;i++){
-        for(int j=1;j<=x;j++){
+        for(int j=1;j<=y;j++){
             if(f[i][j]){
                 n++;
                 rnd(i,j);
@@ -75,7 +83,7 @@ void init(){
     }
     int flag=0;
     for(int i=1;i<=x;i++){
-        for(int j=1;j<=x;j++){
+        for(int j=1;j<=y;j++){
             if(f[i][j])con[++flag]=f[i][j];
         }
     }
@@ -130,34 +138,24 @@ void work(){
     }
 }
 void solute(){
-    start:
-    int flag=1;
-    while(flag){
-        flag=0;
-        for(int i=1;i<=n;i++){
-            if(ca[i]==1){
-                flag=1;
-                ans[a[i][1]]=con[i];
-                for(int j=1;j<=n;j++){
-                    if(is(j,a[i][1])&&j!=i)xrow(i,j);
-                }
-                clear(i,1);
+    for(int i=n;i>0;i--){
+        start:
+        //print();
+        if(ca[i]==0)continue;
+        if(ca[i]==1){
+            ans[a[i][1]]=con[i];
+            for(int j=1;j<i;j++){
+                if(is(j,a[i][1]))xrow(i,j);
             }
-        }
-    }
-    for(int i=1;i<=n;i++){
-        if(ca[i]){
-            // ans[a[i][1]]=0;
-            for(int j=1;j<=n;j++){
-                if(j!=i){
-                    for(int k=1;k<=ca[j];k++){
-                        if(a[j][k]==a[i][1])clear(j,k);
-                    }
+        }else{
+            for(int j=1;j<i;j++){
+                for(int k=1;k<=ca[j];k++){
+                    if(a[j][k]==a[i][1])clear(j,k);
                 }
             }
-            clear(i,1);
-            goto start;
         }
+        clear(i,1);
+        if(ca[i])goto start;
     }
 }
 int main(){
@@ -169,10 +167,16 @@ int main(){
         ansf[p[i].x][p[i].y]=ans[i];
     }
     for(int i=1;i<=x;i++){
-        for(int j=1;j<=x;j++){
+        for(int j=1;j<=y;j++){
             cout<<ansf[i][j]<<' ';
         }
         cout<<endl;
     }
     return 0;
 }
+/*
+3 3
+0 0 896
+0 0 296
+0 516 0
+*/
