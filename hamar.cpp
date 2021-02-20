@@ -131,20 +131,21 @@ void solute(){
     for(int i=n;i>0;i--){
         start:
         //print();
-        int flag=0,pos;
-        for(int j=1;j<=m;j++)if(is(i,j)){
-            flag++;
-            pos=j;
+        if(ca[i]==0)continue;
+        if(ca[i]==1){
+            ans[a[i][1]]=con[i];
+            for(int j=1;j<i;j++){
+                if(is(j,a[i][1]))xrow(i,j);
+            }
+        }else{
+            for(int j=1;j<i;j++){
+                for(int k=1;k<=ca[j];k++){
+                    if(a[j][k]==a[i][1])clear(j,k);
+                }
+            }
         }
-        if(flag==0)continue;
-        if(flag==1)ans[pos]=con[i];
-        for(int j=1;j<i;j++){
-            if(is(j,pos))xrow(i,j);
-        }
-        for(int j=1;j<=ca[i];j++){
-            if(a[i][j]==pos)clear(i,j);
-        }
-        if(flag!=1)goto start;
+        clear(i,1);
+        if(ca[i])goto start;
     }
 }
 int main(){
