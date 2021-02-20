@@ -114,12 +114,14 @@ void work(){
     for(int i=1;i<=n;i++){
         int r=i;
         if(!is(i,r)){
+            r=-1;
             for(int j=i+1;j<=m;j++){
                 if(is(j,i)){
                     r=j;
                     break;
                 }
             }
+            if(r==-1)continue;
             srow(i,r);
         }
         for(int j=i+1;j<=n;j++){
@@ -128,30 +130,40 @@ void work(){
     }
 }
 void solute(){
-    for(int i=n;i>0;i--){
-        start:
-        //print();
-        if(ca[i]==0)continue;
-        if(ca[i]==1){
-            ans[a[i][1]]=con[i];
-            for(int j=1;j<i;j++){
-                if(is(j,a[i][1]))xrow(i,j);
-            }
-        }else{
-            for(int j=1;j<i;j++){
-                for(int k=1;k<=ca[j];k++){
-                    if(a[j][k]==a[i][1])clear(j,k);
+    start:
+    int flag=1;
+    while(flag){
+        flag=0;
+        for(int i=1;i<=n;i++){
+            if(ca[i]==1){
+                flag=1;
+                ans[a[i][1]]=con[i];
+                for(int j=1;j<=n;j++){
+                    if(is(j,a[i][1])&&j!=i)xrow(i,j);
                 }
+                clear(i,1);
             }
         }
-        clear(i,1);
-        if(ca[i])goto start;
+    }
+    for(int i=1;i<=n;i++){
+        if(ca[i]){
+            // ans[a[i][1]]=0;
+            for(int j=1;j<=n;j++){
+                if(j!=i){
+                    for(int k=1;k<=ca[j];k++){
+                        if(a[j][k]==a[i][1])clear(j,k);
+                    }
+                }
+            }
+            clear(i,1);
+            goto start;
+        }
     }
 }
 int main(){
     init();
     work();
-    print();
+    //print();
     solute();
     for(int i=1;i<=m;i++){
         ansf[p[i].x][p[i].y]=ans[i];
