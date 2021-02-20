@@ -11,7 +11,7 @@ struct loc{
 int c[N][N];
 void clear(int i,int j){
     a[i][j]=0;
-    swap(a[i][j],a[i][ca[i]]);
+    for(int u=j;u<ca[i];u++)a[i][u]=a[i][u+1];
     ca[i]--;
 }
 void rnd(int u,int v){
@@ -92,7 +92,7 @@ void xrow(int u,int v){
         if(flag){
             clear(v,flag);
         }else{
-            a[v][ca[v]++]=a[u][i];
+            a[v][++ca[v]]=a[u][i];
         }
     }
     con[v]^=con[u];
