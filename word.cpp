@@ -1,41 +1,21 @@
 #include "bits/stdc++.h"
 using namespace std;
-int n;
-int exgcd(int a,int b,int &x,int &y){
-    if(b==0){
-        x=1;
-        y=0;
-        return a;
-    }
-    int g=exgcd(b,a%b,y,x);
-    y-=(a/b)*x;
-    return g;
-}
+const int mod=10000;
+int f[1010][1010];
+int g[1010][1010];
+int n,k;
 int main(){
-    int a,b,c,x=0,y=0,g;
-    cin>>n;
-    for(int i=0;i<n;i++){
-        cin>>a>>b>>c;
-        g=exgcd(a,b,x,y);
-        if(c%g){
-            cout<<"no solution"<<endl;
-            continue;
+    cin>>n>>k;
+    f[1][0]=1;
+    for(int i=0;i<=k;i++)g[1][i]=1;
+    for(int i=2;i<=n;i++){
+        for(int j=0;j<=min(n*(n-1)/2,k);j++){
+            if(j-i<0)f[i][j]=g[i-1][j];
+            else f[i][j]=(g[i-1][j]-g[i-1][j-i]+mod)%mod;
         }
-        int w=c/g;
-        x*=w;
-        y*=w;
-        a/=g;
-        b/=g;
-        if(x>0){
-            int t=x/b;
-            x-=t*b;
-            y+=t*a;
-        }
-        while(x<=0){
-            x+=b;
-            y-=a;
-        }
-        cout<<x<<' '<<y<<endl;
+        g[i][0]=f[i][0];
+        for(int j=1;j<=k;j++)g[i][j]=(g[i][j-1]+f[i][j])%mod;
     }
+    cout<<f[n][k]<<endl;
     return 0;
 }
