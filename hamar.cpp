@@ -3,13 +3,14 @@ using namespace std;
 #define N 100
 #define M 6400
 int x,y,f[N][N],ansf[N][N];
-int a[M][100],ca[M],con[M],ans[M];
+int a[M][100],ca[M],con[M],ans[M],flagid=5;
 int n,m;//n=number of equation, m=number of unknown
 struct loc{
     int x,y;
 }p[M];
 int c[N][N];
 void clear(int i,int j){
+    if(i==flagid||j==flagid)cout<<"c"<<i<<' '<<j<<endl;
     a[i][j]=0;
     for(int u=j;u<=ca[i];u++)a[i][u]=a[i][u+1];
     ca[i]--;
@@ -47,20 +48,10 @@ void label(){
     }
 }
 void print(){
-    cout<<"cr:";
-    for(int i=1;i<=m;i++){
-        cout<<i<<"=("<<p[i].x<<','<<p[i].y<<") ";
-    }
-    cout<<endl;
-    for(int i=1;i<=x;i++){
-        for(int j=1;j<=y;j++){
-            cout<<"("<<i<<","<<j<<")="<<c[i][j]<<' ';
-        }
-    }
-    cout<<endl;
-    for(int i=1;i<=n;i++){
+    for(int i=flagid;i<=flagid;i++){
+        cout<<i<<":";
         for(int j=1;j<=ca[i];j++){
-            cout<<a[i][j]<<' ';
+            cout<<a[i][j]<<"("<<p[a[i][j]].x<<','<<p[a[i][j]].y<<") ";
         }
         cout<<con[i]<<endl;
     }
@@ -89,6 +80,7 @@ void init(){
     }
 }
 void xrow(int u,int v){
+    if(u==flagid||v==flagid)cout<<u<<"x"<<v<<endl;
     for(int i=1;i<=ca[u];i++){
         int flag=0;
         for(int j=1;j<=ca[v];j++){
@@ -106,11 +98,14 @@ void xrow(int u,int v){
     con[v]^=con[u];
 }
 void srow(int u,int v){
+    if(u==flagid||v==flagid)cout<<u<<"s"<<v<<endl;
     for(int i=1;i<=max(ca[u],ca[v]);i++){
         swap(a[u][i],a[v][i]);
     }
     swap(con[u],con[v]);
     swap(ca[u],ca[v]);
+    if(u==flagid)flagid=v;
+    else if(v==flagid)flagid=u;
 }
 bool is(int u,int v){
     for(int i=1;i<=ca[u];i++){
@@ -120,6 +115,7 @@ bool is(int u,int v){
 }
 void work(){
     for(int i=1;i<=n;i++){
+        print();
         int r=i;
         if(!is(i,r)){
             r=-1;
@@ -140,11 +136,17 @@ void work(){
 void solute(){
     for(int i=n;i>0;i--){
         start:
-        //print();
+        print();
         if(ca[i]==0)continue;
         if(ca[i]==1)ans[a[i][1]]=con[i];
         for(int j=1;j<i;j++){
-            if(is(j,a[i][1]))xrow(i,j);
+            for(int k=1;k<=ca[j];k++){
+                if(a[j][k]==a[i][1]){
+                    clear(j,k);
+                    con[j]^=ans[a[i][1]];
+                    break;
+                }
+            }
         }
         clear(i,1);
         if(ca[i])goto start;
@@ -167,9 +169,3 @@ int main(){
     }
     return 0;
 }
-/*
-3 3
-0 0 896
-0 0 296
-0 516 0
-*/
