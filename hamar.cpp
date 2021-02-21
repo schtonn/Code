@@ -142,17 +142,9 @@ void solute(){
         start:
         //print();
         if(ca[i]==0)continue;
-        if(ca[i]==1){
-            ans[a[i][1]]=con[i];
-            for(int j=1;j<i;j++){
-                if(is(j,a[i][1]))xrow(i,j);
-            }
-        }else{
-            for(int j=1;j<i;j++){
-                for(int k=1;k<=ca[j];k++){
-                    if(a[j][k]==a[i][1])clear(j,k);
-                }
-            }
+        if(ca[i]==1)ans[a[i][1]]=con[i];
+        for(int j=1;j<i;j++){
+            if(is(j,a[i][1]))xrow(i,j);
         }
         clear(i,1);
         if(ca[i])goto start;
@@ -160,8 +152,9 @@ void solute(){
 }
 int main(){
     init();
+    print();
     work();
-    //print();
+    print();
     solute();
     for(int i=1;i<=m;i++){
         ansf[p[i].x][p[i].y]=ans[i];
