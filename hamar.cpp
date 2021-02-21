@@ -1,21 +1,16 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int N=100010,M=100010;
-int n,m,a[N],b[N],bb[N],c[M];
+const int N=200010; 
+int n,x[N],c[N],s[N],ans;
 int main(){
-    cin>>n>>m;
-    for(int i=1;i<=m;i++)cin>>b[i];
+    cin>>n;
+    for(int i=1;i<=n;i++)cin>>x[i]>>c[i]>>s[i];
     for(int i=1;i<=n;i++){
-        cin>>a[i]>>c[i];
+        ans+=c[i];
+        int j=i;
+        while(x[i]+s[i]<=x[j])j++;
+        i=j;
     }
-    for(int k=1;k<=n;k++){
-        memcpy(bb,b,sizeof(b));
-        int p=k-1;
-        while(bb[c[p%n+1]]>=a[p%n+1]){
-            bb[c[p%n+1]]-=a[p%n+1];
-            p++;
-        }
-        cout<<p-k+1<<' ';
-    }
+    cout<<ans<<endl;
     return 0;
 }
