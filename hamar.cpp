@@ -1,181 +1,94 @@
-#include "bits/stdc++.h"
+#include"bits/stdc++.h"
 using namespace std;
-#define N 100
-#define M 6400
-int x,y,f[N][N],ansf[N][N];
-int a[M][100],ca[M],con[M],ans[M];
-int n,m;//n=number of equation, m=number of unknown
-struct loc{
-    int x,y;
-}p[M];
-int c[N][N];
-void clear(int i,int j){
-    a[i][j]=0;
-    for(int u=j;u<=ca[i];u++)a[i][u]=a[i][u+1];
-    ca[i]--;
+struct node{
+    int l,r,c,lazy;
+}t[10000010];
+long long ll[40000001],rr[40000001],cnt,n,m,i,l1,r1,v,val,q,a[1000001],he[1000001];
+void xiafang(long long u){
+    cnt++;
+    ll[u]=cnt;
+    t[cnt].l=t[u].l;
+    t[cnt].r=(t[u].l+t[u].r)/2;
+    t[cnt].lazy=t[u].c*(t[cnt].r-t[cnt].l+1);
+    t[cnt].c=t[u].c;
+    cnt++;
+    rr[u]=cnt;
+    t[cnt].l=(t[u].l+t[u].r)/2+1;
+    t[cnt].r=t[u].r;
+    t[cnt].lazy=t[u].c*(t[cnt].r-t[cnt].l+1);
+    t[cnt].c=t[u].c;
+    t[u].c=0;
 }
-bool neartip(int u,int v){
-    for(int i=-1;i<=1;i++){
-        for(int j=-1;j<=1;j++){
-            if(f[u+i][v+j])return true;
-        }
+void build(long long u,long long l1,long long r1){
+    t[u].l=l1;
+    t[u].r=r1;
+    if(l1==r1){
+        t[u].lazy=a[l1];
+        return;
     }
-    return false;
+    cnt++;
+    ll[u]=cnt;
+    build(ll[u],l1,(l1+r1)/2);
+    cnt++;
+    rr[u]=cnt;
+    build(rr[u],(l1+r1)/2+1,r1);
+    t[u].lazy=t[ll[u]].lazy+t[rr[u]].lazy;
 }
-void rnd(int u,int v){
-    for(int i=-1;i<=1;i++){
-        for(int j=-1;j<=1;j++){
-            int X=u+i,Y=v+j;
-            if(X<=x&&Y<=y&&X>0&&Y>0){
-                if(!f[X][Y]){
-                    a[n][++ca[n]]=c[X][Y];
-                }
-            }
-        }
+void jia(long long mo,long long u,long long l1,long long r1,long long k){
+    t[u].l=t[mo].l;
+    t[u].r=t[mo].r;
+    if(t[u].l>=l1&&t[u].r<=r1){
+        t[u].lazy=k*(t[u].r-t[u].l+1);
+        t[u].c=k;
+        return;
     }
-}
-void label(){
-    for(int i=1;i<=x;i++){
-        for(int j=1;j<=y;j++){
-            if(!f[i][j]&&neartip(i,j)){
-                m++;
-                p[m].x=i;
-                p[m].y=j;
-                c[i][j]=m;
-            }
-        }
-    }
-}
-void print(){
-    cout<<"cr:";
-    for(int i=1;i<=m;i++){
-        cout<<i<<"=("<<p[i].x<<','<<p[i].y<<") ";
-    }
-    cout<<endl;
-    for(int i=1;i<=x;i++){
-        for(int j=1;j<=y;j++){
-            cout<<"("<<i<<","<<j<<")="<<c[i][j]<<' ';
-        }
-    }
-    cout<<endl;
-    for(int i=1;i<=n;i++){
-        for(int j=1;j<=ca[i];j++){
-            cout<<a[i][j]<<' ';
-        }
-        cout<<con[i]<<endl;
-    }
-}
-void init(){
-    cin>>x>>y;
-    for(int i=1;i<=x;i++){
-        for(int j=1;j<=y;j++){
-            cin>>f[i][j];
-        }
-    }
-    label();
-    for(int i=1;i<=x;i++){
-        for(int j=1;j<=y;j++){
-            if(f[i][j]){
-                n++;
-                rnd(i,j);
-            }
-        }
-    }
-    int flag=0;
-    for(int i=1;i<=x;i++){
-        for(int j=1;j<=y;j++){
-            if(f[i][j])con[++flag]=f[i][j];
-        }
+    if(t[mo].c)xiafang(mo);
+    if(r1<=(t[u].l+t[u].r)/2){
+        rr[u]=rr[mo];
+        cnt++;
+        ll[u]=cnt;
+        jia(ll[mo],ll[u],l1,r1,k);
+        t[u].lazy=t[ll[u]].lazy+t[rr[u]].lazy;
+    }else if(l1>(t[u].l+t[u].r)/2){
+        ll[u]=ll[mo];
+        cnt++;
+        rr[u]=cnt;
+        jia(rr[mo],rr[u],l1,r1,k);
+        t[u].lazy=t[ll[u]].lazy+t[rr[u]].lazy;
+    }else{
+        cnt++;
+        ll[u]=cnt;
+        jia(ll[mo],ll[u],l1,r1,k);
+        cnt++;
+        rr[u]=cnt;
+        jia(rr[mo],rr[u],l1,r1,k);
+        t[u].lazy=t[ll[u]].lazy+t[rr[u]].lazy;
     }
 }
-void xrow(int u,int v){
-    for(int i=1;i<=ca[u];i++){
-        int flag=0;
-        for(int j=1;j<=ca[v];j++){
-            if(a[u][i]==a[v][j]){
-                flag=j;
-                break;
-            }
-        }
-        if(flag){
-            clear(v,flag);
-        }else{
-            a[v][++ca[v]]=a[u][i];
-        }
-    }
-    con[v]^=con[u];
-}
-void srow(int u,int v){
-    for(int i=1;i<=max(ca[u],ca[v]);i++){
-        swap(a[u][i],a[v][i]);
-    }
-    swap(con[u],con[v]);
-    swap(ca[u],ca[v]);
-}
-bool is(int u,int v){
-    for(int i=1;i<=ca[u];i++){
-        if(a[u][i]==v)return true;
-    }
-    return false;
-}
-void work(){
-    for(int i=1;i<=n;i++){
-        int r=i;
-        if(!is(i,r)){
-            r=-1;
-            for(int j=i+1;j<=m;j++){
-                if(is(j,i)){
-                    r=j;
-                    break;
-                }
-            }
-            if(r==-1)continue;
-            srow(i,r);
-        }
-        for(int j=i+1;j<=n;j++){
-            if(is(j,i))xrow(i,j);
-        }
-    }
-}
-void solute(){
-    for(int i=n;i>0;i--){
-        start:
-        //print();
-        if(ca[i]==0)continue;
-        if(ca[i]==1)ans[a[i][1]]=con[i];
-        for(int j=1;j<i;j++){
-            for(int k=1;k<=ca[j];k++){
-                if(a[j][k]==a[i][1]){
-                    clear(j,k);
-                    con[j]^=ans[a[i][1]];
-                    break;
-                }
-            }
-        }
-        clear(i,1);
-        if(ca[i])goto start;
-    }
+long long qui(long long u,long long l1,long long r1){
+    if(t[u].l>r1||t[u].r<l1)return 0;
+    if(t[u].l>=l1&&t[u].r<=r1)return t[u].lazy;
+    if(t[u].c)xiafang(u);
+    return (qui(ll[u],l1,r1)+qui(rr[u],l1,r1))%998244353;
 }
 int main(){
-    init();
-    print();
-    work();
-    print();
-    solute();
-    for(int i=1;i<=m;i++){
-        ansf[p[i].x][p[i].y]=ans[i];
-    }
-    for(int i=1;i<=x;i++){
-        for(int j=1;j<=y;j++){
-            cout<<ansf[i][j]<<' ';
+    he[0]=1;
+    cnt=1;
+    cin>>n>>m;
+    for(i=1;i<=n;i++)scanf("%lld",&a[i]);
+    build(1,1,n);
+    for(i=1;i<=m;i++){
+        scanf("%lld%lld",&v,&q);
+        if(q==1){
+            cnt++;
+            he[i]=cnt;
+            scanf("%lld%lld%lld",&l1,&r1,&val);
+            jia(he[v],he[i],l1,r1,val);
+        }else{
+            scanf("%lld%lld",&l1,&r1);
+            he[i]=he[v];
+            printf("%lld\n",qui(he[v],l1,r1)%998244353);
         }
-        cout<<endl;
     }
     return 0;
 }
-/*
-3 3
-0 0 896
-0 0 296
-0 516 0
-*/
