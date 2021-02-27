@@ -1,89 +1,93 @@
-#include "bits/stdc++.h"
+#include<bits/stdc++.h>
 using namespace std;
-
-const long long mod=1000000007,N=100010;
-long long n,m,f[N<<5],dep[N<<5];
-
+const int N=1010;
 struct node{
-    long long l,r;
+    int l,r,size,rnd,v;
 }t[N<<5];
-long long rt[N],tot;
-
-void build(long long&id,long long l,long long r){
-    id=++tot;
-    if(l==r){
-        f[id]=l;
-        return;
+int n,m,T,cnt=1,rt[N],ans[N];
+void update(int k){
+    t[k].size=t[t[k].l].size+t[t[k].r].size+1;
+}
+void newnode(int &k,int x){
+    t[k=++cnt].v=x;t[k].size=1;t[k].rnd=rand();
+}
+int merge(int a,int b){
+    if(!a||!b)return a+b;
+    if(t[a].rnd>t[b].rnd){
+        int p=++cnt;t[p]=t[a];
+        t[p].r=merge(t[p].r,b);
+        update(p);return p;
+    }else{
+        int p=++cnt;t[p]=t[b];
+        t[p].l=merge(a,t[p].l);
+        update(p);return p;
     }
-    long long mid=(l+r)>>1;
-    build(t[id].l,l,mid);
-    build(t[id].r,mid+1,r);
 }
-
-void change(long long&id,long long last,long long l,long long r,long long p,long long c){
-    id=++tot;
-    if(l==r){
-        f[id]=c;
-        dep[id]=dep[last];
-        return;
+void split(int now,int k,int &x,int &y){
+    if(!now)x=y=0;
+    else{
+        if(t[now].v<=k){
+            x=++cnt;t[x]=t[now];
+            split(t[x].r,k,t[x].r,y);
+            update(x);
+        }else{
+            y=++cnt;t[y]=t[now];
+            split(t[y].l,k,x,t[y].l);
+            update(y);
+        }
     }
-    t[id].l=t[last].l;t[id].r=t[last].r;
-    long long mid=(l+r)>>1;
-    if(p<=mid)change(t[id].l,t[last].l,l,mid,p,c);
-    else change(t[id].r,t[last].r,mid+1,r,p,c);
 }
-
-long long query(long long id,long long l,long long r,long long p){
-    if(l==r)return id;
-    long long mid=(l+r)>>1;
-    if(p<=mid)return query(t[id].l,l,mid,p);
-    else return query(t[id].r,mid+1,r,p);
+void del(int &root,int k){
+    int x=0,y=0,z=0;
+    split(root,k,x,z);
+    split(x,k-1,x,y);
+    y=merge(t[y].l,t[y].r);
+    root=merge(merge(x,y),z);
 }
-
-void add(long long id,long long l,long long r,long long p){
-    if(l==r){
-        ++dep[id];
-        return;
-    }
-    long long mid=(l+r)>>1;
-    if(p<=mid)add(t[id].l,l,mid,p);
-    else add(t[id].r,mid+1,r,p);
+void ins(int &root,int k){
+    int x=0,y=0,z=0;
+    split(root,k,x,y);
+    newnode(z,k);
+    root=merge(merge(x,z),y);
 }
-
-long long getf(long long rt,long long x){
-    long long c=query(rt,1,n,x);
-    if(x==f[c])return c;
-    return getf(rt,f[c]);
+int rnk(int x,int k){
+    if(k==t[t[x].l].size+1)return t[x].v;
+    else if(k<=t[t[x].l].size)return rnk(t[x].l,k);
+    else return rnk(t[x].r,k-t[t[x].l].size-1);
 }
-
+int kth(int &root,int k){
+    int x,y;
+    split(root,k-1,x,y);
+    int ans=t[x].size+1;
+    root=merge(x,y);
+    return ans;
+}
+int pre(int &root,int k){
+    int x,y,k,ans;
+    split(root,k-1,x,y);
+    if(!x)return -1;
+    k=t[x].size;
+    ans=rnk(x,k);
+    root=merge(x,y);
+    return ans;
+}
 int main(){
-    ios::sync_with_stdio(false);
-    cin>>n>>m;
-    long long hash=0,op,x,y,X,Y;
-    build(rt[0],1,n);
-    for(long long i=1;i<=m;++i){
-        cin>>op;
-        if(op==1){
-            rt[i]=rt[i-1];
-            cin>>x>>y>>X>>Y;
-            long long a=(hash*x+y)%n+1,b=(hash*X+Y)%n+1;
-            long long f1=getf(rt[i],a);
-            long long f2=getf(rt[i],b);
-            if(f[f1]==f[f2]){
-                hash=(hash*2)%mod;
-                continue;
-            }
-            hash=(hash*2+1)%mod;
-            if(dep[f1]>dep[f2])swap(f1,f2);
-            change(rt[i],rt[i-1],1,n,f[f1],f[f2]);
-            if(dep[f1]==dep[f2])add(rt[i],1,n,f[f2]);
-        }
-        if(op==2){
-            cin>>x>>y;
-            long long k=(hash*x+y)%i;
-            rt[i]=rt[k];
-        }
+    scanf("%d%d%d",&n,&m,&T);
+    for(int i=1;i<=n;++i){
+        int t,q,k;
+        scanf("%d%d%d",&t,&q,&k);
+        rt[i]=rt[t];
+        if(q==1)ins(rt[i],k);
+        else if(q==2)del(rt[i],k);
     }
-    cout<<hash<<endl;
+    for(int i=1;i<=m;i++){
+        int t,q,k,b,c;
+        scanf("%d%d%d%d",&q,&k,&b,&c);
+        rt[i]=rt[t];
+        t=((b*ans[i-1]+c)%T+T)%T;
+        if(q==3)ans[i]=kth(rt[i],k);
+        else ans[i]=pre(rt[i],k);
+        cout<<ans[i]<<endl;
+    }
     return 0;
 }
