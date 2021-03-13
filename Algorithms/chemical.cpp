@@ -1,5 +1,4 @@
 //chemical.cpp
-//Author: schtonn
 //A chemical equation balancer
 
 #include "bits/stdc++.h"
