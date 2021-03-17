@@ -114,7 +114,7 @@ void J(int i,int j,int k,int x){
         }
         maxt=tot;
         X=merge(copyMinus(X,y),X);
-        y=y+y;
+        y+=y;
         t1>>=1;
     }
     maxt=tot;
@@ -166,47 +166,17 @@ int main(){
         cin>>op;
         //cerr<<"Step "<<p<<" "<<op<<endl;
         switch(op){
-        case 'A':
-            cin>>i;
-            A(getId(i));
-            break;
-        case 'B':
-            cin>>i;
-            B(getId(i));
-            break;
-        case 'C':
-            cin>>i;
-            C(getId(i));
-            break;
-        case 'D':
-            cin>>i;
-            D(getId(i));
-            break;
-        case 'E':
-            cin>>i>>x;
-            E(getId(i),x);
-            break;
-        case 'F':
-            cin>>i>>x;
-            F(getId(i),x);
-            break;
-        case 'G':
-            cin>>i>>x;
-            G(getId(i),x);
-            break;
-        case 'H':
-            cin>>i>>j;
-            H(getId(i),getId(j));
-            break;
-        case 'I':
-            cin>>i>>j>>x;
-            I(getId(i),getId(j),x);
-            break;
-        case 'J':
-            cin>>i>>j>>k>>x;
-            J(getId(i),getId(j),k,x);
-            break;
-        default:;
+            case 'A': cin>>i;A(getId(i));break;
+            case 'B': cin>>i;B(getId(i));break;
+            case 'C': cin>>i;C(getId(i));break;
+            case 'D': cin>>i;D(getId(i));break;
+            case 'E': cin>>i>>x;E(getId(i),x);break;
+            case 'F': cin>>i>>x;F(getId(i),x);break;
+            case 'G': cin>>i>>x;G(getId(i),x);break;
+            case 'H': cin>>i>>j;H(getId(i),getId(j));break;
+            case 'I': cin>>i>>j>>x;I(getId(i),getId(j),x);break;
+            case 'J': cin>>i>>j>>k>>x;J(getId(i),getId(j),k,x);break;
+            default:;
         }
     }
     return 0;
