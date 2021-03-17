@@ -25,7 +25,7 @@ struct Node{
 };
 Node ns[MAX_NODES];
 int tot=0;
-int threshold=0;
+int maxt=0;
 int createNode(){
     return ++tot;
 }
@@ -38,7 +38,7 @@ void check(int i){
 }
 int getNode(int p){
     if(p==0)return p;
-    if(p>threshold)return p;
+    if(p>maxt)return p;
     int nId=++tot;
     ns[nId]=ns[p];
     return nId;
@@ -66,8 +66,7 @@ int pushDown(int A){
     return A;
 }
 int merge(int A,int B){
-    if(!A)return B;
-    if(!B)return A;
+    if(!A||!B)return A+B;
     A=pushDown(A);
     B=pushDown(B);
     if(ns[A].v<ns[B].v)swap(A,B);
@@ -90,7 +89,7 @@ void B(int i){cout<<sum[i]<<endl;}
 void C(int i){cout<<ma[i]<<endl;}
 void D(int i){cout<<mi[i]<<endl;}
 void E(int i,int x){
-    threshold=tot;
+    maxt=tot;
     int nId=createNode();
     ns[nId].v=x;
     ns[nId].h=1;
@@ -101,7 +100,7 @@ void E(int i,int x){
     ma[i]=max(ma[i],x);
 }
 void F(int i,int x){
-    threshold=tot;
+    maxt=tot;
     if(root[i]){
         root[i]=getNode(root[i]);
         ns[root[i]].lazy+=x;
@@ -113,22 +112,22 @@ void F(int i,int x){
     }
 }
 void J(int i,int j,int t,int x){
-    threshold=tot;
+    maxt=tot;
     if(num[i]<=0)return;
     int t1=t;
     int A=root[i];
     int R=0,X=copyMinus(A,x),y=x;
     while(t1){
         if(t1&1){
-            threshold=tot;
+            maxt=tot;
             R=merge(copyMinus(R,y),X);
         }
-        threshold=tot;
+        maxt=tot;
         X=merge(copyMinus(X,y),X);
         y=y+y;
         t1>>=1;
     }
-    threshold=tot;
+    maxt=tot;
     root[j]=merge(root[j],R);
     num[j]+=t*num[i];
     sum[j]+=t*sum[i]-(long long)t*(t+1)/2*x*num[i];
@@ -137,7 +136,7 @@ void J(int i,int j,int t,int x){
     check(j);
 }
 int P(int i){
-    threshold=tot;
+    maxt=tot;
     //cerr<<"P "<<i<<endl;
     root[i]=pushDown(root[i]);
     //cerr<<"P x "<<ns[root[i]].v<<" "<<ns[root[i]].lazy<<endl;
@@ -176,7 +175,7 @@ int main(){
     int n;
     cin>>n;
     for(int p=1;p<=n;++p){
-        threshold=tot;
+        maxt=tot;
         char op;
         int i,j,t;
         long long x;
