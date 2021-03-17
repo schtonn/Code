@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include "bits/stdc++.h"
 using namespace std;
 const int MAXT=50010;
 const int oo=(int)1e19;
@@ -21,18 +21,11 @@ struct Node{
     int lazy;
     int v;
     int l,r;
-    int h;
+    int d;
 };
 Node t[MAX_NODES];
 int tot=0;
 int maxt=0;
-void check(int i){
-    return;
-    if(!rt[i])return;
-    if(t[rt[i]].v+t[rt[i]].lazy!=ma[i]){
-        cerr<<i<<" "<<ma[i]<<" "<<t[rt[i]].v+t[rt[i]].lazy<<endl;
-    }
-}
 int getNode(int p){
     if(p==0)return p;
     if(p>maxt)return p;
@@ -48,17 +41,17 @@ int getId(int v){
 int pushDown(int A){
     if(t[A].lazy){
         A=getNode(A);
-        Node&nA=t[A];
-        nA.v+=nA.lazy;
-        if(nA.l){
-            nA.l=getNode(nA.l);
-            t[nA.l].lazy+=nA.lazy;
+        Node&tA=t[A];
+        tA.v+=tA.lazy;
+        if(tA.l){
+            tA.l=getNode(tA.l);
+            t[tA.l].lazy+=tA.lazy;
         }
-        if(nA.r){
-            nA.r=getNode(nA.r);
-            t[nA.r].lazy+=nA.lazy;
+        if(tA.r){
+            tA.r=getNode(tA.r);
+            t[tA.r].lazy+=tA.lazy;
         }
-        nA.lazy=0;
+        tA.lazy=0;
     }
     return A;
 }
@@ -68,10 +61,10 @@ int merge(int A,int B){
     B=pushDown(B);
     if(t[A].v<t[B].v)swap(A,B);
     A=getNode(A);
-    Node&nA=t[A];
-    nA.r=merge(nA.r,B);
-    if(t[nA.r].h>t[nA.l].h)swap(nA.l,nA.r);
-    nA.h=t[nA.r].h+1;
+    Node&tA=t[A];
+    tA.r=merge(tA.r,B);
+    if(t[tA.r].d>t[tA.l].d)swap(tA.l,tA.r);
+    tA.d=t[tA.r].d+1;
     return A;
 }
 int copyMinus(int root,int delta){
@@ -89,7 +82,7 @@ void E(int i,int x){
     maxt=tot;
     int id=++tot;
     t[id].v=x;
-    t[id].h=1;
+    t[id].d=1;
     rt[i]=merge(rt[i],id);
     ++num[i];
     sum[i]+=x;
@@ -130,7 +123,6 @@ void J(int i,int j,int k,int x){
     sum[j]+=k*sum[i]-(long long)k*(k+1)/2*x*num[i];
     mi[j]=min(mi[j],mi[i]-k*x);
     ma[j]=max(ma[j],ma[i]-x);
-    check(j);
 }
 int P(int i){
     maxt=tot;
@@ -150,7 +142,6 @@ void H(int i,int j){
     int x=P(i);
     //cerr<<"H"<<x<<endl;
     E(j,x);
-    check(j);
 }
 void G(int i,int x){
     if(num[i]<=0)return;
