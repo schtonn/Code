@@ -26,7 +26,7 @@ struct Node{
 Node t[MAX_NODES];
 int tot=0;
 int maxt=0;
-int getNode(int p){
+int newt(int p){
     if(p==0)return p;
     if(p>maxt)return p;
     int id=++tot;
@@ -40,15 +40,15 @@ int getId(int v){
 }
 int pushDown(int A){
     if(t[A].lazy){
-        A=getNode(A);
+        A=newt(A);
         Node&tA=t[A];
         tA.v+=tA.lazy;
         if(tA.l){
-            tA.l=getNode(tA.l);
+            tA.l=newt(tA.l);
             t[tA.l].lazy+=tA.lazy;
         }
         if(tA.r){
-            tA.r=getNode(tA.r);
+            tA.r=newt(tA.r);
             t[tA.r].lazy+=tA.lazy;
         }
         tA.lazy=0;
@@ -60,7 +60,7 @@ int merge(int A,int B){
     A=pushDown(A);
     B=pushDown(B);
     if(t[A].v<t[B].v)swap(A,B);
-    A=getNode(A);
+    A=newt(A);
     Node&tA=t[A];
     tA.r=merge(tA.r,B);
     if(t[tA.r].d>t[tA.l].d)swap(tA.l,tA.r);
@@ -92,7 +92,7 @@ void E(int i,int x){
 void F(int i,int x){
     maxt=tot;
     if(rt[i]){
-        rt[i]=getNode(rt[i]);
+        rt[i]=newt(rt[i]);
         t[rt[i]].lazy+=x;
     }
     if(num[i]>0){
