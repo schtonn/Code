@@ -1,51 +1,55 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int N=1<<10;
-const int mod=10007;
-int m,n,p;
-int F[100][N];//F[i][j]表示骨牌覆盖完前i行，多余的骨牌状态为j的方案总数。
-int hole[100];
-int fact(int m) {
-    if(m<2)return m;
-    else{
-        return fact(m/2)*10+m%2;
-    }
+const int N=1000010;
+struct node{
+    int u,v,c;
+}e[N];
+int tot,h[N];
+int n,mp[510][510],f[N],siz[N];
+int m2g(int i,int j){
+	return (i-1)*n+j;
 }
-bool T(int A,int B){
-    int C=A|B;
-    int D=C^((1<<n)-1);
-    int E=D/3;
-    cout<<fact(A)<<','<<fact(B)<<','<<fact(C)<<','<<fact(D)<<','<<fact(E);
-    int F=E|(E<<1);
-    if(A&B)return false;
-    if(F==D)return true;
-    return false;
+void ade(int i,int j,int k,int l){
+    e[tot].u=m2g(i,j);
+    e[tot].v=m2g(k,l);
+    e[tot].c=abs(mp[i][j]-mp[k][l]);
+    tot++;
+}
+bool cmp(node a,node b){
+    return a.c<b.c;
+}
+int getf(int x){
+    return x==f[x]?x:f[x]=getf(f[x]);
 }
 int main(){
-    freopen("Code\\f.test","w",stdout);
-    cin>>n>>m>>p;
-    int x,y;
-    for(int i=1;i<=p;i++){
-        cin>>x>>y;
-        hole[y]|=1<<(x-1);
+    cin>>n;
+    int lim=(n*n+1)/2;
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=n;j++){
+            cin>>mp[i][j];
+        }
     }
-    for(int i=1;i<=m;i++){
-        cout<<fact(hole[i])<<endl;
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=n;j++){
+            if(i>1)ade(i,j,i-1,j);
+            if(j>1)ade(i,j,i,j-1);
+        }
     }
-    if(m==2){
-        F[0][hole[1]]=1;
-    }else{
-        F[0][0]=1;
+    for(int i=1;i<=n*n;i++){
+        f[i]=i;
+        siz[i]=1;
     }
-    for(int i=1;i<=m;i++){//行数
-        for(int B=0;B<=(1<<n)-1;B++){//枚举本行状态
-            for(int A=0;A<=(1<<n)-1;A++){//枚举上一行状态
-                int k=T(A,B|hole[i]);
-                F[i][B]=(F[i][B]+F[i-1][A]*k)%mod;
-                cout<<","<<i<<","<<F[i][B]<<","<<F[i-1][A]<<","<<k<<endl;
+    sort(e,e+tot,cmp);
+    for(int i=0;i<tot;i++){
+        int fu=getf(e[i].u),fv=getf(e[i].v);
+        if(fu!=fv){
+            f[fu]=fv;
+            siz[fv]+=siz[fu];
+            if(siz[fv]>=lim){
+                cout<<e[i].c<<endl;
+                return 0;
             }
         }
     }
-    cout<<F[m][0]<<endl;
     return 0;
 }
