@@ -7,4 +7,5 @@
 *.test
 *.kdbx
 *.keyx
+*.zip
 ~$*
