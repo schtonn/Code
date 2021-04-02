@@ -18,10 +18,7 @@ weigh=[0]*lel
 ans=[int(1)]*lel
 
 m=[[0]*lel for i in range(1010)]
-mc=0
-err=0
-center=0
-isbalanced=0
+global mc,err,center,isbalanced
 
 def gcd(a,b):
     if(b==0):return a
@@ -30,7 +27,6 @@ def gcd(a,b):
 # calc
 
 def getc(s,pos):
-    # print("getc",s,pos)
     s=s[pos:len(s)]
     ret=1
     for i in range(len(s)):
@@ -39,7 +35,6 @@ def getc(s,pos):
     return ret
 
 def ele(s,coef):
-    # print("ele",s,coef)
     global weigh
     for i in eles:
         if(s==i):
@@ -51,7 +46,6 @@ def ele(s,coef):
     err=1
 
 def term(s,coef):
-    # print("term",s,coef)
     i=0
     while i<len(s):
         if(s[i]=='('):
@@ -74,7 +68,6 @@ def term(s,coef):
         i+=1
 
 def form(s,coef):
-    # print("form",s,coef)
     ncoef=getc(s,0)
     ans[mc]=ncoef
     pre=int(math.log10(ncoef)+1)
@@ -82,7 +75,6 @@ def form(s,coef):
     term(s[pre:len(s)],coef*ncoef)
 
 def expr(s,coef):
-    # print("expr",s,coef)
     forms=s.split('+')
     global mc
     for i in range(len(forms)):
@@ -110,8 +102,7 @@ def balanced():
     r=[0]*lel
     for i in range(center):
         for j in range(lel):
-            if(m[i][j]):
-                l[j]+=ans[i]*m[i][j]
+            if(m[i][j]):l[j]+=ans[i]*m[i][j]
     for i in range(center,mc+1):
         for j in range(lel):
             if(m[i][j]):r[j]+=ans[i]*m[i][j]
@@ -169,20 +160,20 @@ def recbal():
     clean()
     return True
 
-def brutbal(step):
+def brutforce(step,rang):
     if(step==mc):return balanced()
-    for i in range(1,10):
+    for i in range(1,rang):
         ans[step]=i
-        if(brutbal(step+1)):return True
+        if(brutforce(step+1,rang)):return True
         ans[step]=0
     return False
 
-# def printt():
-#     for i in range(len(weigh)):
-#         if(weigh[i]!=0):print(eles[i],'=',weigh[i],sep="")
-#     for i in range(mc+1):
-#         for j in range(len(m[i])):
-#             if(m[i][j]!=0):print(i,'.',j,',',eles[j],'=',m[i][j],sep="")
+def brutbal():
+    for i in range(3,20):
+        if(brutforce(0,i)):return True
+    return False
+
+# utilities
 
 def printans(s):
     global center
@@ -219,11 +210,6 @@ def init():
     mc=0
     isbalanced=0
 
-# def printm():
-#     for i in range(1010):
-#         for j in range(lel):
-#             if(m[i][j]):print(i,eles[j],m[i][j])
-
 while True:
     init()
     s=input()
@@ -240,6 +226,6 @@ while True:
     else:
         if(balcheck()):
             if(recbal()):printans(s)
-            elif(brutbal(0)):printans(s)
+            elif(brutbal()):printans(s)
             else:print("failed")
         else:print("impossible")
