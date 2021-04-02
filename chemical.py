@@ -28,6 +28,7 @@ ans=[1]*120
 m=[[0]*120 for i in range(1010)]
 mc=0
 err=0
+center=0
 
 def getc(s,pos):
     # print("getc",s,pos)
@@ -88,10 +89,23 @@ def expr(s,coef):
         mc+=1
         form(forms[i],coef)
 
+def balcheck():
+    global center
+    l=[0]*120
+    r=[0]*120
+    for i in range(center):
+        for j in range(120):
+            if(m[i][j]):l[j]=1
+    for i in range(center,mc+1):
+        for j in range(120):
+            if(m[i][j]):r[j]=1
+    for i in range(120):
+        if(l[i]!=r[i]):return False
+    return True
+
 def printt():
     for i in range(len(weigh)):
         if(weigh[i]!=0):print(eles[i],'=',weigh[i],sep="")
-    print(mc)
     for i in range(mc+1):
         for j in range(len(m[i])):
             if(m[i][j]!=0):print(i,'.',j,',',eles[j],'=',m[i][j],sep="")
@@ -101,13 +115,17 @@ def init():
     weigh=[0]*120
     ans=[1]*120
     m=[[0]*120 for i in range(1010)]
-    err=mc=0
+    err=0
+    mc=0
 
-while 1:
+while True:
     init()
     s=input()
     lr=s.split('=',1)
     expr(lr[0],1)
+    center=mc+1
+    print(center)
     expr(lr[1],-1)
     if(err==1):print("err!")
-    else:printt()
+    # else:printt()
+    print(balcheck())
