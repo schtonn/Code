@@ -4,8 +4,6 @@ headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 
 while(1):
     url=input()
     out=requests.get("http://music.163.com/song/media/outer/url?id="+url+".mp3",headers=headers,timeout=20)
-    res=requests.get("http://music.163.com/#/song?id="+url)
-    soup=BeautifulSoup(res.text,"html.parser")
     mus=out.content
     print("good")
     with open(r"d:/Downloads/Music/"+url+".mp3",'ab') as file:

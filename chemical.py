@@ -22,15 +22,11 @@ priv=[2,2,
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2
 ]
 
-weigh=[0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-]
+weigh=[0]*200
+
+m=[[0]*200 for i in range(1010)]
 err=0
+curex=0
 
 def getc(s,pos):
     # print("getc",s,pos)
@@ -47,6 +43,7 @@ def ele(s,coef):
     for i in eles:
         if(s==i):
             weigh[eles.index(i)]+=coef
+            global curex
             return
     global err
     err=1
@@ -84,7 +81,9 @@ def form(s,coef):
 def expr(s,coef):
     # print("expr",s,coef)
     forms=s.split('+')
-    for i in forms:form(i,coef)
+    for i in range(len(forms)):
+        curex=i
+        form(forms[i],coef)
 
 def printt():
     for i in range(len(weigh)):
@@ -92,9 +91,13 @@ def printt():
 
 def init():
     global weigh
-    for i in range(len(weigh)):weigh[i]=0
     global err
+    global curex
+    global m
+    weigh=[0]*200
+    m=[[0]*200 for i in range(1010)]
     err=0
+    curex=0
 
 while 1:
     init()
