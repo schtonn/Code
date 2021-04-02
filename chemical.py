@@ -13,22 +13,21 @@ eles=["H","He",
     "Db","Sg","Bh","Hs","Mt","Ds","Rg","Cn","Nh","Fl","Mc","Lv","Ts","Og"
 ]
 
-priv=[2,2,
-    1,1,2,2,2,3,2,2,
-    1,1,1,2,2,2,2,2,
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2
-]
+lel=len(eles)
+weigh=[0]*lel
+ans=[int(1)]*lel
 
-weigh=[0]*120
-ans=[1]*120
-
-m=[[0]*120 for i in range(1010)]
+m=[[0]*lel for i in range(1010)]
 mc=0
 err=0
 center=0
+isbalanced=0
+
+def gcd(a,b):
+    if(b==0):return a
+    else:return gcd(b,a%b)
+
+# calc
 
 def getc(s,pos):
     # print("getc",s,pos)
@@ -77,6 +76,7 @@ def term(s,coef):
 def form(s,coef):
     # print("form",s,coef)
     ncoef=getc(s,0)
+    ans[mc]=ncoef
     pre=int(math.log10(ncoef)+1)
     if(not s[0].isdigit()):pre=0
     term(s[pre:len(s)],coef*ncoef)
@@ -86,46 +86,160 @@ def expr(s,coef):
     forms=s.split('+')
     global mc
     for i in range(len(forms)):
-        mc+=1
         form(forms[i],coef)
+        mc+=1
+
+# balance
 
 def balcheck():
     global center
-    l=[0]*120
-    r=[0]*120
+    l=[0]*lel
+    r=[0]*lel
     for i in range(center):
-        for j in range(120):
+        for j in range(lel):
             if(m[i][j]):l[j]=1
     for i in range(center,mc+1):
-        for j in range(120):
+        for j in range(lel):
             if(m[i][j]):r[j]=1
-    for i in range(120):
-        if(l[i]!=r[i]):return False
+    if(l!=r):return False
     return True
 
-def printt():
-    for i in range(len(weigh)):
-        if(weigh[i]!=0):print(eles[i],'=',weigh[i],sep="")
+def balanced():
+    global center
+    l=[0]*lel
+    r=[0]*lel
+    for i in range(center):
+        for j in range(lel):
+            if(m[i][j]):
+                l[j]+=ans[i]*m[i][j]
+    for i in range(center,mc+1):
+        for j in range(lel):
+            if(m[i][j]):r[j]+=ans[i]*m[i][j]
+    if(l!=r):return False
+    return True
+
+def clean():
+    div=0
+    for i in ans:div=gcd(div,i)
+    for i in range(len(ans)):ans[i]=int(ans[i]/div)
+
+def dfs(k,step):
+    if(balanced()):
+        global isbalanced
+        isbalanced=1
+        return True
+    if(step>50):return False
+    clean()
+    for i in ans:
+        if(i>1145141919810):return False
+    l=0
+    r=0
+    for i in range(center):l+=m[i][k]*ans[i]
+    for i in range(center,mc+1):r+=m[i][k]*ans[i]
+    if(l==0 and r==0):return True
+    if(l==0 or r==0):return False
+    div=gcd(l,r)
+    l=int(l/div)
+    r=int(r/div)
+    changed=[0]*lel
+    if(r!=1):
+        for i in range(center):
+            if(m[i][k]):
+                ans[i]*=r
+                changed[i]=True
+    if(l!=1):
+        for i in range(center,mc+1):
+            if(m[i][k]):
+                ans[i]*=l
+                changed[i]=True
     for i in range(mc+1):
-        for j in range(len(m[i])):
-            if(m[i][j]!=0):print(i,'.',j,',',eles[j],'=',m[i][j],sep="")
+        if(changed[i]):
+            for j in range(lel):
+                if(m[i][j] and j!=k):
+                    if(not dfs(j,step+1)):return False
+    return True
+
+def recbal():
+    for i in range(mc):
+        ans[i]=1
+    for i in range(len(eles)):
+        global isbalanced
+        if(not dfs(i,0)):return False
+        if(isbalanced):return True
+    clean()
+    return True
+
+def brutbal(step):
+    if(step==mc):return balanced()
+    for i in range(1,10):
+        ans[step]=i
+        if(brutbal(step+1)):return True
+        ans[step]=0
+    return False
+
+# def printt():
+#     for i in range(len(weigh)):
+#         if(weigh[i]!=0):print(eles[i],'=',weigh[i],sep="")
+#     for i in range(mc+1):
+#         for j in range(len(m[i])):
+#             if(m[i][j]!=0):print(i,'.',j,',',eles[j],'=',m[i][j],sep="")
+
+def printans(s):
+    global center
+    lr=s.split('=')
+    exps=lr[0].split('+')
+    for i in range(len(exps)):
+        s=exps[i]
+        ncoef=getc(s,0)
+        pre=int(math.log10(ncoef)+1)
+        if(not s[0].isdigit()):pre=0
+        s=s[pre:len(s)]
+        if(ans[i]!=1):print(ans[i],end="")
+        print(s,end="")
+        if(i<len(exps)-1):print('+',end="")
+    print('=',end="")
+    exps=lr[1].split('+')
+    for i in range(len(exps)):
+        s=exps[i]
+        ncoef=getc(s,0)
+        pre=int(math.log10(ncoef)+1)
+        if(not s[0].isdigit()):pre=0
+        s=s[pre:len(s)]
+        if(ans[i+center]!=1):print(ans[i+center],end="")
+        print(s,end="")
+        if(i<len(exps)-1):print('+',end="")
+    print()
 
 def init():
-    global weigh,err,ans,mc,m
-    weigh=[0]*120
-    ans=[1]*120
-    m=[[0]*120 for i in range(1010)]
+    global weigh,err,mc,m,ans,isbalanced
+    weigh=[0]*lel
+    ans=[1]*lel
+    m=[[0]*lel for i in range(1010)]
     err=0
     mc=0
+    isbalanced=0
+
+# def printm():
+#     for i in range(1010):
+#         for j in range(lel):
+#             if(m[i][j]):print(i,eles[j],m[i][j])
 
 while True:
     init()
     s=input()
     lr=s.split('=',1)
     expr(lr[0],1)
-    center=mc+1
-    print(center)
+    center=mc
     expr(lr[1],-1)
     if(err==1):print("err!")
-    # else:printt()
-    print(balcheck())
+    for i in range(mc):
+        for j in range(lel):
+            m[i][j]=int(m[i][j]/ans[i])
+    if(balanced()):
+        print("balanced!")
+    else:
+        if(balcheck()):
+            if(recbal()):printans(s)
+            elif(brutbal(0)):printans(s)
+            else:print("failed")
+        else:print("impossible")
