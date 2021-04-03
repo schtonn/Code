@@ -1,5 +1,7 @@
 import math
 
+from tkinter import *
+
 eles=["H","He",
     "Li","Be","B","C","N","O","F","Ne",
     "Na","Mg","Al","Si","P","S","Cl","Ar",
@@ -169,7 +171,7 @@ def brutforce(step,rang):
     return False
 
 def brutbal():
-    for i in range(3,20):
+    for i in range(3,10):
         if(brutforce(0,i)):return True
     return False
 
@@ -177,6 +179,7 @@ def brutbal():
 
 def printans(s):
     global center
+    ret=""
     lr=s.split('=')
     exps=lr[0].split('+')
     for i in range(len(exps)):
@@ -185,10 +188,10 @@ def printans(s):
         pre=int(math.log10(ncoef)+1)
         if(not s[0].isdigit()):pre=0
         s=s[pre:len(s)]
-        if(ans[i]!=1):print(ans[i],end="")
-        print(s,end="")
-        if(i<len(exps)-1):print('+',end="")
-    print('=',end="")
+        if(ans[i]!=1):ret+=str(ans[i])
+        ret+=s
+        if(i<len(exps)-1):ret+='+'
+    ret+='='
     exps=lr[1].split('+')
     for i in range(len(exps)):
         s=exps[i]
@@ -196,10 +199,10 @@ def printans(s):
         pre=int(math.log10(ncoef)+1)
         if(not s[0].isdigit()):pre=0
         s=s[pre:len(s)]
-        if(ans[i+center]!=1):print(ans[i+center],end="")
-        print(s,end="")
-        if(i<len(exps)-1):print('+',end="")
-    print()
+        if(ans[i+center]!=1):ret+=str(ans[i+center])
+        ret+=s
+        if(i<len(exps)-1):ret+='+'
+    return ret
 
 def init():
     global weigh,err,mc,m,ans,isbalanced
@@ -210,22 +213,42 @@ def init():
     mc=0
     isbalanced=0
 
-while True:
+rt = Tk()
+rt.title("chemical")
+rt.geometry("750x400")
+lbl = Label(rt, text="Input your equation")
+lbl.grid(column=0, row=0)
+txt = Entry(rt, width=100)
+txt.grid(column=0, row=1)
+def clicked(event):
+    global center
     init()
-    s=input()
+    s=txt.get()
     lr=s.split('=',1)
     expr(lr[0],1)
     center=mc
     expr(lr[1],-1)
-    if(err==1):print("err!")
+    if(err==1):
+        res="err"
+        return
     for i in range(mc):
         for j in range(lel):
             m[i][j]=int(m[i][j]/ans[i])
     if(balanced()):
-        print("balanced!")
+        res="balanced!"
     else:
         if(balcheck()):
-            if(recbal()):printans(s)
-            elif(brutbal()):printans(s)
-            else:print("failed")
-        else:print("impossible")
+            if(recbal()):res=printans(s)
+            else:
+                lbl.configure(text="thinking...")
+                if(mc<7 and brutbal()):res=printans(s)
+                else:res="failed"
+        else:res="impossible"
+    lbl.configure(text=res)
+
+txt.bind('<Return>', clicked)
+btn = Button(rt, text="Done")
+btn.bind('<Button-1>',clicked)
+btn.grid(column=2, row=1)
+rt.mainloop()
+
