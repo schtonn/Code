@@ -1,6 +1,6 @@
 import math
 
-from tkinter import *
+from tkinter import Tk,Label,Entry,Button
 
 eles=["H","He",
     "Li","Be","B","C","N","O","F","Ne",
@@ -216,9 +216,11 @@ def init():
 rt = Tk()
 rt.title("chemical")
 rt.geometry("750x400")
-lbl = Label(rt, text="Input your equation")
+lbl=Label(rt, text="Input your equation")
 lbl.grid(column=0, row=0)
-txt = Entry(rt, width=100)
+hlp=Label(rt,text="examples:\nFe+CuSO4=FeSO4+Cu\n1458H2+729O2=1458H2O\nCaCO3+HCl=CaCl2+H2O+CO2\nH2((((O)2)2)2)2=H2+O2",width=40,height=10,justify='center')
+hlp.grid(column=0,row=2)
+txt=Entry(rt, width=100)
 txt.grid(column=0, row=1)
 def clicked(event):
     global center
@@ -229,7 +231,7 @@ def clicked(event):
     center=mc
     expr(lr[1],-1)
     if(err==1):
-        res="err"
+        lbl.configure(text="err")
         return
     for i in range(mc):
         for j in range(lel):
@@ -251,4 +253,3 @@ btn = Button(rt, text="Done")
 btn.bind('<Button-1>',clicked)
 btn.grid(column=2, row=1)
 rt.mainloop()
-
