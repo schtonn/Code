@@ -8,4 +8,7 @@
 *.kdbx
 *.keyx
 *.zip
+*.dll
+/*.build
+/__pycache__
 ~$*
