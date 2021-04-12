@@ -8,12 +8,10 @@ struct matrix{
 }f,A,B,I,ans;
 long long e[N],g[N];
 void geteg(long long u){
-    long long a=u,b=u*2%k,a1=u,b1=u*2%k,st=1;
+    long long a=u,b=u*2%k,st=1;
     while(b!=1){
-        swap(a1,b1);
-        b1=(a1+b1)%k;
         st++;
-        if((a==a1&&b==b1)||(a==b&&e[a]==-1)){
+        if((a==0&&b==u)||(a==b&&e[a]==-1)){
             st=a=-1;
             break;
         }
@@ -22,11 +20,9 @@ void geteg(long long u){
             a=g[a];
             break;
         }
-        // cout<<"("<<a<<' '<<a1<<","<<b<<' '<<b1<<")->";
+        // cout<<"("<<a<<","<<b<<")->";
         swap(a,b);
         b=(a+b)%k;
-        swap(a1,b1);
-        b1=(a1+b1)%k;
     }
     e[u]=st;
     g[u]=a;
@@ -95,8 +91,8 @@ int main(){
     cin>>n>>k>>p;
     for(long long i=1;i<k;i++){
         geteg(i);
-        if(e[i]==-1)cout<<"N";
-        else cout<<"Y";
+       if(e[i]==-1)cout<<"N"<<endl;
+       else cout<<"Y"<<endl;
     }
     long long cur=1,ptr=0;
     while(true){
