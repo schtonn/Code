@@ -148,6 +148,6 @@ int main(){
             }
         }
     }
-    cout<<f.v[0][0]<<endl;
+    cout<<(f.v[0][0]+p)%p<<endl;
     return 0;
 }
