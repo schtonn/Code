@@ -7,7 +7,7 @@ struct matrix{
     ll v[5][5];
     ll x,y;
 }f,A,B,I,ans;
-ll e[N],g[N],inv[N];
+ll e[N],g[N],inv[N],vis[N];
 void exgcd(ll a,ll b,ll& d,ll& x,ll& y){
     if(!b){
         d=a;
@@ -101,8 +101,14 @@ int main(){
         swap(a,b);
         b=(a+b)%k;
     }
+    ll flag=0;
     ll cur=1,ptr=0;
     while(true){
+        if(vis[cur]){
+            flag=cur;
+            break;
+        }
+        vis[cur]=1;
         if(ptr+e[cur]+1>n||e[cur]==-1){
             f=(A^(n-ptr))*f;
             break;
@@ -114,6 +120,33 @@ int main(){
         ptr++;
         cur=g[cur];
         if(ptr>=n)break;
+    }
+    matrix C;
+    ll siz;
+    if(flag){
+        siz=e[flag]+2;
+        C=B*(A^(e[flag]+1));
+        for(ll i=g[flag];i!=flag;i=g[i]){
+            C=B*(A^(e[i]+1))*C;
+            siz+=e[i]+2;
+        }
+        f=(C^((n-ptr)/siz))*f;
+        if((n-ptr)%siz){
+            ptr=n-((n-ptr)%siz);
+            while(true){
+                if(ptr+e[cur]+1>n){
+                    f=(A^(n-ptr))*f;
+                    break;
+                }
+                f=(A^(e[cur]+1))*f;
+                ptr+=e[cur]+1;
+                if(ptr>=n)break;
+                f=B*f;
+                ptr++;
+                cur=g[cur];
+                if(ptr>=n)break;
+            }
+        }
     }
     cout<<f.v[0][0]<<endl;
     return 0;

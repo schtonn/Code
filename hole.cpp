@@ -1,78 +1,120 @@
 #include "bits/stdc++.h"
-#define ll long long
 using namespace std;
-
-const ll N=5000010;
-const double pi=acos(-1);
-string s;
-ll n,m,p,c[N];
-struct cpx{
-    double real,imag;
-    cpx(double X=0,double Y=0){real=X;imag=Y;}
-}a[N],b[N];
-inline cpx operator+(cpx a,cpx b){return cpx(a.real+b.real,a.imag+b.imag);}
-inline cpx operator-(cpx a,cpx b){return cpx(a.real-b.real,a.imag-b.imag);}
-inline cpx operator*(cpx a,cpx b){return cpx(a.real*b.real-a.imag*b.imag,a.real*b.imag+a.imag*b.real);}
-
-void FFT(cpx*a,ll op){
-    for(ll i=0;i<p;i++){
-        if(i<c[i])swap(a[i],a[c[i]]);
+typedef long long ll;
+const ll N=1000010;
+ll m,n,k,p;
+struct matrix{
+    ll v[5][5];
+    ll x,y;
+}f,A,B,I,ans;
+ll e[N],g[N],inv[N];
+void exgcd(ll a,ll b,ll& d,ll& x,ll& y){
+    if(!b){
+        d=a;
+        x=1;y=0;
+        return;
     }
-    for(ll i=1;i<p;i<<=1){
-        cpx W(cos(pi/i),op*sin(pi/i));
-        for(ll r=i<<1,j=0;j<p;j+=r){
-            cpx w(1,0);
-            for(ll l=0;l<i;l++,w=w*W){
-                cpx x=a[j+l],y=w*a[j+i+l];
-                a[j+l]=x+y;a[j+i+l]=x-y;
+    exgcd(b,a%b,d,y,x);
+    y-=x*(a/b);
+}
+ll getinv(ll a){
+    ll d,x,y;
+    exgcd(a,k,d,x,y);
+    return d==1?(x+k)%k:-1;
+}
+ostream&operator<<(ostream&ous,matrix a){
+    for(ll i=0;i<a.x;i++){
+        for(ll j=0;j<a.y;j++){
+            ous<<a.v[i][j]<<' ';
+        }
+        ous<<endl;
+    }
+    return ous;
+}
+matrix operator+(matrix a,matrix b){
+    matrix c;
+    if(a.x!=b.x||a.y!=b.y)return c;
+    ll x=a.x,y=a.y;
+    c.x=x;
+    c.y=y;
+    for(ll i=0;i<x;i++){
+        for(ll j=0;j<y;j++){
+            c.v[i][j]=(a.v[i][j]+b.v[i][j])%p;
+        }
+    }
+    return c;
+}
+matrix operator*(matrix a,matrix b){
+    matrix c;
+    if(a.y!=b.x)return c;
+    ll x=a.x,y=b.y,z=a.y;
+    c.x=x;
+    c.y=y;
+    for(ll i=0;i<x;i++){
+        for(ll j=0;j<y;j++){
+            c.v[i][j]=0;
+            for(ll k=0;k<z;k++){
+                c.v[i][j]=(c.v[i][j]+a.v[i][k]*b.v[k][j])%p;
             }
         }
     }
+    return c;
+}
+matrix operator^(matrix a,ll b){
+    matrix c=I;
+    while(b){
+        if(b&1)c=c*a;
+        a=a*a;
+        b>>=1;
+    }
+    return c;
+}
+void init(){
+    A.x=A.y=B.x=B.y=3;
+    I.x=I.y=3;
+    f.x=3;f.y=1;
+    f.v[1][0]=f.v[2][0]=1;
+    A.v[0][0]=A.v[0][1]=A.v[1][0]=A.v[2][2]=1;
+    B.v[0][0]=B.v[0][1]=B.v[1][0]=B.v[2][2]=1;
+    B.v[0][2]=-1;
+    I.v[0][0]=I.v[1][1]=I.v[2][2]=1;
 }
 int main(){
-    ios::sync_with_stdio(false);
-//    while(true){
-        memset(a,0,sizeof(a));
-        memset(b,0,sizeof(b));
-        memset(c,0,sizeof(c));
-        freopen("ab.txt","w",stdout);
-        freopen("a.txt","r",stdin);
-        cin>>s;n=s.size()-1;
-        for(ll i=0;i<=n;i++)a[n-i].real=s[i]-48;
-        freopen("b.txt","r",stdin);
-        cin>>s;m=s.size()-1;
-        for(ll i=0;i<=m;i++)b[m-i].real=s[i]-48;
-        p=1;ll l=0;
-        while(p<=n+m){
-            p<<=1;
-            l++;
+    // freopen("rabbit.in","r",stdin);
+    // freopen("rabbit.out","w",stdout);
+    init();
+    cin>>n>>k>>p;
+    int a=1,b=2;
+    memset(e,-1,sizeof(e));
+    for(int i=1;i<=k*k;i++){
+        if(a==1&&b==1)break;
+        if(!inv[b])inv[b]=getinv(b);
+        if(inv[b]==-1){
+            swap(a,b);
+            b=(a+b)%k;
+            continue;
         }
-        for(ll i=0;i<p;i++){
-            c[i]=(c[i>>1]>>1)|((i&1)<<(l-1));
+        if(e[inv[b]]==-1){
+            e[inv[b]]=i;
+            g[inv[b]]=a*inv[b]%k;
         }
-        FFT(a,1);FFT(b,1);
-        for(ll i=0;i<=p;i++){
-            a[i]=a[i]*b[i];
+        swap(a,b);
+        b=(a+b)%k;
+    }
+    ll cur=1,ptr=0;
+    while(true){
+        if(ptr+e[cur]+1>n||e[cur]==-1){
+            f=(A^(n-ptr))*f;
+            break;
         }
-        FFT(a,-1);
-        memset(c,0,sizeof(c));
-        for(ll i=0;i<=n+m+1;i++){
-            c[i]=a[i].real/p+0.5;
-        }
-        for(ll i=0;i<=n+m;i++){
-            c[i+1]+=c[i]/10;
-            c[i]%=10;
-        }
-        p=n+m+1;
-        while(c[p]){
-            c[p+1]+=c[p]/10;
-            c[p]%=10;
-            p++;
-        }
-        for(ll i=p-1;i>=0;i--){
-            printf("%lld",c[i]);
-        }
-        printf("\n");
-//    }
+        f=(A^(e[cur]+1))*f;
+        ptr+=e[cur]+1;
+        if(ptr>=n)break;
+        f=B*f;
+        ptr++;
+        cur=g[cur];
+        if(ptr>=n)break;
+    }
+    cout<<f.v[0][0]<<endl;
     return 0;
 }
