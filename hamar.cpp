@@ -147,7 +147,7 @@ int main(){
                 if(ptr>=n)break;
             }
         }
-    }
+    } 
     cout<<(f.v[0][0]+p)%p<<endl;
     return 0;
 }
