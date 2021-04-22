@@ -1,67 +1,67 @@
 #include "bits/stdc++.h"
 using namespace std;
-const long long N=500010;
-long long n,a[N][5],siz[5][2]={{2,2},{4,1},{1,1},{2,2},{2,2}},shp[5][4][2]={
-    {{1,1},{1,1}},{{1},{1},{1},{1},},{{1}},{{1,1},{1}},{{0,1},{1,1}}
-},top=0;
-void clear(long long u){
-    for(register long long i=u;i<=top;i++){
-        for(register long long j=0;j<5;j++){
-            a[i][j]=a[i+1][j];
-        }
-    }
-    top--;
+const int inf=1e9;
+const int N=1010;
+int n,m,x,y,z,maxflow,deep[N];
+struct Edge{
+    int next,to,dis;
+}edge[N];
+int num_edge=-1,head[N],cur[N];
+queue<int>q;
+void add_edge(int from,int to,int dis,bool flag){
+    edge[++num_edge].next=head[from];
+    edge[num_edge].to=to;
+    if(flag)edge[num_edge].dis=dis;
+    head[from]=num_edge;
 }
-void put(long long t,long long l,long long c){
-    long long p=0;
-    for(p=top+10;p>=0;p--){
-        long long flag=0;
-        for(register long long i=0;i<siz[t][0];i++){
-            for(register long long j=0;j<siz[t][1];j++){
-                if(shp[t][i][j]&&a[p+i][l+j]!=-1){
-                    flag=1;
-                    break;
-                }
+bool bfs(int s,int t){
+    memset(deep,0x7f,sizeof(deep));
+    while(!q.empty())q.pop();
+    for(int i=1;i<=n;i++)cur[i]=head[i];
+    deep[s]=0;
+    q.push(s);
+    while(!q.empty()){
+        int now=q.front();q.pop();
+        for(int i=head[now];i!=-1;i=edge[i].next){
+            if(deep[edge[i].to]>inf&&edge[i].dis)
+            {
+                deep[edge[i].to]=deep[now]+1;
+                q.push(edge[i].to);
             }
-            if(flag)break;
-        }
-        flag=flag;
-        if(flag)break;
-    }
-    p++;
-    top=max(siz[t][0]+p-1,top);
-    for(register long long i=0;i<siz[t][0];i++){
-        for(register long long j=0;j<siz[t][1];j++){
-            if(shp[t][i][j])a[p+i][l+j]=c;
         }
     }
-    for(register long long i=top;i>=0;i--){
-        long long flag=0;
-        for(register long long j=0;j<5;j++){
-            if(a[i][j]==-1)flag=1;
-        }
-        if(!flag)clear(i);
-    }
+    if(deep[t]<inf)return true;
+    else return false;
 }
-void print(){
-    for(register long long i=top;i>=0;i--){
-        for(register long long j=0;j<5;j++){
-            if(a[i][j]==-1)cout<<" ";
-            else cout<<a[i][j];
+
+
+int dfs(int now,int t,int limit){
+    if(!limit||now==t)return limit;
+    
+    int flow=0,f;
+    for(int i=cur[now];i!=-1;i=edge[i].next){
+        cur[now]=i;
+        if(deep[edge[i].to]==deep[now]+1&&(f=dfs(edge[i].to,t,min(limit,edge[i].dis)))){
+            flow+=f;
+            limit-=f;
+            edge[i].dis-=f;
+            edge[i^1].dis+=f;
+            if(!limit)break;
         }
-        cout<<endl;
     }
-    cout<<endl;
+    return flow;
+}
+void Dinic(int s,int t){
+    while(bfs(s,t))maxflow+=dfs(s,t,inf);
 }
 int main(){
-    ios::sync_with_stdio(false);
-    cin>>n;
-    memset(a,-1,sizeof(a));
-    for(register long long i=1;i<=n;i++){
-        long long t,l,c;
-        cin>>t>>l>>c;
-        put(t-1,l-1,c);
+    memset(head,-1,sizeof(head));
+    scanf("%d%d",&m,&n);
+    for(int i=1;i<=m;i++){
+        scanf("%d%d%d",&x,&y,&z);
+        add_edge(x,y,z,1);add_edge(y,x,z,0);
     }
-    print();
+    Dinic(1,n);
+    printf("%d",maxflow);
     return 0;
 }
