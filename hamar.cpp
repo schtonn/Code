@@ -1,40 +1,45 @@
 #include "bits/stdc++.h"
 using namespace std;
-int n,m,t[1000010];
-int lb(int x){return x&-x;}
-void add(int x,int d){
-    while(x<=n){
-        t[x]+=d;
-        x+=lb(x);
-    }
-}
-int sum(int x){
-    int ans=0;
-    while(x){
-        ans+=t[x];
-        x-=lb(x);
-    }
-    return ans;
+const int N=100010,M=100010;
+struct node{
+    int v,nxt;
+}e[N<<2];
+int n,m,h[N],in[N],st[N],tot;
+void adde(int u,int v){
+    tot++;
+    e[tot].v=v;
+    e[tot].nxt=h[u];
+    h[u]=tot;
 }
 int main(){
-    ios::sync_with_stdio(0);
     cin>>n>>m;
-    int a,pre=0;
-    for(int i=1;i<=n;i++){
-        cin>>a;
-        add(i,a-pre);
-        pre=a;
+    for(int i=0;i<m;i++){
+        int u,v;
+        cin>>u>>v;
+        adde(u,v);
+        in[v]++;
     }
-    int o,x,y;
-    while(m--){
-        cin>>o;
-        if(!o){
-            cin>>x>>y;
-            add(x,1);
-            add(y+1,-1);
-        }else{
-            cin>>x;
-            cout<<sum(x)<<endl;
+    priority_queue<int,vector<int>,greater<int> >q;
+    for(int i=1;i<=n;i++){
+        if(!in[i])q.push(i);
+    }
+    int cnt=0;
+    while(!q.empty()){
+        int u=q.top();
+        q.pop();
+        for(int i=h[u];i;i=e[i].nxt){
+            int v=e[i].v;
+            in[v]--;
+            if(!in[v])q.push(v);
+        }
+        h[u]=0;
+        st[cnt]=u;
+        cnt++;
+    }
+    if(cnt!=n)cout<<"No"<<endl;
+    else{
+        for(int i=0;i<n;i++){
+            cout<<st[i]<<' ';
         }
     }
     return 0;
