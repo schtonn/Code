@@ -6,7 +6,7 @@ import re
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36'}
 
 def main():
-    url = "https://music.163.com/#/playlist?id=5198659099" # 歌单地址 请自行更换
+    url = "https://music.163.com/#/playlist?id=6767501416" # 歌单地址 请自行更换
     if '/#/' in url:
         url = url.replace('/#/', '/')
 

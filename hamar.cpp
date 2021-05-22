@@ -1,67 +1,82 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int inf=1e9;
-const int N=1010;
-int n,m,x,y,z,maxflow,deep[N];
-struct Edge{
-    int next,to,dis;
-}edge[N];
-int num_edge=-1,head[N],cur[N];
-queue<int>q;
-void add_edge(int from,int to,int dis,bool flag){
-    edge[++num_edge].next=head[from];
-    edge[num_edge].to=to;
-    if(flag)edge[num_edge].dis=dis;
-    head[from]=num_edge;
-}
-bool bfs(int s,int t){
-    memset(deep,0x7f,sizeof(deep));
-    while(!q.empty())q.pop();
-    for(int i=1;i<=n;i++)cur[i]=head[i];
-    deep[s]=0;
-    q.push(s);
-    while(!q.empty()){
-        int now=q.front();q.pop();
-        for(int i=head[now];i!=-1;i=edge[i].next){
-            if(deep[edge[i].to]>inf&&edge[i].dis)
-            {
-                deep[edge[i].to]=deep[now]+1;
-                q.push(edge[i].to);
+typedef long long ll;
+ll len,l,s[110];
+char ch[110];
+const ll mod=123456789;
+struct matrix{
+    ll v[110][110];
+    ll x,y;
+}a,ans;
+matrix operator*(matrix a,matrix b){
+    matrix c;
+    if(a.y!=b.x)return c;
+    ll x=a.x,y=b.y,z=a.y;
+    c.x=x;c.y=y;
+    for(ll i=0;i<x;i++){
+        for(ll j=0;j<y;j++){
+            c.v[i][j]=0;
+            for(ll k=0;k<z;k++){
+                c.v[i][j]=(c.v[i][j]+a.v[i][k]*b.v[k][j]+mod)%mod;
             }
         }
     }
-    if(deep[t]<inf)return true;
-    else return false;
+    return c;
 }
-
-
-int dfs(int now,int t,int limit){
-    if(!limit||now==t)return limit;
-    
-    int flow=0,f;
-    for(int i=cur[now];i!=-1;i=edge[i].next){
-        cur[now]=i;
-        if(deep[edge[i].to]==deep[now]+1&&(f=dfs(edge[i].to,t,min(limit,edge[i].dis)))){
-            flow+=f;
-            limit-=f;
-            edge[i].dis-=f;
-            edge[i^1].dis+=f;
-            if(!limit)break;
+ll pre(ll step,ll add){
+    ll ans=0;
+    for(ll i=1;i<=step;i++){
+        ll flag=1;
+        for(ll j=1;j<=i;j++){
+            if(j==i){
+                if(add!=s[j])flag=0;
+            }else{
+                if(s[step-i+j]!=s[j])flag=0;
+            }
+        }
+        if(flag)ans=i;
+    }
+    return ans;
+}
+void init(){
+    a.x=a.y=len;
+    ans.x=1,ans.y=len;
+    ans.v[0][0]=1;
+    for(ll i=0;i<=len-1;i++){
+        for(ll j=1;j<=4;j++){
+            a.v[i][pre(i+1,j)]++;
         }
     }
-    return flow;
 }
-void Dinic(int s,int t){
-    while(bfs(s,t))maxflow+=dfs(s,t,inf);
+ll qpow(ll a,ll n){
+    ll ans=1;
+    while(n){
+        if(n&1)ans=(ans*a)%mod;
+        a=(a*a)%mod;
+        n>>=1;
+    }
+    return ans%mod;
 }
 int main(){
-    memset(head,-1,sizeof(head));
-    scanf("%d%d",&m,&n);
-    for(int i=1;i<=m;i++){
-        scanf("%d%d%d",&x,&y,&z);
-        add_edge(x,y,z,1);add_edge(y,x,z,0);
+    cin>>ch>>l;
+    len=strlen(ch);
+    for(ll i=0;i<len;i++){
+        if(ch[i]=='A')s[i+1]=1;
+        else if(ch[i]=='T')s[i+1]=2;
+        else if(ch[i]=='G')s[i+1]=3;
+        else if(ch[i]=='C')s[i+1]=4;
     }
-    Dinic(1,n);
-    printf("%d",maxflow);
+    init();
+    ll cnt=l;
+    while(cnt){
+        if(cnt&1)ans=ans*a;
+        a=a*a;
+        cnt>>=1;
+    }
+    ll sum=0;
+    for(ll i=0;i<len;i++){
+        sum=(sum+ans.v[0][i])%mod;
+    }
+    cout<<(qpow(4,l)-sum+mod)%mod<<endl;
     return 0;
 }
