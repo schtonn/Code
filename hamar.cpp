@@ -1,29 +1,41 @@
 #include "bits/stdc++.h"
 using namespace std;
-int a[100010],n;
-void qs(int l,int r){
-    int i=l,j=r;
-    if(i<j){
-        int p=a[i];
-        while (i!=j){
-            while(j>i&&a[j]>p)--j;
-            a[i]=a[j];
-            while(i<j&&a[i]<=p)++i;
-            a[j]=a[i];
-        }
-        a[i]=p;
-        qs(l,i-1);
-        qs(i+1,r);
+int n,m,t[1000010];
+int lb(int x){return x&-x;}
+void add(int x,int d){
+    while(x<=n){
+        t[x]+=d;
+        x+=lb(x);
     }
 }
-int main(){
-    cin>>n;
-    for(int i=0;i<n;i++){
-        cin>>a[i];
+int sum(int x){
+    int ans=0;
+    while(x){
+        ans+=t[x];
+        x-=lb(x);
     }
-    qs(0,n-1);
-    for(int i=0;i<n;i++){
-        cout<<a[i]<<endl;
+    return ans;
+}
+int main(){
+    ios::sync_with_stdio(0);
+    cin>>n>>m;
+    int a,pre=0;
+    for(int i=1;i<=n;i++){
+        cin>>a;
+        add(i,a-pre);
+        pre=a;
+    }
+    int o,x,y;
+    while(m--){
+        cin>>o;
+        if(!o){
+            cin>>x>>y;
+            add(x,1);
+            add(y+1,-1);
+        }else{
+            cin>>x;
+            cout<<sum(x)<<endl;
+        }
     }
     return 0;
 }
