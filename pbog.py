@@ -134,8 +134,8 @@ class Translate_as_google(object):
         return result
  
 if __name__ == '__main__':
-    langs = ["en","zh-CN","en","fr","ja","ru","de","fr","zh-CN"]
-    text = """a large mainly solitary arboreal ape with long reddish hair, long arms, and hooked hands and feet, native to Borneo and Sumatra. The mature male develops fleshy cheek pads and a throat pouch."""
+    langs = ["en","zh-CN","en","la","ja","ru","de","la","zh-CN"]
+    text = """游之日，风日清和，湖平于熨，时有小舫往来，如蝇头细字，着鹅溪练上。取酒共酌，意致闲淡，亭午风渐劲，湖水汩汩有声。千帆结阵而来，亦甚雄快。日暮，炮车云生，猛风大起，湖浪奔腾，雪山汹涌，震撼城郭。予始四望惨淡，投箸而起，愀然以悲，泫然不能自已也。"""
     print(text+'\n')
     for i in langs:
         ts = Translate_as_google(i)
