@@ -1,8 +1,11 @@
 #include "bits/stdc++.h"
 using namespace std;
 typedef long long ll;
-const ll inf=1145141919810,N=100010,mod=998244353;
+const ll inf=114514,N=1010,mod=998244353;
 ll son[N][2],v[N],rnd[N],s[N],root,t,sum,B;
+ll brand(){
+	return rand()<<16|rand();	
+}
 void update(ll p){
     s[p]=s[son[p][0]]+s[son[p][1]]+1;
 }
@@ -18,7 +21,7 @@ void insert(ll &p,ll vp){
     if(!p){
         p=++t;
         v[p]=vp;
-        rnd[p]=rand();
+        rnd[p]=brand();
         s[p]=1;
         return;
     }
@@ -53,6 +56,7 @@ ll erp(ll p,ll vp){
     else return erp(son[p][1],vp);
 }
 int main(){
+    srand(114514);
     ll n,m,k,rt=0;
     cin>>n>>m>>k;
     for(ll i=1;i<=n;i++){
