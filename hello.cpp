@@ -1,13 +1,13 @@
 #include "bits/stdc++.h"
 using namespace std;
 typedef long long ll;
-const ll inf=114514,N=1010,mod=998244353;
-ll son[N][2],v[N],rnd[N],s[N],root,t,sum,B;
+const ll inf=114514,N=100010,mod=998244353;
+ll son[N][2],v[N],rnd[N],s[N],cnt[N],root,t,sum,B;
 ll brand(){
 	return rand()<<16|rand();	
 }
 void update(ll p){
-    s[p]=s[son[p][0]]+s[son[p][1]]+1;
+    s[p]=s[son[p][0]]+s[son[p][1]]+cnt[p];
 }
 void rotate(ll &p,bool op){
     ll a=son[p][!op];
@@ -23,6 +23,11 @@ void insert(ll &p,ll vp){
         v[p]=vp;
         rnd[p]=brand();
         s[p]=1;
+        cnt[p]=1;
+        return;
+    }
+    if(v[p]==vp){
+        cnt[p]++;
         return;
     }
     s[p]++;
@@ -33,6 +38,10 @@ void insert(ll &p,ll vp){
 void del(ll &p,ll vp){
     if(!p)return;
     if(vp==v[p]){
+        if(cnt[p]>1){
+            cnt[p]--;
+            return;
+        }
         if(son[p][0]&&son[p][1]){
             bool op=rnd[son[p][0]]>rnd[son[p][1]];
             rotate(p,op),del(son[p][op],vp);
