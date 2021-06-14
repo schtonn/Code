@@ -2,19 +2,14 @@
 using namespace std;
 typedef long long ll;
 const ll inf=0x3f3f3f3f3f3f3f3f,N=100010,mod=998244353;
-ll son[N][2],v[N],rnd[N],s[N],cnt[N],root,t,sum,B;
+ll son[N][2],v[N],rnd[N],cnt[N],root,t,sum,B;
 ll brand(){
     return rand()<<16|rand();
-}
-void update(ll p){
-    s[p]=s[son[p][0]]+s[son[p][1]]+cnt[p];
 }
 void rotate(ll &p,bool op){
     ll a=son[p][!op];
     son[p][!op]=son[a][op];
     son[a][op]=p;
-    update(p);
-    update(a);
     p=a;
 }
 void insert(ll &p,ll vp){
@@ -22,16 +17,13 @@ void insert(ll &p,ll vp){
         p=++t;
         v[p]=vp;
         rnd[p]=brand();
-        s[p]=1;
         cnt[p]=1;
         return;
     }
     if(v[p]==vp){
         cnt[p]++;
-        update(p);
         return;
     }
-    s[p]++;
     bool op=vp>v[p];
     insert(son[p][op],vp);
     if(rnd[son[p][op]]>rnd[p])rotate(p,!op);
@@ -41,16 +33,13 @@ void multiInsert(ll &p,ll vp,ll num){
         p=++t;
         v[p]=vp;
         rnd[p]=brand();
-        s[p]=1;
         cnt[p]=num;
         return;
     }
     if(v[p]==vp){
         cnt[p]+=num;
-        update(p);
         return;
     }
-    s[p]++;
     bool op=vp>v[p];
     multiInsert(son[p][op],vp,num);
     if(rnd[son[p][op]]>rnd[p])rotate(p,!op);
@@ -60,7 +49,6 @@ void del(ll &p,ll vp){
     if(vp==v[p]){
         if(cnt[p]>1){
             cnt[p]--;
-            update(p);
             return;
         }
         if(son[p][0]&&son[p][1]){
@@ -73,7 +61,6 @@ void del(ll &p,ll vp){
         }
     }
     else del(son[p][vp>v[p]],vp);
-    update(p);
 }
 ll pre(ll p,ll vp){
     if(!p)return -inf;
