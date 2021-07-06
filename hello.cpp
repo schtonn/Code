@@ -1,22 +1,22 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int N=100010;
+const long long N=1000010;
 
 struct edge{
-    int v,nxt;
+    long long v,nxt;
 }e[N<<2];
-int h[N],tot,n,m,rt=1,a[N];
-void adde(int u,int v){
+long long h[N],tot,n,m,rt=1,a[N];
+void adde(long long u,long long v){
     tot++;
     e[tot].v=v;
     e[tot].nxt=h[u];
     h[u]=tot;
 }
-int f[N],d[N],siz[N],son[N];
-void dfs1(int u){
+long long f[N],d[N],siz[N],son[N];
+void dfs1(long long u){
     siz[u]=1;
-    for(int i=h[u];i;i=e[i].nxt){
-        int v=e[i].v;
+    for(long long i=h[u];i;i=e[i].nxt){
+        long long v=e[i].v;
         if(f[u]==v)continue;
         d[v]=d[u]+1;
         dfs1(v);
@@ -24,16 +24,16 @@ void dfs1(int u){
         if(!son[u]||siz[son[u]]<siz[v])son[u]=v;
     }
 }
-int top[N],dfn[N],rnk[N],btn[N],dtot;
-void dfs2(int u,int ctop){
+long long top[N],dfn[N],rnk[N],btn[N],dtot;
+void dfs2(long long u,long long ctop){
     top[u]=ctop;
     dfn[u]=++dtot;
     rnk[dtot]=u;
     btn[u]=dfn[u]+siz[u]-1;
     if(!son[u])return;
     dfs2(son[u],ctop);
-    for(int i=h[u];i;i=e[i].nxt){
-        int v=e[i].v;
+    for(long long i=h[u];i;i=e[i].nxt){
+        long long v=e[i].v;
         if(v==son[u]||v==f[u])continue;
         dfs2(v,v);
     }
@@ -43,22 +43,22 @@ void dfs2(int u,int ctop){
 #define ls id<<1
 #define rs id<<1|1
 struct node{
-    int l,r,sum,lazy;
+    long long l,r,sum,lazy;
 }t[2*N];
-void update(int id){
+void update(long long id){
     t[id].sum=t[ls].sum+t[rs].sum;
 }
-void pushdown(int id){
+void pushdown(long long id){
     if(t[id].lazy){
         t[ls].lazy+=t[id].lazy;
         t[rs].lazy+=t[id].lazy;
-        int len=(t[id].r-t[id].l+1);
+        long long len=(t[id].r-t[id].l+1);
         t[ls].sum+=t[id].lazy*(len-(len>>1));
         t[rs].sum+=t[id].lazy*(len>>1);
         t[id].lazy=0;
     }
 }
-void buildtree(int id,int l,int r){
+void buildtree(long long id,long long l,long long r){
     t[id].l=l;
     t[id].r=r;
     t[id].lazy=0;
@@ -66,12 +66,12 @@ void buildtree(int id,int l,int r){
         t[id].sum=a[rnk[l]];
         return;
     }
-    int mid=(l+r)>>1;
+    long long mid=(l+r)>>1;
     buildtree(ls,l,mid);
     buildtree(rs,mid+1,r);
     update(id);
 }
-void change(int id,int l,int r,int c){
+void change(long long id,long long l,long long r,long long c){
     if(t[id].l>=l&&t[id].r<=r){
         t[id].lazy+=c;
         t[id].sum+=c*(t[id].r-t[id].l+1);
@@ -86,7 +86,7 @@ void change(int id,int l,int r,int c){
     }
     update(id);
 }
-int query(int id,int l,int r){
+long long query(long long id,long long l,long long r){
     if(t[id].l>=l&&t[id].r<=r){
         return t[id].sum;
     }
@@ -101,7 +101,7 @@ int query(int id,int l,int r){
 
 
 
-void linkChange(int u,int v,int c){
+void linkChange(long long u,long long v,long long c){
     while(top[u]!=top[v]){
         if(d[top[u]]>d[top[v]]){
             change(1,dfn[top[u]],dfn[u],c);
@@ -114,8 +114,8 @@ void linkChange(int u,int v,int c){
     if(dfn[u]>dfn[v])swap(u,v);
     change(1,dfn[u],dfn[v],c);
 }
-int linkQuery(int u,int v){
-    int ret=0;
+long long linkQuery(long long u,long long v){
+    long long ret=0;
     while(top[u]!=top[v]){
         if(d[top[u]]>d[top[v]]){
             ret+=query(1,dfn[top[u]],dfn[u]);
@@ -129,20 +129,21 @@ int linkQuery(int u,int v){
     ret+=query(1,dfn[u],dfn[v]);
     return ret;
 }
-int getson(int u){
-    int v=rt;
-    do{
-        if(f[v]==u)return v;
+long long getson(long long u){
+    long long v=rt;
+    while(top[u]!=top[v]){
+        if(f[top[v]]==u)return top[v];
         if(d[v]<d[u])return 0;
         v=f[top[v]];
-    }while(top[u]!=top[v]);
+    }
+    if(d[v]<d[u])return 0;
     return son[u];
 }
-void treeChange(int u,int c){
+void treeChange(long long u,long long c){
     if(u==rt){
         change(1,1,n,c);
     }else{
-        int v=getson(u);
+        long long v=getson(u);
         if(v){
             change(1,1,n,c);
             change(1,dfn[v],btn[v],-c);
@@ -151,11 +152,11 @@ void treeChange(int u,int c){
         }
     }
 }
-int treeQuery(int u){
+long long treeQuery(long long u){
     if(u==rt){
         return query(1,1,n);
     }else{
-        int v=getson(u);
+        long long v=getson(u);
         if(v){
             return query(1,1,n)-query(1,dfn[v],btn[v]);
         }else{
@@ -168,13 +169,13 @@ int treeQuery(int u){
 
 int main(){
     ios::sync_with_stdio(0);
-    // freopen("tree.in","r",stdin);
-    // freopen("tree.out","w",stdout);
+    freopen("tree.in","r",stdin);
+    freopen("tree.out","w",stdout);
     cin>>n;
-    for(int i=1;i<=n;i++){
+    for(long long i=1;i<=n;i++){
         cin>>a[i];
     }
-    for(int i=2;i<=n;i++){
+    for(long long i=2;i<=n;i++){
         cin>>f[i];
         adde(f[i],i);
     }
@@ -183,8 +184,8 @@ int main(){
     dfs2(1,1);
     buildtree(1,1,n);
     cin>>m;
-    for(int i=1;i<=m;i++){
-        int op,u,v,k;
+    for(long long i=1;i<=m;i++){
+        long long op,u,v,k;
         cin>>op;
         switch(op){
             case 1:
