@@ -1,43 +1,42 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int N=500010;
+const int N=100010;
 
 struct edge{
-	int v,nxt;
+    int v,nxt;
 }e[N<<2];
 int h[N],tot,n,m,rt=1,a[N];
 void adde(int u,int v){
-	tot++;
-	e[tot].v=v;
-	e[tot].nxt=h[u];
-	h[u]=tot;
+    tot++;
+    e[tot].v=v;
+    e[tot].nxt=h[u];
+    h[u]=tot;
 }
-int f[N],d[N],siz[N],s[N];
-inline void dfs1(int u){
-	siz[u]=1;
-	for(int i=h[u];i;i=e[i].nxt){
-		int v=e[i].v;
-		if(f[u]==v)continue;
-		d[v]=d[u]+1;
-		dfs1(v);
-		siz[u]+=siz[v];
-		if(!s[u]||siz[s[u]]<siz[v])s[u]=v;
-	}
+int f[N],d[N],siz[N],son[N];
+void dfs1(int u){
+    siz[u]=1;
+    for(int i=h[u];i;i=e[i].nxt){
+        int v=e[i].v;
+        if(f[u]==v)continue;
+        d[v]=d[u]+1;
+        dfs1(v);
+        siz[u]+=siz[v];
+        if(!son[u]||siz[son[u]]<siz[v])son[u]=v;
+    }
 }
 int top[N],dfn[N],rnk[N],btn[N],dtot;
-inline void dfs2(int u,int ctop){
-	top[u]=ctop;
-	dfn[u]=++dtot;
-	rnk[dtot]=u;
-	btn[u]=dfn[u];
-	if(!s[u])return;
-	dfs2(s[u],ctop);
-	for(int i=h[u];i;i=e[i].nxt){
-		int v=e[i].v;
-		if(v==s[u]||v==f[u])continue;
-		dfs2(v,v);
-		btn[u]=max(btn[u],dfn[v]);
-	}
+void dfs2(int u,int ctop){
+    top[u]=ctop;
+    dfn[u]=++dtot;
+    rnk[dtot]=u;
+    btn[u]=dfn[u]+siz[u]-1;
+    if(!son[u])return;
+    dfs2(son[u],ctop);
+    for(int i=h[u];i;i=e[i].nxt){
+        int v=e[i].v;
+        if(v==son[u]||v==f[u])continue;
+        dfs2(v,v);
+    }
 }
 
 
@@ -102,85 +101,112 @@ int query(int id,int l,int r){
 
 
 
-inline void lchange(int x,int y,int c){
-	while(top[x]!=top[y]){
-		if(d[top[x]]>d[top[y]]){
-			change(1,dfn[top[x]],dfn[x],c);
-			x=f[top[x]];
-		}else{
-			change(1,dfn[top[y]],dfn[y],c);
-			y=f[top[x]];
-		}
-	}
-	if(dfn[x]>dfn[y])swap(x,y);
-	change(1,dfn[x],dfn[y],c);
+void lchange(int x,int y,int c){
+    while(top[x]!=top[y]){
+        if(d[top[x]]>d[top[y]]){
+            change(1,dfn[top[x]],dfn[x],c);
+            x=f[top[x]];
+        }else{
+            change(1,dfn[top[y]],dfn[y],c);
+            y=f[top[y]];
+        }
+    }
+    if(dfn[x]>dfn[y])swap(x,y);
+    change(1,dfn[x],dfn[y],c);
 }
-inline void lquery(int x,int y){
-	int ret=0;
-	while(top[x]!=top[y]){
-		if(d[top[x]]>d[top[y]]){
-			ret+=query(1,dfn[top[x]],dfn[x]);
-			x=f[top[x]];
-		}else{
-			ret+=query(1,dfn[top[y]],dfn[y]);
-			y=f[top[x]];
-		}
-	}
-	if(dfn[x]>dfn[y])swap(x,y);
-	ret+=query(1,dfn[x],dfn[y]);
+int lquery(int x,int y){
+    int ret=0;
+    while(top[x]!=top[y]){
+        if(d[top[x]]>d[top[y]]){
+            ret+=query(1,dfn[top[x]],dfn[x]);
+            x=f[top[x]];
+        }else{
+            ret+=query(1,dfn[top[y]],dfn[y]);
+            y=f[top[y]];
+        }
+    }
+    if(dfn[x]>dfn[y])swap(x,y);
+    ret+=query(1,dfn[x],dfn[y]);
+    return ret;
 }
-inline void tchange(int x,int c){
-	change(1,dfn[x],dfn[btn[x]],c);
+int getson(int x){
+    int ret=0;
+    while(top[x]!=top[rt]){
+        if(f[x]==rt)return x;
+        if(d[x]<d[rt])return 0;
+        x=f[top[x]];
+    }
+    return son[x];
 }
-inline int tquery(int x){
-	return query(1,dfn[x],dfn[btn[x]]);
+void tchange(int x,int c){
+    if(x==rt){
+        change(1,1,n,c);
+    }else{
+        int v=getson(x);
+        if(v){
+            change(1,1,n,c);
+            change(1,dfn[v],btn[v],-c);
+        }else{
+            change(1,dfn[x],btn[x],c);
+        }
+    }
 }
-inline int lca(int x,int y){
-	while(top[x]!=top[y]){
-		if(d[top[x]]>d[top[y]])x=f[top[x]];
-		else y=f[top[y]];
-	}
-	return d[x]<d[y]?x:y;
+int tquery(int x){
+    if(x==rt){
+        return query(1,1,n);
+    }else{
+        int v=getson(x);
+        if(v){
+            return query(1,1,n)-query(1,dfn[v],btn[v]);
+        }else{
+            return query(1,dfn[x],btn[x]);
+        }
+    }
 }
 
 
 
 int main(){
-	ios::sync_with_stdio(0);
-	cin>>n;
-	for(int i=1;i<=n;i++){
-		cin>>a[i];
-	}
-	for(int i=2;i<=n;i++){
-		cin>>f[i];
-		adde(f[i],i);
-	}
-	d[1]=1;
-	dfs1(1);
-	dfs2(1,1);
-	cin>>m;
-	for(int i=1;i<=m;i++){
-		int op,u,v,k;
-		cin>>op;
-		switch(op){
-			case 1:
-				cin>>u;
-				break;
-			case 2:
-				cin>>u>>v>>k;
-				break;
-			case 3:
-				cin>>u>>k;
-				break;
-			case 4:
-				cin>>u>>v;
-				break;
-			case 5:
-				cin>>u;
-				break;
-			default:
-				break;
-		}
-	}
-	return 0;
+    ios::sync_with_stdio(0);
+    // freopen("tree.in","r",stdin);
+    // freopen("tree.out","w",stdout);
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        cin>>a[i];
+    }
+    for(int i=2;i<=n;i++){
+        cin>>f[i];
+        adde(f[i],i);
+    }
+    d[1]=1;
+    dfs1(1);
+    dfs2(1,1);
+    buildtree(1,1,n);
+    cin>>m;
+    for(int i=1;i<=m;i++){
+        int op,u,v,k;
+        cin>>op;
+        switch(op){
+            case 1:
+                cin>>rt;
+                break;
+            case 2:
+                cin>>u>>v>>k;
+                lchange(u,v,k);
+                break;
+            case 3:
+                cin>>u>>k;
+                tchange(u,k);
+                break;
+            case 4:
+                cin>>u>>v;
+                cout<<lquery(u,v)<<endl;
+                break;
+            case 5:
+                cin>>u;
+                cout<<tquery(u)<<endl;
+                break;
+        }
+    }
+    return 0;
 }
