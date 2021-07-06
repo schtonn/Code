@@ -101,65 +101,65 @@ int query(int id,int l,int r){
 
 
 
-void lchange(int x,int y,int c){
-    while(top[x]!=top[y]){
-        if(d[top[x]]>d[top[y]]){
-            change(1,dfn[top[x]],dfn[x],c);
-            x=f[top[x]];
+void linkChange(int u,int v,int c){
+    while(top[u]!=top[v]){
+        if(d[top[u]]>d[top[v]]){
+            change(1,dfn[top[u]],dfn[u],c);
+            u=f[top[u]];
         }else{
-            change(1,dfn[top[y]],dfn[y],c);
-            y=f[top[y]];
+            change(1,dfn[top[v]],dfn[v],c);
+            v=f[top[v]];
         }
     }
-    if(dfn[x]>dfn[y])swap(x,y);
-    change(1,dfn[x],dfn[y],c);
+    if(dfn[u]>dfn[v])swap(u,v);
+    change(1,dfn[u],dfn[v],c);
 }
-int lquery(int x,int y){
+int linkQuery(int u,int v){
     int ret=0;
-    while(top[x]!=top[y]){
-        if(d[top[x]]>d[top[y]]){
-            ret+=query(1,dfn[top[x]],dfn[x]);
-            x=f[top[x]];
+    while(top[u]!=top[v]){
+        if(d[top[u]]>d[top[v]]){
+            ret+=query(1,dfn[top[u]],dfn[u]);
+            u=f[top[u]];
         }else{
-            ret+=query(1,dfn[top[y]],dfn[y]);
-            y=f[top[y]];
+            ret+=query(1,dfn[top[v]],dfn[v]);
+            v=f[top[v]];
         }
     }
-    if(dfn[x]>dfn[y])swap(x,y);
-    ret+=query(1,dfn[x],dfn[y]);
+    if(dfn[u]>dfn[v])swap(u,v);
+    ret+=query(1,dfn[u],dfn[v]);
     return ret;
 }
-int getson(int x){
-    int ret=0;
-    while(top[x]!=top[rt]){
-        if(f[x]==rt)return x;
-        if(d[x]<d[rt])return 0;
-        x=f[top[x]];
-    }
-    return son[x];
+int getson(int u){
+    int v=rt;
+    do{
+        if(f[v]==u)return v;
+        if(d[v]<d[u])return 0;
+        v=f[top[v]];
+    }while(top[u]!=top[v]);
+    return son[u];
 }
-void tchange(int x,int c){
-    if(x==rt){
+void treeChange(int u,int c){
+    if(u==rt){
         change(1,1,n,c);
     }else{
-        int v=getson(x);
+        int v=getson(u);
         if(v){
             change(1,1,n,c);
             change(1,dfn[v],btn[v],-c);
         }else{
-            change(1,dfn[x],btn[x],c);
+            change(1,dfn[u],btn[u],c);
         }
     }
 }
-int tquery(int x){
-    if(x==rt){
+int treeQuery(int u){
+    if(u==rt){
         return query(1,1,n);
     }else{
-        int v=getson(x);
+        int v=getson(u);
         if(v){
             return query(1,1,n)-query(1,dfn[v],btn[v]);
         }else{
-            return query(1,dfn[x],btn[x]);
+            return query(1,dfn[u],btn[u]);
         }
     }
 }
@@ -192,19 +192,19 @@ int main(){
                 break;
             case 2:
                 cin>>u>>v>>k;
-                lchange(u,v,k);
+                linkChange(u,v,k);
                 break;
             case 3:
                 cin>>u>>k;
-                tchange(u,k);
+                treeChange(u,k);
                 break;
             case 4:
                 cin>>u>>v;
-                cout<<lquery(u,v)<<endl;
+                cout<<linkQuery(u,v)<<endl;
                 break;
             case 5:
                 cin>>u;
-                cout<<tquery(u)<<endl;
+                cout<<treeQuery(u)<<endl;
                 break;
         }
     }
