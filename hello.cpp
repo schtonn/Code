@@ -2,56 +2,59 @@
 using namespace std;
 const int N=5001,inf=0x3f3f3f3f;
 int n,m,s,t,tot=1;
-int mn,mx,h[N],dep[N],E[N][N];
-bool vis[N];
+int mn,mx;
+int cd[N],h[N],fd[N],fa[N];
+bool vis[N],E[N][N];
 struct e{
-    int nxt,v,c;
+    int nxt,v,c,f;
 }e[N];
-inline void adde(int u,int v,int c){
+inline void adde(int u,int v,int c,int f){
     e[++tot].nxt=h[u];
     e[tot].v=v;
     e[tot].c=c;
+    e[tot].f=f;
     h[u]=tot;
 }
-int bfs(){
-    memset(dep,0,sizeof(dep)); 
+inline bool spfa(){
     queue<int>q;
-    while(!q.empty())q.pop();
-    dep[s]=1;
+    memset(cd,0x3f,sizeof(cd));
+    memset(vis,0,sizeof(vis));
     q.push(s);
+    cd[s]=0;
+    vis[s]=1;
+    fd[s]=inf;
     while(!q.empty()){
         int u=q.front();
+        cout<<u<<endl;
+        vis[u]=0;
         q.pop();
-        for(int i=h[u];i!=-1;i=e[i].nxt){
-            if(e[i].c>0&&dep[e[i].v]==0){
-                dep[e[i].v]=dep[u]+1;
-                q.push(e[i].v);
+        for(register int i=h[u];i;i=e[i].nxt){
+            if(!e[i].f)continue;
+            int v=e[i].v;
+            if(cd[v]>cd[u]+e[i].c){
+                cd[v]=cd[u]+e[i].c;
+                fd[v]=min(fd[u],e[i].f);
+                fa[v]=i;
+                if(!vis[v])vis[v]=1,q.push(v);
             }
         }
     }
-    return dep[t];
+    if(cd[t]==inf)return 0;
+    return 1;
 }
-int dfs(int u,int f){
-    if(u==t)return f;
-    for(int i=h[u];i!=-1;i=e[i].nxt){
-        int v=e[i].v,c=e[i].c;
-        if((dep[v]==dep[u]+1)&&(c!=0)){
-            int nf=dfs(v,min(f,c));
-            if(nf>0){
-                e[i].c-=nf;
-                e[i^1].c+=nf;
-                return nf;
-            }
+inline void MCMF(){
+    while(spfa()){
+        int x=t;
+        mx+=fd[t];
+        mn+=cd[t];
+        int u;
+        while(x!=s){
+            u=fa[x];
+            e[u].f-=fd[t];
+            e[u^1].f+=fd[t];
+            x=e[u^1].v;
         }
     }
-    return 0;
-}
-int dinic(){
-    int ans=0;
-    while(bfs()){
-        while(int nf=dfs(s,inf))ans+=nf;
-    }
-    return ans;
 }
 map<int,string>is;
 map<string,int>si;
@@ -69,8 +72,8 @@ signed main(){
         string su,sv;
         cin>>su>>sv;
         int u=gets(su),v=gets(sv);
-        adde(u,v,inf);
-        adde(v,u,0);
+        adde(u,v,0,inf);
+        adde(v,u,0,0);
         E[u][v]=E[v][u]=1;
     }
     cin>>m;
@@ -79,8 +82,8 @@ signed main(){
         string su;
         cin>>su;
         int u=gets(su);
-        adde(u,t,1);
-        adde(t,u,0);
+        adde(u,t,0,1);
+        adde(t,u,0,0);
     }
     string ss;
     cin>>ss;
@@ -89,21 +92,29 @@ signed main(){
         E[i][i]=1;
         for(int j=1;j<=cnt;j++){
             if(!E[i][j]){
-                adde(i,j,inf);
-                adde(j,i,inf);
+                adde(i,j,1,inf);
+                adde(j,i,1,inf);
                 E[i][j]=E[j][i]=1;
             }
         }
     }
-    dinic();
+    MCMF();
+    cout<<mn<<' '<<mx<<endl;
     return 0;
 }
 /*
+1
+6 7
 2
-USA EUROP
-EUROPE UK
+6
+7
+1
+
 2
-UK
-EUROPE
-USA
+1 2
+3 4
+2
+3
+4
+1
 */
