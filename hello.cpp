@@ -1,60 +1,109 @@
 #include "bits/stdc++.h"
 using namespace std;
-int n,m,tot,ans,d[4][2]={{1,0},{0,1},{-1,0},{0,-1}};
-struct node{
-    bool a[10][10];
-    bool operator<(const node p)const{
-        for(int i=1;i<=n;i++){
-            for(int j=1;j<=ceil((double)n/2);j++){
-                if(a[i][j]!=p.a[i][j])return a[i][j]<p.a[i][j];
+const int N=5001,inf=0x3f3f3f3f;
+int n,m,s,t,tot=1;
+int mn,mx,h[N],dep[N],E[N][N];
+bool vis[N];
+struct e{
+    int nxt,v,c;
+}e[N];
+inline void adde(int u,int v,int c){
+    e[++tot].nxt=h[u];
+    e[tot].v=v;
+    e[tot].c=c;
+    h[u]=tot;
+}
+int bfs(){
+    memset(dep,0,sizeof(dep)); 
+    queue<int>q;
+    while(!q.empty())q.pop();
+    dep[s]=1;
+    q.push(s);
+    while(!q.empty()){
+        int u=q.front();
+        q.pop();
+        for(int i=h[u];i!=-1;i=e[i].nxt){
+            if(e[i].c>0&&dep[e[i].v]==0){
+                dep[e[i].v]=dep[u]+1;
+                q.push(e[i].v);
             }
         }
-        return a[n][(int)ceil((double)n/2)]<p.a[n][(int)ceil((double)n/2)];
     }
-    void print(){
-        for(int i=1;i<=n;i++){
-            for(int j=1;j<=n;j++){
-                if(j<=ceil((double)n/2))cout<<!a[i][j]<<' ';
-                else cout<<!a[n-i+1][2*(int)ceil((double)n/2)-j-(n%2)+1]<<' ';
+    return dep[t];
+}
+int dfs(int u,int f){
+    if(u==t)return f;
+    for(int i=h[u];i!=-1;i=e[i].nxt){
+        int v=e[i].v,c=e[i].c;
+        if((dep[v]==dep[u]+1)&&(c!=0)){
+            int nf=dfs(v,min(f,c));
+            if(nf>0){
+                e[i].c-=nf;
+                e[i^1].c+=nf;
+                return nf;
             }
-            cout<<endl;
-        }
-        cout<<endl;
-    }
-}k;
-map<node,int>mp;
-bool check(node c){
-    for(int i=1;i<=n;i++){
-        int j=ceil((double)n/2);
-        if(c.a[i][j]!=c.a[n-i+1][j])return 0;
-    }
-    return 1;
-}
-void dfs(node c,int x,int y,int step){
-    if(mp.count(c)||x>n||y>ceil((double)n/2)||x<1||y<1)return;
-    if(check(c))c.print(),ans++;
-    mp[c]=tot++;
-    for(int i=0;i<4;i++){
-        int dx=x+d[i][0],dy=y+d[i][1];
-        int flag=c.a[dx][dy];
-        c.a[dx][dy]=1;
-        dfs(c,dx,dy,step+1);
-        c.a[dx][dy]=flag;
-    }
-}
-int main(){
-    cin>>n;
-    for(int i=1;i<=n;i++){
-        for(int j=1;j<=ceil((double)n/2);j++){
-            k.a[i][j]=0;
         }
     }
-    for(int i=1;i<=n;i++){
-        int j=ceil((double)n/2);
-        k.a[i][j]=1;
-        dfs(k,i,j,0);
-        k.a[i][j]=0;
-    }
-    cout<<ans+1<<endl;
     return 0;
 }
+int dinic(){
+    int ans=0;
+    while(bfs()){
+        while(int nf=dfs(s,inf))ans+=nf;
+    }
+    return ans;
+}
+map<int,string>is;
+map<string,int>si;
+int cnt;
+int gets(string s){
+    if(si.find(s)!=si.end())return si[s];
+    cnt++;
+    is[cnt]=s;
+    si[s]=cnt;
+    return cnt;
+}
+signed main(){
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        string su,sv;
+        cin>>su>>sv;
+        int u=gets(su),v=gets(sv);
+        adde(u,v,inf);
+        adde(v,u,0);
+        E[u][v]=E[v][u]=1;
+    }
+    cin>>m;
+    t=cnt+2;
+    for(int i=1;i<=m;i++){
+        string su;
+        cin>>su;
+        int u=gets(su);
+        adde(u,t,1);
+        adde(t,u,0);
+    }
+    string ss;
+    cin>>ss;
+    s=gets(ss);
+    for(int i=1;i<=cnt;i++){
+        E[i][i]=1;
+        for(int j=1;j<=cnt;j++){
+            if(!E[i][j]){
+                adde(i,j,inf);
+                adde(j,i,inf);
+                E[i][j]=E[j][i]=1;
+            }
+        }
+    }
+    dinic();
+    return 0;
+}
+/*
+2
+USA EUROP
+EUROPE UK
+2
+UK
+EUROPE
+USA
+*/
