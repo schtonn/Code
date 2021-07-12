@@ -1,126 +1,99 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int N=5001,inf=0x3f3f3f3f;
-int n,m,s,t,tot=1,ctot;
-int mn,mx;
-int cd[N],h[N],fd[N],fa[N];
-bool vis[N],E[N][N];
-struct e{
-    int nxt,v,c,f;
-}e[N];
-inline void adde(int u,int v,int c,int f){
-    e[++tot].nxt=h[u];
-    e[tot].v=v;
-    e[tot].c=c;
-    e[tot].f=f;
+const int N=1010;
+int h[N],val[N],ans;
+bool vis[N],vis2[N],a[N];
+struct node{
+    int v,nxt;
+}e[N<<2];
+int tot;
+void add(int u,int v){
+    e[++tot].v=v;
+    e[tot].nxt=h[u];
     h[u]=tot;
 }
-inline bool spfa(){
-    queue<int>q;
-    memset(cd,0x3f3f3f3f,sizeof(cd));
-    memset(vis,0,sizeof(vis));
-    memset(fd,0,sizeof(fd));
-    q.push(s);
-    cd[s]=0;
-    vis[s]=1;
-    fd[s]=inf;
-    while(!q.empty()){
-        int u=q.front();
-        cout<<u<<endl;
-        vis[u]=0;
-        q.pop();
-        for(register int i=h[u];i;i=e[i].nxt){
-            if(!e[i].f)continue;
-            int v=e[i].v,c=e[i].c;
-            if(cd[v]>cd[u]+c){
-                cd[v]=cd[u]+c;
-                fd[v]=min(fd[u],e[i].f);
-                fa[v]=i;
-                if(!vis[v])vis[v]=1,q.push(v);
-            }
-        }
-    }
-    if(cd[t]==inf)return 0;
-    return 1;
-}
-inline void MCMF(){
-    while(spfa()){
-        int x=t;
-        mx+=fd[t];
-        mn+=cd[t];
-        int u;
-        while(x!=s){
-            u=fa[x];
-            if(e[u].c==1){
-                e[u].c=0;
-                e[u^1].c=1;
-            }
-            e[u].f-=fd[t];
-            e[u^1].f+=fd[t];
-            x=e[u^1].v;
-        }
+void dfs(int u){
+    if(vis[u])return;
+    vis[u]=1;
+    for(int i=h[u];i;i=e[i].nxt){
+        dfs(e[i].v);
     }
 }
-map<int,string>is;
+int dfs2(int u){
+    if(vis2[u]||vis[u])return 0;
+    vis2[u]=1;
+    for(int i=h[u];i;i=e[i].nxt){
+        val[u]+=dfs2(e[i].v);
+    }
+    return val[u]+(!vis[u]&&a[u]);
+}
 map<string,int>si;
 int cnt;
 int gets(string s){
     if(si.find(s)!=si.end())return si[s];
     cnt++;
-    is[cnt]=s;
     si[s]=cnt;
     return cnt;
 }
-signed main(){
+bool check(){
+    for(int i=1;i<=cnt;i++)if(a[i]&&!vis[i])return true;
+    return false;
+}
+int main(){
+    // freopen("adapters.in","r",stdin);
+    // freopen("adapters.out","w",stdout);
+    int n,m,s;
     cin>>n;
     for(int i=1;i<=n;i++){
-        string su,sv;
-        cin>>su>>sv;
-        int u=gets(su),v=gets(sv);
-        adde(u,v,0,inf);
-        adde(v,u,0,0);
-        E[u][v]=E[v][u]=1;
+        string uu,vv;
+        cin>>uu>>vv;
+        int u=gets(uu),v=gets(vv);
+        add(u,v);
     }
     cin>>m;
-    t=cnt+2;
     for(int i=1;i<=m;i++){
-        string su;
-        cin>>su;
-        int u=gets(su);
-        adde(u,t,0,1);
-        adde(t,u,0,0);
+        string tt;
+        cin>>tt;
+        a[gets(tt)]=1;
     }
     string ss;
     cin>>ss;
     s=gets(ss);
-    ctot=tot;
-    for(int i=1;i<=cnt;i++){
-        E[i][i]=1;
-        for(int j=1;j<=cnt;j++){
-            if(!E[i][j]){
-                adde(i,j,1,inf);
-                adde(j,i,1,inf);
-                E[i][j]=E[j][i]=1;
+    dfs(s);
+    while(check()){
+        memset(val,0,sizeof(val));
+        memset(vis2,0,sizeof(vis2));
+        int mx=0,id=0;
+        for(int i=1;i<=cnt;i++){
+            dfs2(i);
+            if(val[i]>mx){
+                mx=val[i];
+                id=i;
             }
         }
+        add(s,id);
+        ans++;
+        memset(vis,0,sizeof(vis));
+        dfs(s);
     }
-    MCMF();
-    cout<<mn<<' '<<mx<<endl;
+    cout<<ans<<endl;
     return 0;
 }
 /*
-1
+6
+1 2
+2 3
+3 4
+4 1
+1 5
 6 7
+6
 2
+3
+4
+5
 6
 7
 1
 
-2
-1 2
-3 4
-2
-3
-4
-1
 */
