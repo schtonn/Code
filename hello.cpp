@@ -1,7 +1,7 @@
 #include "bits/stdc++.h"
 using namespace std;
 const int N=5001,inf=0x3f3f3f3f;
-int n,m,s,t,tot=1;
+int n,m,s,t,tot=1,ctot;
 int mn,mx;
 int cd[N],h[N],fd[N],fa[N];
 bool vis[N],E[N][N];
@@ -17,8 +17,9 @@ inline void adde(int u,int v,int c,int f){
 }
 inline bool spfa(){
     queue<int>q;
-    memset(cd,0x3f,sizeof(cd));
+    memset(cd,0x3f3f3f3f,sizeof(cd));
     memset(vis,0,sizeof(vis));
+    memset(fd,0,sizeof(fd));
     q.push(s);
     cd[s]=0;
     vis[s]=1;
@@ -30,9 +31,9 @@ inline bool spfa(){
         q.pop();
         for(register int i=h[u];i;i=e[i].nxt){
             if(!e[i].f)continue;
-            int v=e[i].v;
-            if(cd[v]>cd[u]+e[i].c){
-                cd[v]=cd[u]+e[i].c;
+            int v=e[i].v,c=e[i].c;
+            if(cd[v]>cd[u]+c){
+                cd[v]=cd[u]+c;
                 fd[v]=min(fd[u],e[i].f);
                 fa[v]=i;
                 if(!vis[v])vis[v]=1,q.push(v);
@@ -50,6 +51,10 @@ inline void MCMF(){
         int u;
         while(x!=s){
             u=fa[x];
+            if(e[u].c==1){
+                e[u].c=0;
+                e[u^1].c=1;
+            }
             e[u].f-=fd[t];
             e[u^1].f+=fd[t];
             x=e[u^1].v;
@@ -88,6 +93,7 @@ signed main(){
     string ss;
     cin>>ss;
     s=gets(ss);
+    ctot=tot;
     for(int i=1;i<=cnt;i++){
         E[i][i]=1;
         for(int j=1;j<=cnt;j++){
