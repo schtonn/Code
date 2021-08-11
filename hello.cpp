@@ -1,26 +1,24 @@
-#include<iostream>
-#include<cstring>
-#include<string>
+#include "bits/stdc++.h"
 using namespace std;
-int n,m,p,f[21],con,w[200],ans;
-string name[100],say[200];
+const int N=100;
+string nam[N],s[N];
 string day[10]={"","Today is Sunday.","Today is Monday.","Today is Tuesday.","Today is Wednesday.","Today is Thursday.","Today is Friday.","Today is Saturday.",};
-void set(int u,int k){
+int n,m,p,f[N],con,w[N],ans;
+void g(int u,int k){
     if(f[u]!=-1&&f[u]!=k)con=1;
     else f[u]=k;
 }
 int main(){
     cin>>m>>n>>p;
-    for(int i=1;i<=m;i++)
-        cin>>name[i];
+    for(int i=1;i<=m;i++)cin>>nam[i];
     for(int i=1;i<=p;i++){
-        string nm;
-        cin>>nm;
-        nm.erase(nm.end()-1);
+        string say;
+        cin>>say;
+        say=say.substr(0,say.length()-1);
         for(int j=1;j<=m;j++)
-        if(name[j]==nm)w[i]=j;
-        getline(cin,say[i]);
-        say[i].erase(say[i].begin());
+        if(nam[j]==say)w[i]=j;
+        getline(cin,s[i]);
+        s[i].erase(s[i].begin());
     }
     for(int a=1;a<=7;a++){
         for(int b=1;b<=m;b++){
@@ -28,18 +26,18 @@ int main(){
             memset(f,-1,sizeof(f));
             for(int i=1;i<=p;i++){
                 int u=w[i];
-                if(say[i]=="I am guilty.")set(u,b==u);
-                if(say[i]=="I am not guilty.")set(u,b!=u);
+                if(s[i]=="I am guilty.")g(u,b==u);
+                if(s[i]=="I am not guilty.")g(u,b!=u);
                 for(int j=1;j<=7;j++)
-                if(say[i]==day[j])set(u,j==a);
+                if(s[i]==day[j])g(u,j==a);
                 for(int j=1;j<=m;j++){
-                    if(say[i]==name[j]+" is guilty.")set(u,j==b);
-                    if(say[i]==name[j]+" is not guilty.")set(u,j!=b);
+                    if(s[i]==nam[j]+" is guilty.")g(u,j==b);
+                    if(s[i]==nam[j]+" is not guilty.")g(u,j!=b);
                 }
             }
             int fak=0,neu=0;
             for(int i=1;i<=m;i++){
-                if(f[i]==1)fak++;
+                if(f[i]==0)fak++;
                 if(f[i]==-1)neu++;
             }
             if(!con&&fak<=n&&fak+neu>=n){
@@ -51,6 +49,6 @@ int main(){
         }
     }
     if(!ans)cout<<"Impossible";
-    else cout<<name[ans];
+    else cout<<nam[ans];
     return 0;
 }
