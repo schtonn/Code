@@ -1,7 +1,7 @@
 #include "bits/stdc++.h"
 using namespace std;
 typedef long long ll;
-const ll N=90,mod=998244353;
+const ll N=110,mod=998244353;
 struct matrix{
     ll v[N+2][N+2];
     ll x,y;
@@ -62,18 +62,26 @@ void init(){
     for(ll i=1;i<k;i++){
         t[i].x=n[i+1];
         t[i].y=n[i];
+        for(int j=0;j<t[i].x;j++){
+            for(int k=0;k<t[i].y;k++){
+                t[i].v[j][k]=0;
+            }
+        }
     }
 }
 matrix getI(ll x){
     matrix ret;
     ret.x=ret.y=x;
     for(ll i=0;i<x;i++){
-        ret.v[i][i]=1;
+        for(int j=0;j<x;j++){
+            if(i==j)ret.v[i][j]=1;
+            else ret.v[i][j]=0;
+        }
     }
     return ret;
 }
 ll det(matrix a){
-    ll ret=1,c=1,n=a.x,neg=1;
+    ll ret=1,c=1,n=a.x;
     if(a.x!=a.y)return 0;
     for(ll g=0,h=0;g<n&&h<n;g++,h++){
         ll flag=g;
@@ -92,34 +100,20 @@ ll det(matrix a){
                 ll t1=gcd(abs(a.v[i][h]),abs(a.v[g][h]));
                 ll t2=a.v[g][h]/t1;
                 t1=a.v[i][h]/t1;
-                if(t2<0)neg*=-1;
-                c=(c*abs(t2))%mod;
+                c=(c*t2+mod)%mod;
                 for(ll j=h;j<n;j++){
-                    a.v[i][j]=(((a.v[i][j]*t2)%mod)-((a.v[g][j]*t1)%mod))%mod;
+                    a.v[i][j]=(((a.v[i][j]*t2))-((a.v[g][j]*t1))+mod)%mod;
                 }
             }
         }
-        cout<<a<<endl;
     }
-    for(ll i=1;i<a.x;i++){
+    for(ll i=0;i<a.x;i++){
         ret=(ret*a.v[i][i])%mod;
     }
-    cout<<ret<<' '<<c<<endl;
-    return neg*(ret*(qpow(c,mod-2)%mod))%mod;
+    return (ret*(qpow(c,mod-2)%mod))%mod;
 }
-int pre[4][4]={
-    {1,6,5,4},
-    {7,2,3,11},
-    {8,9,10,12},
-    {16,15,14,13}
-};
-// int pre[4][4]={
-//     {1,6,5,4},
-//     {7,2,3,11},
-//     {8,9,10,12},
-//     {16,15,14,13}
-// };
 int main(){
+    ios::sync_with_stdio(0);
     cin>>T;
     while(T--){
         cin>>k;
@@ -134,18 +128,8 @@ int main(){
                 t[i].v[v-1][u-1]=1;
             }
             f=t[i]*f;
-            cout<<f<<endl;
         }
-        cout<<det(f)<<"GGG"<<endl;
+        cout<<(det(f)+mod)%mod<<endl;
     }
-    matrix y;
-    y.x=y.y=4;
-    for(int i=0;i<4;i++){
-        for(int j=0;j<4;j++){
-            y.v[i][j]=pre[i][j];
-        }
-    }
-    cout<<y<<endl;
-    cout<<det(y)<<endl;
     return 0;
 }
