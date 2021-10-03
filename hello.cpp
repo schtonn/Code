@@ -1,65 +1,86 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int N=2e7+5;
-int r,c,n,f[N],ans=0;
-const int dx[]={1,0,-1,0,1,1,-1,-1};
-const int dy[]={0,1,0,-1,1,-1,1,-1};
-bool a[3005][6005];
-int find(int x){
-    return x==f[x]?x:f[x]=find(f[x]);
+const int N=100010;
+struct node{
+    int v,nxt;
+}e[N<<2];
+int h[N],tot,kksk;
+void adde(int u,int v){
+    tot++;
+    e[tot].v=v;
+    e[tot].nxt=h[u];
+    h[u]=tot;
 }
-int id(int x,int y){
-    return(x-1)*c*2+y;
+int n,m,q,a[N],s[N],f[N],g[N];
+
+void dfs1(int fa,int u,int k){
+    int mx=0;
+    for(int i=h[u];i;i=e[i].nxt){
+        int v=e[i].v;
+        if(v==fa)continue;
+        dfs1(u,v,k);
+        f[u]+=max(0,f[v]-k)+(!a[v]);
+    }
 }
-bool ok(int&x,int&y){
-    if(y==0)y=c*2;
-    else if(y==c*2+1)y=1;
-    return(x>0&&x<=r&&a[x][y]);
-}
-bool can(int x,int y){
-    int x_=x,y_=y+c;
-    for(int i=0;i<8;i++){
-        int X=x+dx[i],Y=y+dy[i];
-        if(!ok(X,Y))continue;
-        for(int j=0;j<8;j++){
-            int X_=x_+dx[j],Y_=y_+dy[j];
-            if(!ok(X_,Y_))continue;
-            if(find(id(X,Y))==find(id(X_,Y_))){return 0;}
+void dfs2(int fa,int u){
+    for(int i=h[u];i;i=e[i].nxt){
+        int v=e[i].v;
+        if(v==fa)continue;
+        int l=-1,r=100010,fv=f[v],fu=f[u];
+        while(l<r){
+            int k=(l+r)>>1;
+            int c=fu-max(0,fv-g[u]+1)-(!a[v]);
+            f[v]=fv+max(0,c-k)+(!a[u]);
+//            cout<<u<<' '<<v<<' '<<fu<<' '<<fv<<' '<<g[u]<<' '<<c<<' '<<f[v]<<endl;
+            if(f[v]>k)l=k+1;
+            else r=k;
         }
+        g[v]=l;
+        dfs2(u,v);
     }
-    return 1;
-}
-void merge(int a,int b){
-    int x=find(a),y=find(b);
-    f[x]=y;
-}
-void del(int x,int y){
-    int x_=x,y_=y+c;
-    for(int i=0;i<8;i++){
-        int X=x+dx[i],Y=y+dy[i];
-        if(ok(X,Y))merge(id(x,y),id(X,Y));
-        int X_=x_+dx[i],Y_=y_+dy[i];
-        if(ok(X_,Y_))merge(id(x_,y_),id(X_,Y_));
-    }
-    a[x][y]=1;
-    a[x_][y_]=1;
 }
 int main(){
-    cin>>r>>c>>n;
-    if(c==1){
-        cout<<0<<endl;
-        return 0;   
+    // freopen("query.in","r",stdin);
+    // freopen("query.out","w",stdout);
+    cin>>n;
+    for(int i=1;i<n;i++){
+        int u,v;
+        cin>>u>>v;
+        adde(u,v);
+        adde(v,u);
     }
-    for(int i=1;i<=r;i++){
-        for(int j=1;j<=c*2;j++){
-            f[id(i,j)]=id(i,j);
+    for(int i=1;i<=n;i++){
+        cin>>a[i];
+        if(!a[i])kksk=1;
+    }
+    int l=-1,r=100010;
+    while(l<r){
+        int mid=(l+r)>>1;
+        memset(f,0,sizeof(f));
+        dfs1(1,1,mid);
+        if(f[1]>mid)l=mid+1;
+        else r=mid;
+    }
+    g[1]=l;
+    dfs2(1,1);
+    // for(int i=1;i<=n;i++){
+    //     cout<<g[i]<<' '<<f[i]<<endl;
+    // }
+    cin>>m;
+    int mx=0;
+    for(int i=1;i<=m;i++)cin>>s[i],mx=max(mx,g[s[i]]);
+    cin>>q;
+    if(!kksk){
+        for(int i=1;i<=q;i++){
+            cout<<"No"<<endl;
         }
+        return 0;
     }
-    while(n--){
-        int x,y;
-        cin>>x>>y;
-        if(can(x,y))del(x,y),ans++;
+    for(int i=1;i<=q;i++){
+        int k;
+        cin>>k;
+        if(k<mx)cout<<"Yes"<<endl;
+        else cout<<"No"<<endl;
     }
-    printf("%d\n",ans);
     return 0;
 }
