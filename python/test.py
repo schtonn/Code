@@ -1,49 +1,141 @@
+import speech_recognition as sr
+import pyaudio
+import wave
+import msvcrt
+import requests
+import json
+import execjs 
+from urllib import parse
 import pyttsx3
-msg = '''今天我，寒夜里看雪飘过
-​
-怀着冷却了的心窝漂远方
-​
-风雨里追赶，雾里分不清影踪
-​
-天空海阔你与我
-​
-可会变（谁没在变）
-​
-多少次，迎着冷眼与嘲笑
-​
-从没有放弃过心中的理想
-​
-一刹那恍惚， 若有所失的感觉
-​
-不知不觉已变淡
-​
-心里爱（谁明白我）
-​
-原谅我这一生不羁放纵爱自由
-​
-也会怕有一天会跌倒
-​
-背弃了理想 ，谁人都可以
-​
-哪会怕有一天只你共我
-'''
 
-engine = pyttsx3.init()
-volume = engine.getProperty('volume')
+class Py4Js():
+    def __init__(self):
+        self.ctx = execjs.compile(""" 
+        function TL(a) { 
+        var k = ""; 
+        var b = 406644; 
+        var b1 = 3293161072; 
+        var jd = "."; 
+        var $b = "+-a^+6"; 
+        var Zb = "+-3^+b+-f"; 
+        for (var e = [], f = 0, g = 0; g < a.length; g++) { 
+            var m = a.charCodeAt(g); 
+            128 > m ? e[f++] = m : (2048 > m ? e[f++] = m >> 6 | 192 : (55296 == (m & 64512) && g + 1 < a.length && 56320 == (a.charCodeAt(g + 1) & 64512) ? (m = 65536 + ((m & 1023) << 10) + (a.charCodeAt(++g) & 1023), 
+            e[f++] = m >> 18 | 240, 
+            e[f++] = m >> 12 & 63 | 128) : e[f++] = m >> 12 | 224, 
+            e[f++] = m >> 6 & 63 | 128), 
+            e[f++] = m & 63 | 128) 
+        } 
+        a = b; 
+        for (f = 0; f < e.length; f++) a += e[f], 
+        a = RL(a, $b); 
+        a = RL(a, Zb); 
+        a ^= b1 || 0; 
+        0 > a && (a = (a & 2147483647) + 2147483648); 
+        a %= 1E6; 
+        return a.toString() + jd + (a ^ b) 
+    }; 
+    function RL(a, b) { 
+        var t = "a"; 
+        var Yb = "+"; 
+        for (var c = 0; c < b.length - 2; c += 3) { 
+            var d = b.charAt(c + 2), 
+            d = d >= t ? d.charCodeAt(0) - 87 : Number(d), 
+            d = b.charAt(c + 1) == Yb ? a >>> d: a << d; 
+            a = b.charAt(c) == Yb ? a + d & 4294967295 : a ^ d 
+        } 
+        return a 
+    } 
+    """)
 
-# 标准的粤语发音
-voices = engine.setProperty(
-      'voice', "com.apple.speech.synthesis.voice.sin-ji")
+    def getTk(self, text):
+        return self.ctx.call("TL", text)
+class Translate_as_google(object):
+    def __init__(self, to_language, this_language='auto', read=False):
+        '''
+            to_language:要翻译成的语言
+            this_language:要转换的文字,默认为auto自动
+            read:在指定位置生成text的朗读文件
+        '''
+        self.this_language = this_language
+        self.to_language = to_language
+        self.read = read
+ 
+    def open_url(self, url):
+        '''请求'''
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
+        req = requests.get(url=url, headers=headers , timeout=8)
+ 
+        return req
+ 
+    def buildUrl(self):
+        '''封装请求url
+            sl:要转换的文字 tl:转换的结果类型 q要输入的文字'''
+        baseUrl = 'http://translate.google.cn/translate_a/single'
+        baseUrl += '?client=webapp&'
+        baseUrl += 'sl=%s&' % self.this_language
+        baseUrl += 'tl=%s&' % self.to_language
+        baseUrl += 'hl=zh-CN&'
+        baseUrl += 'dt=at&'
+        baseUrl += 'dt=bd&'
+        baseUrl += 'dt=ex&'
+        baseUrl += 'dt=ld&'
+        baseUrl += 'dt=md&'
+        baseUrl += 'dt=qca&'
+        baseUrl += 'dt=rw&'
+        baseUrl += 'dt=rm&'
+        baseUrl += 'dt=ss&'
+        baseUrl += 'dt=t&'
+        baseUrl += 'ie=UTF-8&'
+        baseUrl += 'oe=UTF-8&'
+        baseUrl += 'clearbtn=1&'
+        baseUrl += 'otf=1&'
+        baseUrl += 'pc=1&'
+        baseUrl += 'srcrom=0&'
+        baseUrl += 'ssel=0&'
+        baseUrl += 'tsel=0&'
+        baseUrl += 'kc=2&'
+        baseUrl += 'tk=' + str(self.tk) + '&'
+        baseUrl += 'q=' + parse.quote(self.text)
+        return baseUrl
+ 
+    def read_go(self, args):
+        '''朗读截取
+        upload:下载到路径及文件名称
+        return_language:返回的语言类型
+        '''
+        upload, return_language = args[0], args[1]
+        read_translate_url = 'http://translate.google.cn/translate_tts?ie=UTF-8&q=%s&tl=%s&total=1&idx=0&textlen=3&tk=%s&client=webapp&prev=input' % (
+            self.text, return_language, self.tk)
+        data = self.open_url(read_translate_url) #请求的返回所有数据
+        with open(upload, 'wb') as f:
+            f.write(data.content)
+ 
+    def translate(self,text):
+        '''翻译截取'''
+        self.text = text
+        js = Py4Js()
+        self.tk = js.getTk(self.text)
+ 
+        if len(self.text) > 4891:
+            raise ("翻译的长度超过限制！！！")
+        url = self.buildUrl()
+        # print(url)
+        _result = self.open_url(url)
+        data = _result.content.decode('utf-8')
+ 
+        tmp = json.loads(data)
+        jsonArray = tmp[0]
+        result = None
+        for jsonItem in jsonArray:
+            if jsonItem[0]:
+                if result:
+                    result = result + " " + jsonItem[0]
+                else:
+                    result = jsonItem[0]
+        return result
 
-# 普通话发音
-# voices = engine.setProperty(
-#     'voice', "com.apple.speech.synthesis.voice.ting-ting.premium")
 
-# 台湾甜美女生普通话发音
-# voices = engine.setProperty(  
-#     'voice', "com.apple.speech.synthesis.voice.mei-jia")
-print('准备开始语音播报...')
-# 输入语音播报词语
-engine.setProperty('volume', 0.7)
-engine.say(msg)
-engine.runAndWait()
+ts=Translate_as_google("en-US")
+ts.translate("你好")
+print(ts)

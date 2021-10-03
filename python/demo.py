@@ -60,45 +60,45 @@ class Translate_as_google(object):
         self.this_language = this_language
         self.to_language = to_language
         self.read = read
- 
+
     def open_url(self, url):
         '''请求'''
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
+        headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36 QIHU 360SE'}
         req = requests.get(url=url, headers=headers , timeout=8)
- 
+
         return req
- 
+
     def buildUrl(self):
         '''封装请求url
             sl:要转换的文字 tl:转换的结果类型 q要输入的文字'''
-        baseUrl = 'http://translate.google.cn/translate_a/single'
+        baseUrl = 'http://translate.google.cn/'
         baseUrl += '?client=webapp&'
         baseUrl += 'sl=%s&' % self.this_language
         baseUrl += 'tl=%s&' % self.to_language
         baseUrl += 'hl=zh-CN&'
-        baseUrl += 'dt=at&'
-        baseUrl += 'dt=bd&'
-        baseUrl += 'dt=ex&'
-        baseUrl += 'dt=ld&'
-        baseUrl += 'dt=md&'
-        baseUrl += 'dt=qca&'
-        baseUrl += 'dt=rw&'
-        baseUrl += 'dt=rm&'
-        baseUrl += 'dt=ss&'
-        baseUrl += 'dt=t&'
-        baseUrl += 'ie=UTF-8&'
-        baseUrl += 'oe=UTF-8&'
-        baseUrl += 'clearbtn=1&'
-        baseUrl += 'otf=1&'
-        baseUrl += 'pc=1&'
-        baseUrl += 'srcrom=0&'
-        baseUrl += 'ssel=0&'
-        baseUrl += 'tsel=0&'
-        baseUrl += 'kc=2&'
-        baseUrl += 'tk=' + str(self.tk) + '&'
+        # baseUrl += 'dt=at&'
+        # baseUrl += 'dt=bd&'
+        # baseUrl += 'dt=ex&'
+        # baseUrl += 'dt=ld&'
+        # baseUrl += 'dt=md&'
+        # baseUrl += 'dt=qca&'
+        # baseUrl += 'dt=rw&'
+        # baseUrl += 'dt=rm&'
+        # baseUrl += 'dt=ss&'
+        # baseUrl += 'dt=t&'
+        # baseUrl += 'ie=UTF-8&'
+        # baseUrl += 'oe=UTF-8&'
+        # baseUrl += 'clearbtn=1&'
+        # baseUrl += 'otf=1&'
+        # baseUrl += 'pc=1&'
+        # baseUrl += 'srcrom=0&'
+        # baseUrl += 'ssel=0&'
+        # baseUrl += 'tsel=0&'
+        # baseUrl += 'kc=2&'
+        # baseUrl += 'tk=' + str(self.tk) + '&'
         baseUrl += 'q=' + parse.quote(self.text)
         return baseUrl
- 
+
     def read_go(self, args):
         '''朗读截取
         upload:下载到路径及文件名称
@@ -110,20 +110,20 @@ class Translate_as_google(object):
         data = self.open_url(read_translate_url) #请求的返回所有数据
         with open(upload, 'wb') as f:
             f.write(data.content)
- 
+
     def translate(self,text):
         '''翻译截取'''
         self.text = text
         js = Py4Js()
         self.tk = js.getTk(self.text)
- 
+
         if len(self.text) > 4891:
             raise ("翻译的长度超过限制！！！")
         url = self.buildUrl()
         # print(url)
         _result = self.open_url(url)
         data = _result.content.decode('utf-8')
- 
+
         tmp = json.loads(data)
         jsonArray = tmp[0]
         result = None
@@ -166,7 +166,7 @@ test=sr.AudioFile('./test1.wav')
 with test as source:
     audio=r.record(source)
 type(audio)
-result=r.recognize_google(audio,language='zh-CN', show_all=True)['alternative']
+result=r.recognize_google(audio,language='en', show_all=True)['alternative']
 
 for i in result:
     text=i['transcript']
