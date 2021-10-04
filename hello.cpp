@@ -1,86 +1,124 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int N=100010;
 struct node{
-    int v,nxt;
-}e[N<<2];
-int h[N],tot,kksk;
-void adde(int u,int v){
-    tot++;
-    e[tot].v=v;
-    e[tot].nxt=h[u];
-    h[u]=tot;
+	int v,ran,l,r,siz,cnt;
+}t[1000010];
+int n,q,rt,tot,c[10];
+int brand(){
+	int ret=0;
+	ret=(ret<<15)|(rand()&0x7fff);
+	ret=(ret<<15)|(rand()&0x7fff);
+	return ret;
 }
-int n,m,q,a[N],s[N],f[N],g[N];
-
-void dfs1(int fa,int u,int k){
-    int mx=0;
-    for(int i=h[u];i;i=e[i].nxt){
-        int v=e[i].v;
-        if(v==fa)continue;
-        dfs1(u,v,k);
-        f[u]+=max(0,f[v]-k)+(!a[v]);
-    }
+stack<int>st;
+int getnode(int v,int c){
+	int ret;
+	if(!st.empty())ret=st.top(),st.pop();
+	else ret=++tot;
+	t[ret].v=v;
+	t[ret].ran=brand();
+	t[ret].l=t[ret].r=0;
+	t[ret].siz=t[ret].cnt=c;
+	return ret;
 }
-void dfs2(int fa,int u){
-    for(int i=h[u];i;i=e[i].nxt){
-        int v=e[i].v;
-        if(v==fa)continue;
-        int l=-1,r=100010,fv=f[v],fu=f[u];
-        while(l<r){
-            int k=(l+r)>>1;
-            int c=fu-max(0,fv-g[u]+1)-(!a[v]);
-            f[v]=fv+max(0,c-k)+(!a[u]);
-//            cout<<u<<' '<<v<<' '<<fu<<' '<<fv<<' '<<g[u]<<' '<<c<<' '<<f[v]<<endl;
-            if(f[v]>k)l=k+1;
-            else r=k;
-        }
-        g[v]=l;
-        dfs2(u,v);
-    }
+void remove(int p){
+	if(!p)return;
+	st.push(p);
+	if(t[p].l)remove(t[p].l);
+	if(t[p].r)remove(t[p].r);
+	t[p].l=t[p].r=0;
+}
+void update(int p){
+	if(!p)return;
+	t[p].siz=t[t[p].l].siz+t[t[p].r].siz+t[p].cnt;
+}
+int merge(int L,int R){
+	if(L==0||R==0)return max(L,R);
+	if(t[L].ran<t[R].ran){
+		t[L].r=merge(t[L].r,R);
+		update(L);
+		return L;
+	}else{
+		t[R].l=merge(L,t[R].l);
+		update(R);
+		return R;
+	}
+}
+void splits(int p,int s,int &L,int &R){
+	if(!p){L=R=0;return;}
+	if(t[t[p].l].siz+t[p].cnt<=s){
+		L=p;
+		splits(t[p].r,s-t[t[p].l].siz-t[p].cnt,t[p].r,R);
+	}else if(t[t[p].l].siz+1<=s){
+		int q=getnode(t[p].v,t[p].cnt-s+t[t[p].l].siz);
+		t[p].cnt=s-t[t[p].l].siz;
+		int pl=t[p].l,pr=t[p].r;
+		t[p].l=t[p].r=0;
+		L=merge(pl,p);
+		R=merge(q,pr);
+	}else{
+		R=p;
+		splits(t[p].l,s,L,t[p].l);
+	}
+	update(p);
+}
+void count(int p){
+	if(!p)return;
+	c[t[p].v]+=t[p].cnt;
+	count(t[p].l);
+	count(t[p].r);
+}
+int solve(int p){
+	if(!p)return 0;
+	memset(c,0,sizeof(c));
+	count(p);
+	remove(p);
+	int ret=0;
+	for(int i=0;i<7;i++){
+		if(c[i]/2)ret=merge(ret,getnode(i,c[i]/2));
+	}
+	for(int i=0;i<7;i++){
+		if(c[i]&1){
+			ret=merge(ret,getnode(i,1));
+			break;
+		}
+	}
+	for(int i=6;i>=0;i--){
+		if(c[i]/2)ret=merge(ret,getnode(i,c[i]/2));
+	}
+	return ret;
+}
+void print(int p){
+	if(!p)return;
+	print(t[p].l);
+	for(int i=1;i<=t[p].cnt;i++)cout<<(char)(t[p].v+'a');
+	print(t[p].r);
 }
 int main(){
-    // freopen("query.in","r",stdin);
-    // freopen("query.out","w",stdout);
-    cin>>n;
-    for(int i=1;i<n;i++){
-        int u,v;
-        cin>>u>>v;
-        adde(u,v);
-        adde(v,u);
-    }
-    for(int i=1;i<=n;i++){
-        cin>>a[i];
-        if(!a[i])kksk=1;
-    }
-    int l=-1,r=100010;
-    while(l<r){
-        int mid=(l+r)>>1;
-        memset(f,0,sizeof(f));
-        dfs1(1,1,mid);
-        if(f[1]>mid)l=mid+1;
-        else r=mid;
-    }
-    g[1]=l;
-    dfs2(1,1);
-    // for(int i=1;i<=n;i++){
-    //     cout<<g[i]<<' '<<f[i]<<endl;
-    // }
-    cin>>m;
-    int mx=0;
-    for(int i=1;i<=m;i++)cin>>s[i],mx=max(mx,g[s[i]]);
-    cin>>q;
-    if(!kksk){
-        for(int i=1;i<=q;i++){
-            cout<<"No"<<endl;
-        }
-        return 0;
-    }
-    for(int i=1;i<=q;i++){
-        int k;
-        cin>>k;
-        if(k<mx)cout<<"Yes"<<endl;
-        else cout<<"No"<<endl;
-    }
-    return 0;
+	srand(114514);
+	cin>>n;
+	string s;
+	cin>>s;
+	int cnt=0;
+	for(int i=1;i<=n;i++){
+		cnt++;
+		if(s[i]!=s[i-1]){
+			rt=merge(rt,getnode(s[i-1]-'a',cnt));
+			cnt=0;
+		}
+	}
+	cin>>q;
+	while(q--){
+		int l,r;
+		cin>>l>>r;
+		l=min(l,t[rt].siz);
+		r=min(r,t[rt].siz);
+		int x,y,z;
+		splits(rt,l-1,x,y);
+		splits(y,r-l+1,y,z);
+		y=solve(y);
+		rt=merge(merge(x,y),z);
+	}
+	print(rt);
+	return 0;
 }
