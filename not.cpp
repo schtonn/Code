@@ -35,8 +35,7 @@ int main(){
 			s.insert(p,c[j]/2,j+'a');
 			p+=c[j]/2;
 		}
-        cout<<s<<endl;
 	}
-	cerr<<s<<' '<<s.length()<<endl;
+	cout<<s<<endl;
 	return 0;
 }
