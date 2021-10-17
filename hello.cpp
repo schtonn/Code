@@ -1,50 +1,112 @@
-#include "bits/stdc++.h"
+#include<iostream>
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
 using namespace std;
-const long long p=1e9+7,N=100010;
-long long n,m,ans[N];
-struct node{
-    int v,c,nxt;
-}e[N<<2];
-int tot,h[N],d[N],siz[N],mx,mxd;
-void adde(int u,int v,int c){
-    tot++;
-    e[tot].v=v;
-    e[tot].c=c;
-    e[tot].nxt=h[u];
-    h[u]=tot;
-}
-void dfs(int u,int f){
-    for(int i=h[u];i;i=e[i].nxt){
-        int v=e[i].v;
-        if(v==f)continue;
-        d[v]=d[u]+e[i].c;
-        if(d[v]>mx)mxd=v,mx=d[v];
-        dfs(v,u);
+const int MOD=65521;
+const int MM=800;
+const int RSIZE=128;
+const int MATRIX_SIZE=256;
+class Matrix{
+public:
+    unsigned int s[MATRIX_SIZE][MATRIX_SIZE];
+};
+long long n;
+int m,M;
+int tt[MM][RSIZE],fr[MM][RSIZE];
+int*cur[MM],*curFr[MM];
+int tc[MM],nc[MM];
+Matrix tm,ans,tmpm;
+bool mark[MM],canReach[MM];
+int remap[MM],who[MM];
+void dfs(int cp,int cl,int nl){
+    if(cp>m)return;
+    if(cp==m){
+        *(cur[cl]++)=nl;
+        *(curFr[nl]++)=cl;
+        return;
+    }
+    dfs(cp+1,cl*3+1,nl*3);
+    dfs(cp+1,cl*3+2,nl*3+1);
+    dfs(cp+2,cl*3*3+1,nl*3*3+3+1);
+    dfs(cp+3,cl*3*3*3,nl*3*3*3+9+3+1);
+    dfs(cp+4,cl*3*3*3*3,nl*3*3*3*3+27+9+3);
+    dfs(cp+2,cl*3*3,nl*3*3+1);
+    dfs(cp+2,cl*3*3,nl*3*3+3);
+    if(cp>0&&nl%3==0)dfs(cp+1,cl*3,nl*3+3+1);
+    dfs(cp+2,cl*3*3+1,nl*3*3+3*2+1);
+    dfs(cp+3,cl*3*3*3,nl*3*3*3+9*2+3+1);
+    dfs(cp+4,cl*3*3*3*3,nl*3*3*3*3+27*2+9+3);
+    dfs(cp+3,cl*3*3*3,nl*3*3*3+3);
+    if(cp>0&&nl%3==0)dfs(cp+1,cl*3,nl*3+3+2);
+    if(cp>0&&nl%3==0){
+        dfs(cp+2,cl*3*3+1,nl*3*3+9+3+1);
+        dfs(cp+3,cl*3*3*3,nl*3*3*3+27+9+3+1);
+        dfs(cp+4,cl*3*3*3*3,nl*3*3*3*3+81+27*2+9+3);
     }
 }
-void dfs2(int u,int f){
-    for(int i=h[u];i;i=e[i].nxt){
-        int v=e[i].v;
-        if(v==f)continue;
-        dfs2(v,u);
-        siz[u]+=siz[v];
-    }
+void goto0(int x){
+    if(canReach[x])return;
+    canReach[x]=true;
+    for(int*pp=fr[x];pp<curFr[x];++pp)goto0(*pp);
 }
-int main(){ 
-    cin>>n;
-    ans[0]=1;
-    for(long long i=1;i<=n;i++){
-        ans[i]=(i-1)*(ans[i-1]+ans[i-2])%p;
+int ccnt=0;
+void go(int x){
+    if(!canReach[x])return;
+    if(mark[x])return;
+    who[ccnt]=x;
+    remap[x]=ccnt++;
+    mark[x]=true;
+    for(int*pp=tt[x];pp<cur[x];++pp)go(*pp);
+}
+void init(){
+    memset(tt,0,sizeof(tt));
+    for(int i=0;i<M;++i){
+        cur[i]=tt[i];
+        curFr[i]=fr[i];
     }
-    for(int i=1;i<n;i++){
-        int u,v,c;
-        cin>>u>>v>>c;
-        adde(u,v,c);
-        adde(v,u,c);
+    dfs(0,0,0);
+    int maxR=0;
+    for(int i=0;i<M;++i)if(cur[i]-tt[i]>maxR)maxR=cur[i]-tt[i];
+    maxR=0;
+    for(int i=0;i<M;++i)if(curFr[i]-fr[i]>maxR)maxR=curFr[i]-fr[i];
+    memset(canReach,0,sizeof(canReach));
+    goto0(0);
+    memset(mark,0,sizeof(mark));
+    go(0);
+    memset(&tm,0,sizeof(tm));
+    for(int i=0;i<M;++i)if(mark[i])for(int*pp=tt[i];pp<cur[i];++pp)if(mark[*pp])tm.s[remap[i]][remap[*pp]]++;
+}
+void matrixMul(Matrix&ans,const Matrix&a,const Matrix&b){
+    for(int i=0;i<ccnt;++i)for(int j=0;j<ccnt;++j){
+            long long r=0;	
+            const unsigned int*ai=a.s[i];
+            for(int k=0;k<ccnt;++k)r+=ai[k]*b.s[k][j];
+            r%=MOD;
+            ans.s[i][j]=r;
+        }
+}
+long long work(){
+    long long cur=1;
+    memset(&ans,0,sizeof(ans));
+    for(int i=0;i<ccnt;++i)ans.s[i][i]=1;
+    while(n){
+        if(n&cur){
+            matrixMul(tmpm,ans,tm);
+            ans=tmpm;
+            n-=cur;
+        }
+        matrixMul(tmpm,tm,tm);
+        tm=tmpm;
+        cur*=2;
     }
-    dfs(1,1);
-    cout<<mxd<<' '<<mx<<endl;
-    dfs(mxd,mxd);
-    cout<<mxd<<' '<<mx<<endl;
+    return ans.s[0][0];
+}
+int main(){
+    cin>>n>>m;
+    M=1;
+    for(int i=0;i<m;++i)M*=3;
+    init();
+    cout<<work()<<endl;
     return 0;
 }
