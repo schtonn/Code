@@ -1,4 +1,4 @@
-## The False Cause Fallacy (*Master*)
+## The False Cause Fallacy
 
 ---
 
@@ -109,5 +109,3 @@ And you can draw the mind map down here:
 &nbsp;
 
 &nbsp;
-
-<font size=1 face="Consolas">~~I like you very much, you're so masterful♥~~</font>
