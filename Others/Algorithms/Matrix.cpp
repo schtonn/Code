@@ -1,16 +1,16 @@
 #include "bits/stdc++.h"
 using namespace std;
-const int N=90;
-int m,n;
+const long long N=90,mod=10000000000;
+long long m,n;
 struct matrix{
-    int v[N+2][N+2];
-    int x,y;
+    long long v[N+2][N+2];
+    long long x,y;
 }t,I,ans;
-int pre[N+2];
+long long pre[N+2];
 ostream&operator<<(ostream&ous,matrix a){
-    for(int i=0;i<a.x;i++){
-        for(int j=0;j<a.y;j++){
-            ous<<a.v[i][j]<<' ';
+    for(long long i=0;i<a.x;i++){
+        for(long long j=0;j<a.y;j++){
+            ous<<a.v[i][j]%mod<<' ';
         }
         ous<<endl;
     }
@@ -19,12 +19,12 @@ ostream&operator<<(ostream&ous,matrix a){
 matrix operator+(matrix a,matrix b){
     matrix c;
     if(a.x!=b.x||a.y!=b.y)return c;
-    int x=a.x,y=a.y;
+    long long x=a.x,y=a.y;
     c.x=x;
     c.y=y;
-    for(int i=0;i<x;i++){
-        for(int j=0;j<y;j++){
-            c.v[i][j]=(a.v[i][j]+b.v[i][j]);
+    for(long long i=0;i<x;i++){
+        for(long long j=0;j<y;j++){
+            c.v[i][j]=(a.v[i][j]+b.v[i][j])%mod;
         }
     }
     return c;
@@ -32,14 +32,14 @@ matrix operator+(matrix a,matrix b){
 matrix operator*(matrix a,matrix b){
     matrix c;
     if(a.y!=b.x)return c;
-    int x=a.x,y=b.y,z=a.y;
+    long long x=a.x,y=b.y,z=a.y;
     c.x=x;
     c.y=y;
-    for(int i=0;i<x;i++){
-        for(int j=0;j<y;j++){
+    for(long long i=0;i<x;i++){
+        for(long long j=0;j<y;j++){
             c.v[i][j]=0;
-            for(int k=0;k<z;k++){
-                c.v[i][j]=(c.v[i][j]+a.v[i][k]*b.v[k][j]);
+            for(long long k=0;k<z;k++){
+                c.v[i][j]=(c.v[i][j]+(a.v[i][k]*b.v[k][j]%mod))%mod;
             }
         }
     }
@@ -54,7 +54,7 @@ void init(){
 int main(){
     cin>>m;
     init();
-    int cnt=m;
+    long long cnt=m;
     ans=I;
     while(cnt){
         if(cnt&1)ans=ans*t;

@@ -1,93 +1,77 @@
 #include "bits/stdc++.h"
-#define N 350000
 using namespace std;
-const double pi=3.141592653589793238462643383279502884197;
-char a[N>>1],b[N>>1];
-double ar[N],av[N],br[N],bv[N];
-int i,la,lb,lans,l;
-int ans[N>>1];
-void dswap(double&x,double&y){double t=x;x=y;y=t;}
-int rev(int x,int len){
-    int ret=0;
-    for(int i=1;i<=len;i++){
-        ret<<=1;
-        ret|=x&1;
-        x>>=1;
-    }
-    return ret;
+int l[3],d[3][100],pos[100][2];
+long long pw[100],ans;
+void pop(int x){
+//	cout<<"P"<<x<<endl;
+	for(int i=0;i<l[x];i++)d[x][i]=d[x][i+1],pos[d[x][i]][1]=i;
+	l[x]--;
 }
-void FFT(double*ar,double*av,int n,int flag){
-    int lgn=log((double)n)/log((double)2);
-    for(int i=0;i<=n-1;i++){
-        int j=rev(i,lgn);
-        if(j>i){
-            dswap(ar[i],ar[j]);
-            dswap(av[i],av[j]);
-        }
-    }
-    for(int s=1;s<=lgn;s++){
-        int m=(1<<s);
-        double wrP=cos(2*pi/m),wvP=sin(2*pi/m);
-        if(flag)wvP=-wvP;
-        for(i=0;i<n;i+=m){
-            double wr=1.0,wv=0.0;
-            for(int j=0;j<=m/2-1;j++){
-                int p=i+j+m/2;
-                double tr=wr*ar[p]-wv*av[p];
-                double tv=wr*av[p]+wv*ar[p];
-                double ur=ar[i+j],uv=av[i+j];
-                ar[i+j]=ur+tr;
-                av[i+j]=uv+tv;
-                ar[p]=ur-tr;
-                av[p]=uv-tv;
-                double trP=wr*wrP-wv*wvP;
-                double tvP=wr*wvP+wv*wrP;
-                wr=trP;
-                wv=tvP;
-            }
-        }
-    }
+void push(int x,int p){
+//	cout<<"U"<<x<<' '<<p<<endl;
+	for(int i=l[x];i>0;i--)d[x][i]=d[x][i-1],pos[d[x][i]][1]=i;
+	d[x][0]=p;
+	pos[p][0]=x;
+	pos[p][1]=0;
+	l[x]++;
 }
-void clean(){
-    memset(ans,0,sizeof(ans));
-    memset(ar,0,sizeof(ar));
-    memset(av,0,sizeof(av));
-    memset(br,0,sizeof(br));
-    memset(bv,0,sizeof(bv));
+int get(int a,int b){
+	for(int i=0;i<3;i++)if(i!=a&&i!=b)return i;
+	return 0;
 }
-void work(){
-    la=strlen(a);
-    lb=strlen(b);
-    l=1;
-    int lmax=max(la,lb);
-    while(l<lmax)l<<=1;
-    l<<=1;
-    for(int i=0;i<=l-1;i++){
-        if(i<la)ar[i]=(double)a[la-i-1]-'0';
-        if(i<lb)br[i]=(double)b[lb-i-1]-'0';
-        av[i]=bv[i]=0.0;
-    }
-    FFT(ar,av,l,0);
-    FFT(br,bv,l,0);
-    for(int i=0;i<=l-1;i++){
-        double r=ar[i]*br[i]-av[i]*bv[i];
-        double v=ar[i]*bv[i]+av[i]*br[i];
-        ar[i]=r;av[i]=v;
-    }
-    FFT(ar,av,l,1);
-    for(int i=0;i<=l-1;i++){ar[i]/=l;av[i]/=l;}
-    for(int i=0;i<=l-1;i++)ans[i]=(int)(ar[i]+0.5);
-    for(int i=0;i<=l-1;i++)ans[i+1]+=ans[i]/10,ans[i]%=10;
-    lans=la+lb+2;
-    while(ans[lans]==0&&lans>0)lans--;
-    for(int i=lans;i>=0;i--)printf("%d",ans[i]);
-    printf("\n");
+void mvstack(int v,int p){
+//	cout<<"S"<<v<<' '<<p<<endl;
+	int u=pos[v][0],n=pos[v][1]+1;
+	stack<int>s;
+	for(int i=1;i<=n;i++)s.push(d[u][0]),pop(u);
+	while(!s.empty())push(p,s.top()),s.pop();
+	ans+=pw[n]-1;
+}
+void mv(int v,int p){
+//	cout<<v<<">>"<<p+1<<endl;
+	if(v==0)getchar();
+	int u=pos[v][0];
+	if(u==p)return;
+	int q=get(u,p);
+	int flag=1;
+	while(flag){
+		flag=0;
+		while(pos[v][1]!=0){
+			flag=1;
+			if(d[q][0]>d[u][pos[v][1]-1]){
+				mvstack(d[u][pos[v][1]-1],q);
+			}
+			else mv(d[u][pos[v][1]-1],q);
+		}
+		while(d[p][0]&&d[p][0]<v){
+			flag=1;
+			int g=0;
+			while(d[p][g]&&d[p][g]<v)g++;
+			if(d[q][0]>d[p][g-1]||!d[q][0]){
+				mvstack(d[p][g-1],q);
+			}
+			else mv(d[p][g-1],q);
+		}
+	}
+	pop(u);
+	push(p,v);
+	ans++;
+	return;
 }
 int main(){
-    while(true){
-        cin>>a>>b;
-        clean();
-        work();
-    }
-    return 0;
+	for(int i=0;i<3;i++)cin>>l[i];
+	for(int i=0;i<3;i++){
+		for(int j=0;j<l[i];j++){
+			cin>>d[i][j];
+			pos[d[i][j]][0]=i;
+			pos[d[i][j]][1]=j;
+		}
+	}
+	pw[0]=1;
+	for(int i=1;i<=70;i++)pw[i]=pw[i-1]*2;
+	for(int i=l[0]+l[1]+l[2];i>0;i--){
+		mv(i,2);
+	}
+	cout<<ans<<endl;
+	return 0;
 }
