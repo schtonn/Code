@@ -1,112 +1,66 @@
-#include<iostream>
-#include<cstdlib>
-#include<cstdio>
-#include<cstring>
+#include "bits/stdc++.h"
 using namespace std;
-const int MOD=65521;
-const int MM=800;
-const int RSIZE=128;
-const int MATRIX_SIZE=256;
-class Matrix{
-public:
-    unsigned int s[MATRIX_SIZE][MATRIX_SIZE];
+typedef long long ll;
+inline ll read(){
+    ll x=0,f=1;
+    char c=getchar();
+    while(c<'0' || c>'9')c=getchar();
+    while(c<='9' && c>='0')x=x*10+c-'0',c=getchar();
+    return x*f;
+}
+const ll m1=11;
+const ll m2=m1*2+2;
+const ll m3=m2;
+ll n;
+struct Matrix{
+    ll a[3][3];
+    Matrix(){memset(a,0,sizeof a);}
+    Matrix operator+(const Matrix & p)const{
+        Matrix ret;
+        for(ll i=0;i<=1;++i)
+            for(ll j=0;j<=1;++j)
+                for(ll k=0;k<=1;++k)
+                    ret.a[i][j]=(ret.a[i][j]+a[i][k]*p.a[k][j])%m1;
+        return ret;
+    }
 };
-long long n;
-int m,M;
-int tt[MM][RSIZE],fr[MM][RSIZE];
-int*cur[MM],*curFr[MM];
-int tc[MM],nc[MM];
-Matrix tm,ans,tmpm;
-bool mark[MM],canReach[MM];
-int remap[MM],who[MM];
-void dfs(int cp,int cl,int nl){
-    if(cp>m)return;
-    if(cp==m){
-        *(cur[cl]++)=nl;
-        *(curFr[nl]++)=cl;
-        return;
+ll get1(ll x){
+    Matrix p,q;
+    p.a[0][0]=1;p.a[0][1]=1;p.a[1][0]=1;
+    q.a[0][1]=1;//,q.a[1][1]=1;
+    for(;x;x>>=1,p=p+p)
+        if(x & 1)q=q+p;
+    return q.a[0][0];
+}
+char s[1000007];
+struct bign{
+    ll z[1000007],l;
+    void init(){
+        memset(z,0,sizeof(z));
+        cin>>s+1;
+        l=strlen(s+1);
+        for(ll i=1;i<=l;i++)
+            z[i]=s[l-i+1]-'0';
     }
-    dfs(cp+1,cl*3+1,nl*3);
-    dfs(cp+1,cl*3+2,nl*3+1);
-    dfs(cp+2,cl*3*3+1,nl*3*3+3+1);
-    dfs(cp+3,cl*3*3*3,nl*3*3*3+9+3+1);
-    dfs(cp+4,cl*3*3*3*3,nl*3*3*3*3+27+9+3);
-    dfs(cp+2,cl*3*3,nl*3*3+1);
-    dfs(cp+2,cl*3*3,nl*3*3+3);
-    if(cp>0&&nl%3==0)dfs(cp+1,cl*3,nl*3+3+1);
-    dfs(cp+2,cl*3*3+1,nl*3*3+3*2+1);
-    dfs(cp+3,cl*3*3*3,nl*3*3*3+9*2+3+1);
-    dfs(cp+4,cl*3*3*3*3,nl*3*3*3*3+27*2+9+3);
-    dfs(cp+3,cl*3*3*3,nl*3*3*3+3);
-    if(cp>0&&nl%3==0)dfs(cp+1,cl*3,nl*3+3+2);
-    if(cp>0&&nl%3==0){
-        dfs(cp+2,cl*3*3+1,nl*3*3+9+3+1);
-        dfs(cp+3,cl*3*3*3,nl*3*3*3+27+9+3+1);
-        dfs(cp+4,cl*3*3*3*3,nl*3*3*3*3+81+27*2+9+3);
+    ll operator %(const long long & a)const{
+        ll b=0;
+        for(ll i=l;i>=1;i--)
+            b=(b*10+z[i])% a;
+        return b;
     }
-}
-void goto0(int x){
-    if(canReach[x])return;
-    canReach[x]=true;
-    for(int*pp=fr[x];pp<curFr[x];++pp)goto0(*pp);
-}
-int ccnt=0;
-void go(int x){
-    if(!canReach[x])return;
-    if(mark[x])return;
-    who[ccnt]=x;
-    remap[x]=ccnt++;
-    mark[x]=true;
-    for(int*pp=tt[x];pp<cur[x];++pp)go(*pp);
-}
-void init(){
-    memset(tt,0,sizeof(tt));
-    for(int i=0;i<M;++i){
-        cur[i]=tt[i];
-        curFr[i]=fr[i];
-    }
-    dfs(0,0,0);
-    int maxR=0;
-    for(int i=0;i<M;++i)if(cur[i]-tt[i]>maxR)maxR=cur[i]-tt[i];
-    maxR=0;
-    for(int i=0;i<M;++i)if(curFr[i]-fr[i]>maxR)maxR=curFr[i]-fr[i];
-    memset(canReach,0,sizeof(canReach));
-    goto0(0);
-    memset(mark,0,sizeof(mark));
-    go(0);
-    memset(&tm,0,sizeof(tm));
-    for(int i=0;i<M;++i)if(mark[i])for(int*pp=tt[i];pp<cur[i];++pp)if(mark[*pp])tm.s[remap[i]][remap[*pp]]++;
-}
-void matrixMul(Matrix&ans,const Matrix&a,const Matrix&b){
-    for(int i=0;i<ccnt;++i)for(int j=0;j<ccnt;++j){
-            long long r=0;	
-            const unsigned int*ai=a.s[i];
-            for(int k=0;k<ccnt;++k)r+=ai[k]*b.s[k][j];
-            r%=MOD;
-            ans.s[i][j]=r;
-        }
-}
-long long work(){
-    long long cur=1;
-    memset(&ans,0,sizeof(ans));
-    for(int i=0;i<ccnt;++i)ans.s[i][i]=1;
-    while(n){
-        if(n&cur){
-            matrixMul(tmpm,ans,tm);
-            ans=tmpm;
-            n-=cur;
-        }
-        matrixMul(tmpm,tm,tm);
-        tm=tmpm;
-        cur*=2;
-    }
-    return ans.s[0][0];
-}
+}z;
 int main(){
-    cin>>n>>m;
-    M=1;
-    for(int i=0;i<m;++i)M*=3;
-    init();
-    cout<<work()<<endl;
+    ll t=read();
+    bign num;
+    while(t--){
+        num.init();
+        n=num%10000;
+//		n=num%m3;
+        printf("%lld\n",get1(n));
+    }
     return 0;
 }
+/*
+https://zhuanlan.zhihu.com/p/166123245
+http://t.zoukankan.com/sssy-p-9418732.html
+*/
